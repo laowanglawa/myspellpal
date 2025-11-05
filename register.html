@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>单词记忆系统 - 注册</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind 配置 -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#4F46E5',
+                        secondary: '#7C3AED',
+                        accent: '#8B5CF6',
+                        success: '#10B981',
+                        warning: '#F59E0B',
+                        danger: '#EF4444',
+                        info: '#3B82F6',
+                        dark: {
+                            primary: '#4F46E5',
+                            secondary: '#7C3AED',
+                            bg: '#111827',
+                            card: '#1F2937',
+                            text: '#F3F4F6',
+                        },
+                    },
+                    fontFamily: {
+                        inter: ['Inter', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'glow': '0 0 15px rgba(79, 70, 229, 0.5)',
+                        'glow-dark': '0 0 15px rgba(124, 58, 237, 0.5)',
+                    },
+                },
+            }
+        }
+    </script>
+    
+    <!-- 自定义工具类 -->
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .text-shadow {
+                text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            }
+            .text-shadow-dark {
+                text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            }
+            .bg-gradient-custom {
+                background-image: linear-gradient(135deg, #4F46E5, #7C3AED);
+            }
+            .bg-gradient-custom-dark {
+                background-image: linear-gradient(135deg, #4F46E5, #8B5CF6);
+            }
+        }
+    </style>
+    
+    <style>
+        /* 动画效果 */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        /* 平滑过渡 */
+        body {
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        
+        /* 输入框聚焦效果 */
+        .form-input:focus {
+            transition: all 0.3s ease;
+        }
+    </style>
+</head>
+<body class="font-inter bg-gray-50 dark:bg-dark-bg text-gray-900 dark:text-dark-text min-h-screen flex items-center justify-center p-4">
+    <div class="max-w-md w-full space-y-8 bg-white dark:bg-dark-card p-8 rounded-2xl shadow-lg animate-fade-in">
+        <!-- 标题区域 -->
+        <div class="text-center">
+            <h2 class="text-[clamp(1.5rem,3vw,2rem)] font-bold text-gray-900 dark:text-dark-text">
+                创建新账号
+            </h2>
+            <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
+                加入我们的单词记忆系统，开始您的学习之旅
+            </p>
+        </div>
+        
+        <!-- 注册表单 -->
+        <form id="registerForm" class="mt-8 space-y-6">
+            <!-- 用户名输入框 -->
+            <div class="rounded-md -space-y-px">
+                <div>
+                    <label for="username" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        用户名
+                    </label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fa fa-user text-gray-400"></i>
+                        </div>
+                        <input id="username" name="username" type="text" required
+                            class="form-input rounded-lg block w-full pl-10 pr-3 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-dark-card text-gray-900 dark:text-dark-text placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary dark:focus:ring-dark-primary dark:focus:border-dark-primary"
+                            placeholder="请输入用户名">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 邮箱输入框 -->
+            <div class="rounded-md -space-y-px">
+                <div>
+                    <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        邮箱地址
+                    </label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fa fa-envelope text-gray-400"></i>
+                        </div>
+                        <input id="email" name="email" type="email" required
+                            class="form-input rounded-lg block w-full pl-10 pr-3 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-dark-card text-gray-900 dark:text-dark-text placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary dark:focus:ring-dark-primary dark:focus:border-dark-primary"
+                            placeholder="请输入邮箱地址">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 密码输入框 -->
+            <div class="rounded-md -space-y-px">
+                <div>
+                    <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        密码
+                    </label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fa fa-lock text-gray-400"></i>
+                        </div>
+                        <input id="password" name="password" type="password" required
+                            class="form-input rounded-lg block w-full pl-10 pr-10 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-dark-card text-gray-900 dark:text-dark-text placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary dark:focus:ring-dark-primary dark:focus:border-dark-primary"
+                            placeholder="请设置密码">
+                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
+                            <button type="button" id="togglePassword" class="text-gray-400 hover:text-gray-500 focus:outline-none">
+                                <i class="fa fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                        密码至少包含6个字符，建议使用字母、数字和特殊符号的组合
+                    </p>
+                </div>
+            </div>
+            
+            <!-- 确认密码输入框 -->
+            <div class="rounded-md -space-y-px">
+                <div>
+                    <label for="confirmPassword" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        确认密码
+                    </label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fa fa-lock text-gray-400"></i>
+                        </div>
+                        <input id="confirmPassword" name="confirmPassword" type="password" required
+                            class="form-input rounded-lg block w-full pl-10 pr-3 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-dark-card text-gray-900 dark:text-dark-text placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary dark:focus:ring-dark-primary dark:focus:border-dark-primary"
+                            placeholder="请再次输入密码">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 注册按钮 -->
+            <div>
+                <button type="submit" 
+                    class="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-gradient-custom hover:bg-gradient-to-br hover:from-primary hover:to-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary dark:focus:ring-dark-primary transition-all duration-300 hover:shadow-glow dark:hover:shadow-glow-dark">
+                    <span class="absolute left-0 inset-y-0 flex items-center pl-3">
+                        <i class="fa fa-user-plus"></i>
+                    </span>
+                    注册账号
+                </button>
+            </div>
+        </form>
+        
+        <!-- 返回登录 -->
+        <div class="text-center">
+            <p class="text-sm text-gray-600 dark:text-gray-400">
+                已有账号？ <a href="login.html" class="font-medium text-primary hover:text-secondary dark:text-dark-primary dark:hover:text-dark-secondary transition-colors">
+                    返回登录
+                </a>
+            </p>
+        </div>
+    </div>
+    
+    <!-- 成功提示模态框 -->
+    <div id="successModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white dark:bg-dark-card p-6 rounded-lg shadow-xl max-w-md w-full mx-4">
+            <div class="text-center">
+                <div class="w-16 h-16 bg-success bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fa fa-check text-2xl text-success"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-900 dark:text-dark-text mb-2">注册成功！</h3>
+                <p class="text-gray-600 dark:text-gray-400 mb-6">您的账号已创建成功，即将跳转到登录页面...</p>
+                <button id="closeSuccessModal" class="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors">
+                    确定
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // 密码显示/隐藏功能
+        const togglePassword = document.getElementById('togglePassword');
+        const password = document.getElementById('password');
+        
+        togglePassword.addEventListener('click', function() {
+            // 切换密码输入框的类型
+            const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+            password.setAttribute('type', type);
+            
+            // 切换图标
+            this.querySelector('i').classList.toggle('fa-eye');
+            this.querySelector('i').classList.toggle('fa-eye-slash');
+        });
+        
+        // 表单提交处理
+        const registerForm = document.getElementById('registerForm');
+        const successModal = document.getElementById('successModal');
+        const closeSuccessModal = document.getElementById('closeSuccessModal');
+        
+        registerForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+            
+            // 获取表单数据
+            const username = document.getElementById('username').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            
+            // 简单的表单验证
+            if (!username || !email || !password || !confirmPassword) {
+                alert('请填写所有必填字段');
+                return;
+            }
+            
+            // 验证密码是否一致
+            if (password !== confirmPassword) {
+                alert('两次输入的密码不一致');
+                return;
+            }
+            
+            // 验证密码长度
+            if (password.length < 6) {
+                alert('密码长度至少为6个字符');
+                return;
+            }
+            
+            // 模拟注册成功（实际应用中应该发送到服务器）
+            console.log('注册信息:', { username, email, password });
+            
+            // 使用localStorage保存注册信息
+            // 获取现有用户列表，如果不存在则创建空数组
+            const users = JSON.parse(localStorage.getItem('registeredUsers')) || [];
+            
+            // 检查用户名是否已存在
+            const userExists = users.some(user => user.username === username);
+            if (userExists) {
+                alert('用户名已存在，请选择其他用户名');
+                return;
+            }
+            
+            // 添加新用户
+            users.push({ username, email, password });
+            
+            // 保存到localStorage
+            localStorage.setItem('registeredUsers', JSON.stringify(users));
+            
+            // 显示成功提示
+            successModal.classList.remove('hidden');
+            
+            // 3秒后自动跳转到登录页面
+            setTimeout(() => {
+                window.location.href = 'login.html';
+            }, 3000);
+        });
+        
+        // 关闭成功提示
+        closeSuccessModal.addEventListener('click', function() {
+            successModal.classList.add('hidden');
+            window.location.href = 'login.html';
+        });
+        
+        // 支持深色模式检测
+        function checkDarkMode() {
+            if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                document.documentElement.classList.add('dark');
+            }
+        }
+        
+        // 初始化检查深色模式
+        checkDarkMode();
+        
+        // 监听深色模式变化
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', checkDarkMode);
+    </script>
+</body>
+</html>
