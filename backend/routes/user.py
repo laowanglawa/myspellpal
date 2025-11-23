@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
-from ..models.user import User
-from ..app import db
+from models.user import User
+from app import db
 
 # 创建蓝图
 user_bp = Blueprint('user', __name__)

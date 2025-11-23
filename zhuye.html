@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WordMaster - 首页</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    
+    <!-- Tailwind 配置 -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3B82F6',
+                        secondary: '#10B981',
+                        warning: '#F59E0B',
+                        danger: '#EF4444',
+                        dark: '#1E293B',
+                        light: '#F8FAFC'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .card-hover {
+                @apply transition-all duration-300 hover:shadow-lg hover:-translate-y-1;
+            }
+            .btn-primary {
+                @apply bg-primary text-white font-medium py-2 px-6 rounded-lg transition-all duration-300 hover:bg-primary/90 hover:shadow-md active:scale-95;
+            }
+            .btn-secondary {
+                @apply bg-secondary text-white font-medium py-2 px-6 rounded-lg transition-all duration-300 hover:bg-secondary/90 hover:shadow-md active:scale-95;
+            }
+            .btn-outline {
+                @apply border border-gray-300 bg-white text-gray-700 font-medium py-2 px-6 rounded-lg transition-all duration-300 hover:bg-gray-50 hover:shadow-md active:scale-95;
+            }
+            
+            /* 暗色模式下的按钮样式 */
+            .dark .btn-outline {
+                @apply border border-gray-700 bg-gray-800 text-gray-200 hover:bg-gray-700;
+            }
+            .input-focus {
+                @apply focus:ring-2 focus:ring-primary/50 focus:border-primary focus:outline-none;
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-gray-900 dark:to-gray-800 text-dark dark:text-white">
+    <!-- 导航栏 -->
+    <nav class="bg-white dark:bg-gray-800 shadow-md fixed w-full top-0 z-50 transition-all duration-300">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <i class="fa fa-book text-primary text-2xl"></i>
+                <h1 class="text-xl font-bold text-primary">WordMaster</h1>
+            </div>
+            <div class="flex items-center space-x-4">
+                <button id="themeToggle" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                    <i class="fa fa-moon-o text-xl"></i>
+                </button>
+                <div class="flex items-center">
+                    <div class="mr-2 text-sm font-medium" id="currentUsername">Guest</div>
+                    <button id="settingsBtn" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                        <i class="fa fa-cog text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主要内容 -->
+    <main class="container mx-auto px-4 pt-24 pb-16 max-w-4xl">
+        <!-- 欢迎区域 -->
+        <div class="text-center mb-12">
+            <h2 class="text-3xl md:text-4xl font-bold mb-4">欢迎回来，<span id="welcomeUsername">学习者</span>！</h2>
+            <p class="text-gray-500 dark:text-gray-400 max-w-xl mx-auto">
+                今天你想要如何提升你的词汇量？选择背诵或默写模式开始你的学习之旅。
+            </p>
+        </div>
+
+        <!-- 统计概览 -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-12">
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-6 card-hover">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-gray-500 dark:text-gray-400 font-medium">总学习单词</h3>
+                    <div class="w-10 h-10 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
+                        <i class="fa fa-book text-primary"></i>
+                    </div>
+                </div>
+                <p id="totalLearnedWords" class="text-3xl font-bold">0</p>
+                <p class="text-sm text-green-600 dark:text-green-400 mt-1">
+                    <i class="fa fa-arrow-up mr-1"></i> 较昨日 +5%
+                </p>
+            </div>
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-6 card-hover">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-gray-500 dark:text-gray-400 font-medium">今日学习</h3>
+                    <div class="w-10 h-10 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center">
+                        <i class="fa fa-calendar-check-o text-secondary"></i>
+                    </div>
+                </div>
+                <p id="todayLearnedWords" class="text-3xl font-bold">0</p>
+                <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mt-2">
+                    <div class="bg-secondary h-2 rounded-full" style="width: 40%"></div>
+                </div>
+                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">目标进度: 4/10</p>
+            </div>
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-6 card-hover">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-gray-500 dark:text-gray-400 font-medium">学习连续天数</h3>
+                    <div class="w-10 h-10 bg-purple-100 dark:bg-purple-900 rounded-full flex items-center justify-center">
+                        <i class="fa fa-fire text-purple-600"></i>
+                    </div>
+                </div>
+                <p id="streakDays" class="text-3xl font-bold">3</p>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                    <i class="fa fa-calendar mr-1"></i> 已连续学习3天
+                </p>
+            </div>
+        </div>
+
+        <!-- 主要功能卡片 -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+            <!-- 背诵模式卡片 -->
+            <div class="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-xl shadow-lg p-8 card-hover relative overflow-hidden">
+                <!-- 装饰元素 -->
+                <div class="absolute -top-16 -right-16 w-32 h-32 bg-blue-200 dark:bg-blue-800/30 rounded-full opacity-50"></div>
+                
+                <div class="relative z-10">
+                    <div class="w-16 h-16 mx-auto bg-primary/20 dark:bg-primary/30 rounded-full flex items-center justify-center mb-6">
+                        <i class="fa fa-volume-up text-primary text-3xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-center mb-4">单词背诵</h3>
+                    <p class="text-gray-600 dark:text-gray-300 text-center mb-8">
+                        通过听、看、读的方式快速记忆单词，适合初期学习和巩固。
+                    </p>
+                    <div class="space-y-2 mb-6">
+                        <div class="flex items-center text-sm text-gray-500 dark:text-gray-400">
+                            <i class="fa fa-check-circle text-green-500 mr-2"></i>
+                            支持语音播放和自动切换
+                        </div>
+                        <div class="flex items-center text-sm text-gray-500 dark:text-gray-400">
+                            <i class="fa fa-check-circle text-green-500 mr-2"></i>
+                            提供单词音标和例句
+                        </div>
+                        <div class="flex items-center text-sm text-gray-500 dark:text-gray-400">
+                            <i class="fa fa-check-circle text-green-500 mr-2"></i>
+                            可按难度分级学习
+                        </div>
+                    </div>
+                    <button id="reciteModeBtn" class="w-full py-3 bg-primary text-white rounded-lg font-medium shadow transition-all hover:shadow-lg hover:bg-primary/90">
+                        开始背诵
+                    </button>
+                </div>
+            </div>
+
+            <!-- 默写模式卡片 -->
+            <div class="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-xl shadow-lg p-8 card-hover relative overflow-hidden">
+                <!-- 装饰元素 -->
+                <div class="absolute -top-16 -right-16 w-32 h-32 bg-green-200 dark:bg-green-800/30 rounded-full opacity-50"></div>
+                
+                <div class="relative z-10">
+                    <div class="w-16 h-16 mx-auto bg-secondary/20 dark:bg-secondary/30 rounded-full flex items-center justify-center mb-6">
+                        <i class="fa fa-pencil text-secondary text-3xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-center mb-4">单词默写</h3>
+                    <p class="text-gray-600 dark:text-gray-300 text-center mb-8">
+                        通过默写测试记忆效果，实时反馈，提高记忆效率。
+                    </p>
+                    <div class="space-y-2 mb-6">
+                        <div class="flex items-center text-sm text-gray-500 dark:text-gray-400">
+                            <i class="fa fa-check-circle text-green-500 mr-2"></i>
+                            实时检查答案并反馈
+                        </div>
+                        <div class="flex items-center text-sm text-gray-500 dark:text-gray-400">
+                            <i class="fa fa-check-circle text-green-500 mr-2"></i>
+                            记录错误单词便于复习
+                        </div>
+                        <div class="flex items-center text-sm text-gray-500 dark:text-gray-400">
+                            <i class="fa fa-check-circle text-green-500 mr-2"></i>
+                            提供练习统计和历史记录
+                        </div>
+                    </div>
+                    <button id="memorizeModeBtn" class="w-full py-3 bg-secondary text-white rounded-lg font-medium shadow transition-all hover:shadow-lg hover:bg-secondary/90">
+                        开始默写
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 最近学习记录 -->
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-6 mb-8">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="font-bold text-lg">最近学习记录</h3>
+                <button class="text-primary hover:text-primary/80 text-sm font-medium">查看全部</button>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="min-w-full">
+                    <thead>
+                        <tr class="text-left text-gray-500 dark:text-gray-400 text-sm border-b border-gray-200 dark:border-gray-700">
+                            <th class="pb-3 font-medium">日期</th>
+                            <th class="pb-3 font-medium">模式</th>
+                            <th class="pb-3 font-medium">单词数</th>
+                            <th class="pb-3 font-medium">正确率</th>
+                            <th class="pb-3 font-medium">用时</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recentActivity">
+                        <!-- 记录将通过JS动态生成 -->
+                        <tr>
+                            <td colspan="5" class="py-8 text-center text-gray-500 dark:text-gray-400">
+                                暂无学习记录
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 学习建议 -->
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-6">
+            <div class="flex items-center mb-4">
+                <i class="fa fa-lightbulb-o text-warning text-xl mr-3"></i>
+                <h3 class="font-bold text-lg">学习建议</h3>
+            </div>
+            <div class="space-y-3">
+                <div class="flex items-start">
+                    <div class="w-6 h-6 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center text-primary mr-3 mt-0.5">1</div>
+                    <p class="text-gray-600 dark:text-gray-300 text-sm">建议每天坚持15-20分钟的单词学习，保持学习连续性。</p>
+                </div>
+                <div class="flex items-start">
+                    <div class="w-6 h-6 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center text-primary mr-3 mt-0.5">2</div>
+                    <p class="text-gray-600 dark:text-gray-300 text-sm">结合背诵和默写模式，先背诵后默写，效果更佳。</p>
+                </div>
+                <div class="flex items-start">
+                    <div class="w-6 h-6 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center text-primary mr-3 mt-0.5">3</div>
+                    <p class="text-gray-600 dark:text-gray-300 text-sm">定期复习已学单词，巩固记忆，避免遗忘。</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="bg-white dark:bg-gray-800 py-6 shadow-inner mt-auto">
+        <div class="container mx-auto px-4 text-center text-gray-500 dark:text-gray-400 text-sm">
+            <p>&copy; 2023 WordMaster 英语单词学习平台. 让学习更高效！</p>
+        </div>
+    </footer>
+
+    <!-- 设置模态框 -->
+    <div id="settingsModal" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center hidden">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl w-full max-w-md p-6 transform transition-all scale-95 opacity-0">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold">页面设置</h3>
+                <button id="closeSettingsModalBtn" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+                    <i class="fa fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <!-- 字体大小设置 -->
+            <div class="mb-6">
+                <label for="fontSizeSelect" class="block text-gray-700 dark:text-gray-300 mb-2">字体大小</label>
+                <select 
+                    id="fontSizeSelect" 
+                    class="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg input-focus bg-white dark:bg-gray-900"
+                >
+                    <option value="normal">标准</option>
+                    <option value="small">小</option>
+                    <option value="large">大</option>
+                    <option value="xlarge">超大</option>
+                </select>
+            </div>
+            
+            <!-- 字体类型设置 -->
+            <div class="mb-6">
+                <label for="fontFamilySelect" class="block text-gray-700 dark:text-gray-300 mb-2">字体类型</label>
+                <select 
+                    id="fontFamilySelect" 
+                    class="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg input-focus bg-white dark:bg-gray-900"
+                >
+                    <option value="system">系统默认</option>
+                    <option value="serif">衬线字体</option>
+                    <option value="mono">等宽字体</option>
+                </select>
+            </div>
+            
+            <!-- 重新登录按钮 -->
+            <div class="mb-6">
+                <button id="logoutBtn" class="w-full btn-outline border-red-300 text-red-600 dark:text-red-400 dark:border-red-800 hover:bg-red-50 dark:hover:bg-red-900/30">
+                    <i class="fa fa-sign-out mr-2"></i> 退出登录
+                </button>
+            </div>
+            
+            <div class="flex space-x-4">
+                <button id="applySettingsBtn" class="btn-primary flex-1">
+                    应用设置
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM元素
+        const elements = {
+            themeToggle: document.getElementById('themeToggle'),
+            currentUsername: document.getElementById('currentUsername'),
+            welcomeUsername: document.getElementById('welcomeUsername'),
+            reciteModeBtn: document.getElementById('reciteModeBtn'),
+            memorizeModeBtn: document.getElementById('memorizeModeBtn'),
+            settingsBtn: document.getElementById('settingsBtn'),
+            settingsModal: document.getElementById('settingsModal'),
+            closeSettingsModalBtn: document.getElementById('closeSettingsModalBtn'),
+            logoutBtn: document.getElementById('logoutBtn'),
+            applySettingsBtn: document.getElementById('applySettingsBtn'),
+            recentActivity: document.getElementById('recentActivity')
+        };
+
+        // 检查用户登录状态
+        function checkLoginStatus() {
+            const currentUser = localStorage.getItem('currentUser');
+            if (!currentUser) {
+                // 如果没有登录，跳转到登录页面
+                window.location.href = 'index.html';
+                return false;
+            } else {
+                // 显示当前用户名
+                elements.currentUsername.textContent = currentUser;
+                elements.welcomeUsername.textContent = currentUser;
+                return true;
+            }
+        }
+
+        // 初始化应用
+        function initApp() {
+            // 检查用户登录状态
+            if (!checkLoginStatus()) return;
+            
+            // 检查暗色模式
+            checkDarkMode();
+            
+            // 初始化页面设置
+            initPageSettings();
+            
+            // 更新最近学习记录
+            updateRecentActivity();
+            
+            // 添加事件监听
+            elements.themeToggle.addEventListener('click', toggleTheme);
+            elements.reciteModeBtn.addEventListener('click', goToReciteMode);
+            elements.memorizeModeBtn.addEventListener('click', goToMemorizeMode);
+            elements.settingsBtn.addEventListener('click', openSettingsModal);
+            elements.closeSettingsModalBtn.addEventListener('click', closeSettingsModal);
+            elements.logoutBtn.addEventListener('click', confirmLogout);
+            elements.applySettingsBtn.addEventListener('click', applySettings);
+        }
+
+        // 切换到背诵模式
+        function goToReciteMode() {
+            // 如果背诵页面不存在，可以考虑创建或跳转到默页面但使用背诵模式
+            // 这里暂时也跳转到默写页面
+            window.location.href = 'word-memorization.html?mode=recite';
+        }
+
+        // 切换到默写模式
+        function goToMemorizeMode() {
+            window.location.href = 'word-memorization.html?mode=memorize';
+        }
+
+        // 切换主题
+        function toggleTheme() {
+            document.documentElement.classList.toggle('dark');
+            const isDark = document.documentElement.classList.contains('dark');
+            elements.themeToggle.innerHTML = isDark ? 
+                '<i class="fa fa-sun-o text-xl"></i>' : 
+                '<i class="fa fa-moon-o text-xl"></i>';
+            
+            // 保存主题偏好
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+        }
+
+        // 检查暗色模式
+        function checkDarkMode() {
+            const savedTheme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            
+            if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+                document.documentElement.classList.add('dark');
+                elements.themeToggle.innerHTML = '<i class="fa fa-sun-o text-xl"></i>';
+            } else {
+                document.documentElement.classList.remove('dark');
+                elements.themeToggle.innerHTML = '<i class="fa fa-moon-o text-xl"></i>';
+            }
+        }
+
+        // 初始化页面设置
+        function initPageSettings() {
+            const savedFontSize = localStorage.getItem('fontSize');
+            const savedFontFamily = localStorage.getItem('fontFamily');
+            
+            // 应用字体大小设置
+            if (savedFontSize) {
+                switch(savedFontSize) {
+                    case 'small':
+                        document.body.classList.add('text-sm');
+                        break;
+                    case 'large':
+                        document.body.classList.add('text-lg');
+                        break;
+                    case 'xlarge':
+                        document.body.classList.add('text-xl');
+                        break;
+                }
+            }
+            
+            // 应用字体设置
+            if (savedFontFamily) {
+                switch(savedFontFamily) {
+                    case 'serif':
+                        document.body.classList.add('font-serif');
+                        break;
+                    case 'mono':
+                        document.body.classList.add('font-mono');
+                        break;
+                }
+            }
+        }
+
+        // 打开设置模态框
+        function openSettingsModal() {
+            // 加载保存的设置
+            const savedFontSize = localStorage.getItem('fontSize') || 'normal';
+            const savedFontFamily = localStorage.getItem('fontFamily') || 'system';
+            
+            // 设置选项的值
+            document.getElementById('fontSizeSelect').value = savedFontSize;
+            document.getElementById('fontFamilySelect').value = savedFontFamily;
+            
+            // 显示模态框
+            elements.settingsModal.classList.remove('hidden');
+            const modalContent = elements.settingsModal.querySelector('div');
+            setTimeout(() => {
+                modalContent.classList.remove('scale-95', 'opacity-0');
+                modalContent.classList.add('scale-100', 'opacity-100');
+            }, 10);
+        }
+
+        // 关闭设置模态框
+        function closeSettingsModal() {
+            const modalContent = elements.settingsModal.querySelector('div');
+            modalContent.classList.remove('scale-100', 'opacity-100');
+            modalContent.classList.add('scale-95', 'opacity-0');
+            setTimeout(() => {
+                elements.settingsModal.classList.add('hidden');
+            }, 300);
+        }
+
+        // 应用设置
+        function applySettings() {
+            const fontSize = document.getElementById('fontSizeSelect').value;
+            const fontFamily = document.getElementById('fontFamilySelect').value;
+            
+            // 保存设置到localStorage
+            localStorage.setItem('fontSize', fontSize);
+            localStorage.setItem('fontFamily', fontFamily);
+            
+            // 应用字体大小设置
+            switch(fontSize) {
+                case 'small':
+                    document.body.classList.add('text-sm');
+                    document.body.classList.remove('text-lg', 'text-xl');
+                    break;
+                case 'large':
+                    document.body.classList.add('text-lg');
+                    document.body.classList.remove('text-sm', 'text-xl');
+                    break;
+                case 'xlarge':
+                    document.body.classList.add('text-xl');
+                    document.body.classList.remove('text-sm', 'text-lg');
+                    break;
+                default:
+                    document.body.classList.remove('text-sm', 'text-lg', 'text-xl');
+            }
+            
+            // 应用字体设置
+            switch(fontFamily) {
+                case 'serif':
+                    document.body.classList.add('font-serif');
+                    document.body.classList.remove('font-mono');
+                    break;
+                case 'mono':
+                    document.body.classList.add('font-mono');
+                    document.body.classList.remove('font-serif');
+                    break;
+                default:
+                    document.body.classList.remove('font-serif', 'font-mono');
+            }
+            
+            // 显示应用成功的提示
+            showToast('设置已应用');
+            closeSettingsModal();
+        }
+
+        // 显示提示信息
+        function showToast(message) {
+            // 创建toast元素
+            const toast = document.createElement('div');
+            toast.className = 'fixed top-20 right-4 bg-gray-800 text-white py-2 px-4 rounded-lg shadow-lg transform transition-all duration-300 translate-x-full opacity-0 z-50';
+            toast.textContent = message;
+            
+            // 添加到页面
+            document.body.appendChild(toast);
+            
+            // 显示toast
+            setTimeout(() => {
+                toast.classList.remove('translate-x-full', 'opacity-0');
+            }, 10);
+            
+            // 自动消失
+            setTimeout(() => {
+                toast.classList.add('translate-x-full', 'opacity-0');
+                setTimeout(() => {
+                    document.body.removeChild(toast);
+                }, 300);
+            }, 3000);
+        }
+
+        // 确认退出登录
+        function confirmLogout() {
+            // 弹出确认对话框
+            if (confirm('确定要退出登录吗？')) {
+                // 清除当前用户信息
+                localStorage.removeItem('currentUser');
+                // 关闭设置模态框
+                closeSettingsModal();
+                // 跳转到登录页面
+                window.location.href = 'index.html';
+            }
+        }
+
+        // 更新最近活动记录
+        function updateRecentActivity() {
+            // 获取当前登录用户
+            const currentUser = localStorage.getItem('currentUser') || 'guest';
+            // 使用与用户关联的键名
+            const userHistoryKey = `practiceHistory_${currentUser}`;
+            
+            const history = JSON.parse(localStorage.getItem(userHistoryKey) || '[]');
+            
+            if (history.length === 0) {
+                elements.recentActivity.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="py-8 text-center text-gray-500 dark:text-gray-400">
+                            暂无学习记录
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            let html = '';
+            const recentRecords = history.slice(0, 5); // 只显示最近5条记录
+            
+            recentRecords.forEach(record => {
+                // 假设每条记录有mode字段，默认为'memorize'
+                const mode = record.mode || 'memorize';
+                html += `
+                    <tr class="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                        <td class="py-3 font-medium">${record.date}</td>
+                        <td class="py-3">
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${mode === 'recite' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100' : 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100'}">
+                                ${mode === 'recite' ? '背诵' : '默写'}
+                            </span>
+                        </td>
+                        <td class="py-3">${record.wordCount}</td>
+                        <td class="py-3">
+                            <span class="inline-flex items-center justify-center px-2.5 py-0.5 rounded-full text-xs font-medium ${record.accuracy >= 80 ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100' : record.accuracy >= 60 ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-100' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100'}">
+                                ${record.accuracy}%
+                            </span>
+                        </td>
+                        <td class="py-3">${record.duration}</td>
+                    </tr>
+                `;
+            });
+            
+            elements.recentActivity.innerHTML = html;
+        }
+
+        // 页面加载完成后初始化应用
+        document.addEventListener('DOMContentLoaded', initApp);
+    </script>
+</body>
+</html>

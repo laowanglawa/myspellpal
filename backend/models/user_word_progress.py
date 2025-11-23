@@ -1,5 +1,5 @@
 from datetime import datetime
-from ..app import db
+from database import db
 
 class UserWordProgress(db.Model):
     """用户单词学习进度模型"""

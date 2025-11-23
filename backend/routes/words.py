@@ -1,10 +1,12 @@
 from flask import Blueprint, request, jsonify
 from datetime import datetime
 import random
-from ..models.word import Word
-from ..models.user import User
-from ..models.user_word_progress import UserWordProgress
-from ..app import db
+import requests
+import urllib.parse
+from models.word import Word
+from models.user import User
+from models.user_word_progress import UserWordProgress
+from app import db
 
 # 创建蓝图
 words_bp = Blueprint('words', __name__)
@@ -87,6 +89,50 @@ def get_random_word():
     
     except Exception as e:
         return jsonify({'success': False, 'message': f'获取随机单词失败: {str(e)}'}), 500
+
+# AI图片生成API
+AI_IMAGE_API = "https://image.pollinations.ai/prompt/"
+
+@words_bp.route('/image', methods=['GET'])
+def get_word_image():
+    """获取单词相关的AI生成图片"""
+    try:
+        # 获取查询参数
+        word = request.args.get('word', '', type=str)
+        definition = request.args.get('definition', '', type=str)
+        
+        if not word:
+            return jsonify({'success': False, 'message': '缺少单词参数'}), 400
+        
+        # 构建提示词，结合单词和定义以生成更相关的图片
+        prompt = f"{word} {definition}"
+        
+        # URL编码提示词
+        encoded_prompt = urllib.parse.quote(prompt)
+        
+        # 构建完整的API请求URL
+        image_url = f"{AI_IMAGE_API}{encoded_prompt}"
+        
+        # 验证API是否可访问
+        response = requests.head(image_url, timeout=5)
+        if response.status_code == 200:
+            return jsonify({
+                'success': True,
+                'image_url': image_url
+            }), 200
+        else:
+            return jsonify({
+                'success': False,
+                'message': '图片生成服务暂时不可用'
+            }), 503
+    except requests.RequestException:
+        # 如果请求失败，返回友好错误信息
+        return jsonify({
+            'success': False,
+            'message': '生成图片时发生错误'
+        }), 500
+    except Exception as e:
+        return jsonify({'success': False, 'message': f'获取单词图片失败: {str(e)}'}), 500
 
 @words_bp.route('/practice', methods=['POST'])
 def practice_word():

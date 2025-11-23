@@ -1,4 +1,4 @@
-from ..app import db
+from database import db
 
 class Word(db.Model):
     """单词模型"""

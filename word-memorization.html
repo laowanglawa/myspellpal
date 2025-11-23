@@ -77,7 +77,7 @@
                 <button id="themeToggle" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
                     <i class="fa fa-moon-o text-xl"></i>
                 </button>
-                <button id="homeBtn" class="hidden sm:flex items-center btn-outline text-sm">
+                <button id="homeBtn" class="flex items-center btn-outline text-sm">
                     <i class="fa fa-home mr-2"></i> 首页
                 </button>
                 <button id="settingsBtn" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
@@ -155,6 +155,22 @@
                         <span id="wordPronunciation" class="text-gray-400 text-lg font-normal ml-2 hidden"></span>
                     </h2>
                     <p id="wordExample" class="text-gray-500 dark:text-gray-400 text-center italic"></p>
+                </div>
+                
+                <!-- AI生成图片区域 - 仅在背诵模式显示 -->
+                <div id="wordImageContainer" class="mb-8 hidden">
+                    <div class="flex flex-col items-center justify-center">
+                        <div class="w-full max-w-sm aspect-video rounded-lg overflow-hidden flex items-center justify-center border-2 border-gray-200 dark:border-gray-600 shadow-md bg-white dark:bg-gray-800">
+                            <img id="wordImage" src="" alt="单词相关图片" class="w-full h-full object-contain" />
+                            <div id="imageLoading" class="absolute flex flex-col items-center justify-center">
+                                <div class="w-12 h-12 border-4 border-primary/30 border-t-primary rounded-full animate-spin"></div>
+                                <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">AI正在生成图片...</p>
+                            </div>
+                        </div>
+                        <button id="refreshImageBtn" class="mt-3 px-4 py-2 text-sm text-primary hover:text-primary/80 transition-colors">
+                            <i class="fa fa-refresh mr-1"></i> 重新生成图片
+                        </button>
+                    </div>
                 </div>
                 
                 <!-- 输入区域 -->
@@ -620,18 +636,30 @@
             detailsAccuracy: document.getElementById('detailsAccuracy'),
             detailsDuration: document.getElementById('detailsDuration'),
             detailsWordsList: document.getElementById('detailsWordsList'),
-            settingsBtn: document.getElementById('settingsBtn')
+            settingsBtn: document.getElementById('settingsBtn'),
+            homeBtn: document.getElementById('homeBtn'),
+            wordImageContainer: document.getElementById('wordImageContainer'),
+            wordImage: document.getElementById('wordImage'),
+            imageLoading: document.getElementById('imageLoading'),
+            refreshImageBtn: document.getElementById('refreshImageBtn')
         };
 
         // 应用状态
         let wordCountLimit = 10; // 默认单词数量
+        let practiceMode = 'memorize'; // 'memorize' 或 'recite'
+        
+        // 从URL获取模式参数
+        function getModeFromUrl() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('mode');
+        }
         
         // 检查用户登录状态
         function checkLoginStatus() {
             const currentUser = localStorage.getItem('currentUser');
             if (!currentUser) {
                 // 如果没有登录，跳转到登录页面
-                window.location.href = 'login.html';
+                window.location.href = 'zhuye.html';
             } else {
                 // 显示当前用户名（如果有对应的UI元素）
                 const userDisplay = document.getElementById('currentUsername');
@@ -654,6 +682,16 @@
             // 从localStorage加载单词数量设置
             if (localStorage.getItem('wordCountLimit')) {
                 wordCountLimit = parseInt(localStorage.getItem('wordCountLimit'));
+            }
+            
+            // 从URL获取模式参数
+            const urlMode = getModeFromUrl();
+            if (urlMode === 'recite') {
+                practiceMode = 'recite';
+                // 可以在这里添加背诵模式的特殊设置
+                showToast('背诵模式已启动');
+            } else {
+                practiceMode = 'memorize'; // 默认默写模式
             }
             
             // 默认开始随机模式
@@ -688,8 +726,20 @@
             elements.confirmWordCountBtn.addEventListener('click', confirmWordCount);
             elements.closeDetailsModalBtn.addEventListener('click', closeDetailsModal);
             
+            // 添加刷新图片按钮事件监听
+            elements.refreshImageBtn.addEventListener('click', function() {
+                const currentWord = appState.practiceWords[appState.currentWordIndex];
+                // 重新生成图片时使用英文例句作为关键词
+                generateWordImage(currentWord, true);
+            });
+            
             // 添加设置按钮事件监听
             elements.settingsBtn.addEventListener('click', openSettingsModal);
+            
+            // 添加主页按钮事件监听
+            elements.homeBtn.addEventListener('click', function() {
+                window.location.href = 'index.html';
+            });
             
             // 为难度选项添加事件监听
             document.querySelectorAll('.difficulty-option').forEach(option => {
@@ -816,6 +866,40 @@
             updateStats();
         }
 
+        // 生成单词相关图片
+        function generateWordImage(word, useSentence = false) {
+            // 显示加载状态
+            elements.imageLoading.classList.remove('hidden');
+            elements.wordImage.src = ''; // 清空当前图片
+            
+            // 默认使用单词本身作为关键词
+            let url = `http://127.0.0.1:5000/api/v1/words/image?word=${encodeURIComponent(word.word)}`;
+            
+            // 如果是重新生成图片，则使用英文例句作为关键词
+            if (useSentence) {
+                url = `http://127.0.0.1:5000/api/v1/words/image?sentence=${encodeURIComponent(word.example)}`;
+            }
+            
+            fetch(url)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('API调用失败');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // 使用后端返回的图片URL
+                    elements.wordImage.src = data.image_url;
+                    elements.imageLoading.classList.add('hidden');
+                })
+                .catch(error => {
+                    console.error('生成图片时出错:', error);
+                    // 出错时使用备用图片
+                    elements.wordImage.src = `https://picsum.photos/800/450?random=${Date.now()}`;
+                    elements.imageLoading.classList.add('hidden');
+                });
+        }
+        
         // 显示当前单词
         function showCurrentWord() {
             if (appState.currentWordIndex >= appState.practiceWords.length) {
@@ -829,6 +913,15 @@
             elements.wordLevel.textContent = 
                 currentWord.level === 'easy' ? '简单' : 
                 currentWord.level === 'medium' ? '中等' : '困难';
+            
+            // 在背诵模式下显示AI生成的图片
+            if (practiceMode === 'recite') {
+                elements.wordImageContainer.classList.remove('hidden');
+                // 初始显示图片时使用单词本身作为关键词
+                generateWordImage(currentWord, false);
+            } else {
+                elements.wordImageContainer.classList.add('hidden');
+            }
             
             elements.wordInput.value = '';
             elements.wordInput.focus();
@@ -989,7 +1082,7 @@
                 // 关闭设置模态框
                 closeSettingsModal();
                 // 跳转到登录页面
-                window.location.href = 'login.html';
+                window.location.href = 'index.html';
             }
         }
         

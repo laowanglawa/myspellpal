@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify
 from datetime import datetime
-from ..models.user import User
-from ..app import db
+from models.user import User
+from app import db
 
 # 创建蓝图
 auth_bp = Blueprint('auth', __name__)
