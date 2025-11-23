@@ -143,7 +143,7 @@
                     <div class="w-16 h-16 mx-auto bg-primary/20 dark:bg-primary/30 rounded-full flex items-center justify-center mb-6">
                         <i class="fa fa-volume-up text-primary text-3xl"></i>
                     </div>
-                    <h3 class="text-2xl font-bold text-center mb-4">单词背诵</h3>
+                    <h3 class="text-2xl font-bold text-center mb-4">单词记忆</h3>
                     <p class="text-gray-600 dark:text-gray-300 text-center mb-8">
                         通过听、看、读的方式快速记忆单词，适合初期学习和巩固。
                     </p>
@@ -162,7 +162,7 @@
                         </div>
                     </div>
                     <button id="reciteModeBtn" class="w-full py-3 bg-primary text-white rounded-lg font-medium shadow transition-all hover:shadow-lg hover:bg-primary/90">
-                        开始背诵
+                        开始记忆
                     </button>
                 </div>
             </div>
@@ -243,7 +243,7 @@
                 </div>
                 <div class="flex items-start">
                     <div class="w-6 h-6 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center text-primary mr-3 mt-0.5">2</div>
-                    <p class="text-gray-600 dark:text-gray-300 text-sm">结合背诵和默写模式，先背诵后默写，效果更佳。</p>
+                    <p class="text-gray-600 dark:text-gray-300 text-sm">结合记忆和默写模式，先记忆后默写，效果更佳。</p>
                 </div>
                 <div class="flex items-start">
                     <div class="w-6 h-6 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center text-primary mr-3 mt-0.5">3</div>
@@ -367,7 +367,7 @@
             elements.applySettingsBtn.addEventListener('click', applySettings);
         }
 
-        // 切换到背诵模式
+        // 切换到记忆模式
         function goToReciteMode() {
             // 如果背诵页面不存在，可以考虑创建或跳转到默页面但使用背诵模式
             // 这里暂时也跳转到默写页面
@@ -581,7 +581,7 @@
                         <td class="py-3 font-medium">${record.date}</td>
                         <td class="py-3">
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${mode === 'recite' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100' : 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100'}">
-                                ${mode === 'recite' ? '背诵' : '默写'}
+                                ${mode === 'recite' ? '记忆' : '默写'}
                             </span>
                         </td>
                         <td class="py-3">${record.wordCount}</td>

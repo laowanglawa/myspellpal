@@ -738,7 +738,7 @@
             
             // 添加主页按钮事件监听
             elements.homeBtn.addEventListener('click', function() {
-                window.location.href = 'index.html';
+                window.location.href = 'zhuye.html';
             });
             
             // 为难度选项添加事件监听
@@ -872,32 +872,35 @@
             elements.imageLoading.classList.remove('hidden');
             elements.wordImage.src = ''; // 清空当前图片
             
-            // 默认使用单词本身作为关键词
-            let url = `http://127.0.0.1:5000/api/v1/words/image?word=${encodeURIComponent(word.word)}`;
+            // 定义pollinations.ai API基础URL
+            const aiImageApi = 'https://image.pollinations.ai/prompt/';
             
-            // 如果是重新生成图片，则使用英文例句作为关键词
-            if (useSentence) {
-                url = `http://127.0.0.1:5000/api/v1/words/image?sentence=${encodeURIComponent(word.example)}`;
+            // 选择用于生成图片的提示词
+            let prompt;
+            if (useSentence && word.example) {
+                // 如果是重新生成图片且有例句，则使用英文例句作为提示词
+                prompt = word.example;
+            } else {
+                // 默认使用单词本身作为提示词
+                prompt = word.word;
             }
             
-            fetch(url)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('API调用失败');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    // 使用后端返回的图片URL
-                    elements.wordImage.src = data.image_url;
-                    elements.imageLoading.classList.add('hidden');
-                })
-                .catch(error => {
-                    console.error('生成图片时出错:', error);
-                    // 出错时使用备用图片
-                    elements.wordImage.src = `https://picsum.photos/800/450?random=${Date.now()}`;
-                    elements.imageLoading.classList.add('hidden');
-                });
+            // 构建完整的图片URL
+            const imageUrl = `${aiImageApi}${encodeURIComponent(prompt)}`;
+            
+            // 直接设置图片URL
+            elements.wordImage.onload = function() {
+                elements.imageLoading.classList.add('hidden');
+            };
+            
+            elements.wordImage.onerror = function() {
+                console.error('生成图片时出错');
+                // 出错时使用备用图片
+                elements.wordImage.src = `https://picsum.photos/800/450?random=${Date.now()}`;
+                elements.imageLoading.classList.add('hidden');
+            };
+            
+            elements.wordImage.src = imageUrl;
         }
         
         // 显示当前单词
