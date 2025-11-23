@@ -41,6 +41,21 @@
                 transform: translateY(-5px);
                 box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
             }
+            .btn-primary {
+                @apply bg-primary hover:bg-primary/90 text-white font-medium px-6 py-2 rounded-md transition-colors flex items-center justify-center;
+            }
+            .btn-secondary {
+                @apply bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium px-4 py-2 rounded-md transition-colors;
+            }
+            .input-field {
+                @apply w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-primary transition-colors;
+            }
+            .input-field-error {
+                @apply border-error focus:ring-error focus:border-error;
+            }
+            .loading-spinner {
+                @apply animate-spin rounded-full h-5 w-5 border-2 border-white border-opacity-20 border-t-white;
+            }
         }
     </style>
 </head>
@@ -87,15 +102,17 @@
                 </h3>
                 <div class="space-y-4">
                     <div>
-                        <label for="classroom-name" class="block text-sm font-medium text-gray-700 mb-1">班级名称</label>
-                        <input type="text" id="classroom-name" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-primary transition-colors" placeholder="输入班级名称">
+                        <label for="classroom-name" class="block text-sm font-medium text-gray-700 mb-1">班级名称 <span class="text-error">*</span></label>
+                        <input type="text" id="classroom-name" class="input-field" placeholder="输入班级名称">
+                        <p id="classroom-name-error" class="hidden text-xs text-error mt-1">请输入班级名称</p>
                     </div>
                     <div>
                         <label for="classroom-description" class="block text-sm font-medium text-gray-700 mb-1">班级描述 (可选)</label>
-                        <textarea id="classroom-description" rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-primary transition-colors" placeholder="输入班级描述"></textarea>
+                        <textarea id="classroom-description" rows="3" class="input-field" placeholder="输入班级描述"></textarea>
                     </div>
-                    <button class="bg-primary hover:bg-primary/90 text-white font-medium px-6 py-2 rounded-md transition-colors flex items-center justify-center">
-                        <i class="fa fa-save mr-2"></i> 创建班级
+                    <button id="create-classroom-btn" class="btn-primary">
+                        <i class="fa fa-save mr-2"></i>
+                        <span>创建班级</span>
                     </button>
                 </div>
             </div>
@@ -161,11 +178,13 @@
                 </h3>
                 <div class="space-y-4">
                     <div>
-                        <label for="join-classroom-code" class="block text-sm font-medium text-gray-700 mb-1">班级代码</label>
-                        <input type="text" id="join-classroom-code" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-primary transition-colors font-mono" placeholder="输入8位班级代码">
+                        <label for="join-classroom-code" class="block text-sm font-medium text-gray-700 mb-1">班级代码 <span class="text-error">*</span></label>
+                        <input type="text" id="join-classroom-code" class="input-field font-mono" placeholder="输入8位班级代码">
+                        <p id="join-classroom-error" class="hidden text-xs text-error mt-1">请输入正确的8位班级代码</p>
                     </div>
-                    <button class="w-full bg-primary hover:bg-primary/90 text-white font-medium px-6 py-2 rounded-md transition-colors flex items-center justify-center">
-                        <i class="fa fa-plus mr-2"></i> 加入班级
+                    <button id="join-classroom-btn" class="w-full btn-primary">
+                        <i class="fa fa-plus mr-2"></i>
+                        <span>加入班级</span>
                     </button>
                 </div>
             </div>
@@ -249,84 +268,270 @@
                 </div>
             </div>
             <div class="px-6 py-4 border-t border-gray-200 bg-gray-50">
-                <button id="close-modal-btn" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium px-4 py-2 rounded-md transition-colors">
+                <button id="close-modal-btn" class="btn-secondary">
                     关闭
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- 简单的交互脚本 -->
+    <!-- 增强的交互脚本 -->
     <script>
         // 角色切换功能
-        document.getElementById('teacher-view').addEventListener('click', function() {
+        function switchToTeacherView() {
             document.getElementById('teacher-view').classList.add('bg-primary', 'text-white');
             document.getElementById('teacher-view').classList.remove('text-gray-700');
             document.getElementById('student-view').classList.remove('bg-primary', 'text-white');
             document.getElementById('student-view').classList.add('text-gray-700');
             document.getElementById('teacher-section').classList.remove('hidden');
             document.getElementById('student-section').classList.add('hidden');
-        });
+            
+            // 存储用户偏好到localStorage
+            localStorage.setItem('viewMode', 'teacher');
+        }
 
-        document.getElementById('student-view').addEventListener('click', function() {
+        function switchToStudentView() {
             document.getElementById('student-view').classList.add('bg-primary', 'text-white');
             document.getElementById('student-view').classList.remove('text-gray-700');
             document.getElementById('teacher-view').classList.remove('bg-primary', 'text-white');
             document.getElementById('teacher-view').classList.add('text-gray-700');
             document.getElementById('student-section').classList.remove('hidden');
             document.getElementById('teacher-section').classList.add('hidden');
-        });
+            
+            // 存储用户偏好到localStorage
+            localStorage.setItem('viewMode', 'student');
+        }
+
+        document.getElementById('teacher-view').addEventListener('click', switchToTeacherView);
+        document.getElementById('student-view').addEventListener('click', switchToStudentView);
 
         // 模态框功能
         const viewButtons = document.querySelectorAll('.text-info');
         const modal = document.getElementById('modal-example');
         const closeModalBtn = document.getElementById('close-modal');
         const closeModalFooterBtn = document.getElementById('close-modal-btn');
+        const modalTitle = modal.querySelector('h3');
+        
+        // 为模态框添加入场动画
+        function openModal(className) {
+            // 更新模态框标题
+            if (className) {
+                modalTitle.textContent = `班级成员列表 - ${className}`;
+            }
+            
+            // 显示模态框并添加动画
+            modal.classList.remove('hidden');
+            modal.style.opacity = '0';
+            modal.style.transition = 'opacity 0.2s ease';
+            setTimeout(() => {
+                modal.style.opacity = '1';
+            }, 10);
+        }
+
+        function closeModal() {
+            modal.style.opacity = '0';
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 200);
+        }
 
         viewButtons.forEach(button => {
             button.addEventListener('click', function() {
-                modal.classList.remove('hidden');
+                // 获取班级名称
+                const className = this.closest('tr').querySelector('td:first-child').textContent;
+                openModal(className);
             });
         });
 
-        closeModalBtn.addEventListener('click', function() {
-            modal.classList.add('hidden');
-        });
-
-        closeModalFooterBtn.addEventListener('click', function() {
-            modal.classList.add('hidden');
-        });
+        closeModalBtn.addEventListener('click', closeModal);
+        closeModalFooterBtn.addEventListener('click', closeModal);
 
         // 点击模态框外部关闭
         modal.addEventListener('click', function(event) {
             if (event.target === modal) {
-                modal.classList.add('hidden');
+                closeModal();
+            }
+        });
+        
+        // 按下ESC键关闭模态框
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape' && !modal.classList.contains('hidden')) {
+                closeModal();
             }
         });
 
-        // 创建班级功能
-        const createClassroomBtn = document.querySelector('button:has(.fa-save)');
+        // 设置按钮加载状态
+        function setButtonLoading(button, isLoading) {
+            const originalContent = button.innerHTML;
+            
+            if (isLoading) {
+                // 保存原始内容
+                button.setAttribute('data-original-content', originalContent);
+                // 禁用按钮并显示加载状态
+                button.disabled = true;
+                button.innerHTML = `
+                    <div class="loading-spinner mr-2"></div>
+                    <span>处理中...</span>
+                `;
+            } else {
+                // 恢复原始内容并启用按钮
+                button.disabled = false;
+                button.innerHTML = button.getAttribute('data-original-content') || originalContent;
+            }
+        }
+
+        // 创建班级功能 - 增强版
+        const createClassroomBtn = document.getElementById('create-classroom-btn');
+        const classroomNameInput = document.getElementById('classroom-name');
+        const classroomNameError = document.getElementById('classroom-name-error');
+        const classroomDescriptionInput = document.getElementById('classroom-description');
+
+        // 验证班级名称
+        function validateClassName() {
+            const className = classroomNameInput.value.trim();
+            const isValid = className !== '';
+            
+            if (!isValid) {
+                classroomNameInput.classList.add('input-field-error');
+                classroomNameError.classList.remove('hidden');
+            } else {
+                classroomNameInput.classList.remove('input-field-error');
+                classroomNameError.classList.add('hidden');
+            }
+            
+            return isValid;
+        }
+
+        // 输入时验证
+        classroomNameInput.addEventListener('input', validateClassName);
+        
+        // 提交创建班级
         createClassroomBtn.addEventListener('click', function() {
-            const className = document.getElementById('classroom-name').value;
-            if (className.trim() === '') {
-                alert('请输入班级名称');
+            if (!validateClassName()) {
+                // 滚动到错误位置
+                classroomNameInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                classroomNameInput.focus();
                 return;
             }
-            alert('班级创建成功！\n这是一个预览，实际功能需要连接后端服务。');
-            document.getElementById('classroom-name').value = '';
-            document.getElementById('classroom-description').value = '';
+
+            // 显示加载状态
+            setButtonLoading(createClassroomBtn, true);
+
+            // 模拟API请求延迟
+            setTimeout(() => {
+                // 重置加载状态
+                setButtonLoading(createClassroomBtn, false);
+                
+                // 显示成功消息
+                const successMessage = document.createElement('div');
+                successMessage.className = 'fixed bottom-4 right-4 bg-success text-white px-4 py-2 rounded-md shadow-lg z-50';
+                successMessage.textContent = '班级创建成功！';
+                document.body.appendChild(successMessage);
+                
+                // 3秒后移除成功消息
+                setTimeout(() => {
+                    successMessage.classList.add('opacity-0', 'transition-opacity', 'duration-300');
+                    setTimeout(() => successMessage.remove(), 300);
+                }, 3000);
+                
+                // 清空表单
+                classroomNameInput.value = '';
+                classroomDescriptionInput.value = '';
+            }, 1000);
         });
 
-        // 加入班级功能
-        const joinClassroomBtn = document.querySelector('button:has(.fa-plus):not(:has(.fa-save))');
+        // 加入班级功能 - 增强版
+        const joinClassroomBtn = document.getElementById('join-classroom-btn');
+        const joinClassroomCodeInput = document.getElementById('join-classroom-code');
+        const joinClassroomError = document.getElementById('join-classroom-error');
+
+        // 验证班级代码
+        function validateClassroomCode() {
+            const code = joinClassroomCodeInput.value.trim();
+            const isValid = /^[A-Za-z0-9]{8}$/.test(code);
+            
+            if (!isValid) {
+                joinClassroomCodeInput.classList.add('input-field-error');
+                joinClassroomError.classList.remove('hidden');
+            } else {
+                joinClassroomCodeInput.classList.remove('input-field-error');
+                joinClassroomError.classList.add('hidden');
+            }
+            
+            return isValid;
+        }
+
+        // 输入时验证
+        joinClassroomCodeInput.addEventListener('input', validateClassroomCode);
+        
+        // 限制只能输入字母和数字，并自动转为大写
+        joinClassroomCodeInput.addEventListener('input', function() {
+            this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+        });
+
+        // 提交加入班级
         joinClassroomBtn.addEventListener('click', function() {
-            const code = document.getElementById('join-classroom-code').value;
-            if (code.trim().length !== 8) {
-                alert('请输入正确的8位班级代码');
+            if (!validateClassroomCode()) {
+                // 滚动到错误位置
+                joinClassroomCodeInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                joinClassroomCodeInput.focus();
                 return;
             }
-            alert('加入班级成功！\n这是一个预览，实际功能需要连接后端服务。');
-            document.getElementById('join-classroom-code').value = '';
+
+            // 显示加载状态
+            setButtonLoading(joinClassroomBtn, true);
+
+            // 模拟API请求延迟
+            setTimeout(() => {
+                // 重置加载状态
+                setButtonLoading(joinClassroomBtn, false);
+                
+                // 显示成功消息
+                const successMessage = document.createElement('div');
+                successMessage.className = 'fixed bottom-4 right-4 bg-success text-white px-4 py-2 rounded-md shadow-lg z-50';
+                successMessage.textContent = '加入班级成功！';
+                document.body.appendChild(successMessage);
+                
+                // 3秒后移除成功消息
+                setTimeout(() => {
+                    successMessage.classList.add('opacity-0', 'transition-opacity', 'duration-300');
+                    setTimeout(() => successMessage.remove(), 300);
+                }, 3000);
+                
+                // 清空输入
+                joinClassroomCodeInput.value = '';
+            }, 1000);
+        });
+        
+        // 添加键盘支持 - 回车键提交
+        classroomNameInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                createClassroomBtn.click();
+            }
+        });
+        
+        joinClassroomCodeInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                joinClassroomBtn.click();
+            }
+        });
+        
+        // 页面加载时恢复视图模式
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedViewMode = localStorage.getItem('viewMode');
+            if (savedViewMode === 'student') {
+                switchToStudentView();
+            } else {
+                // 默认显示教师视图
+                switchToTeacherView();
+            }
+            
+            // 添加页面淡入效果
+            document.body.style.opacity = '0';
+            document.body.style.transition = 'opacity 0.5s ease';
+            setTimeout(() => {
+                document.body.style.opacity = '1';
+            }, 100);
         });
     </script>
 </body>

@@ -260,6 +260,61 @@
         </div>
     </footer>
 
+    <!-- 词库选择模态框 -->
+    <div id="wordlistSelectModal" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center hidden">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl w-full max-w-md p-6 transform transition-all scale-100 opacity-100">
+            <div class="text-center mb-6">
+                <div class="w-16 h-16 mx-auto bg-primary/20 dark:bg-primary/30 rounded-full flex items-center justify-center mb-4">
+                    <i class="fa fa-book text-primary text-3xl"></i>
+                </div>
+                <h3 class="text-xl font-bold mb-2">选择你的词库</h3>
+                <p class="text-gray-500 dark:text-gray-400">请根据你的英语水平选择适合的词库开始学习</p>
+            </div>
+            
+            <div class="space-y-3 mb-6">
+                <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors wordlist-option" data-level="beginner">
+                    <div class="flex items-center">
+                        <div class="w-10 h-10 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center mr-4">
+                            <i class="fa fa-graduation-cap text-blue-600 dark:text-blue-400"></i>
+                        </div>
+                        <div class="flex-1">
+                            <h4 class="font-medium">初级词库</h4>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">适合英语基础学习者，包含常用基础词汇</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors wordlist-option" data-level="intermediate">
+                    <div class="flex items-center">
+                        <div class="w-10 h-10 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center mr-4">
+                            <i class="fa fa-certificate text-green-600 dark:text-green-400"></i>
+                        </div>
+                        <div class="flex-1">
+                            <h4 class="font-medium">中级词库</h4>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">适合英语进阶学习者，包含日常应用词汇</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors wordlist-option" data-level="advanced">
+                    <div class="flex items-center">
+                        <div class="w-10 h-10 bg-purple-100 dark:bg-purple-900 rounded-full flex items-center justify-center mr-4">
+                            <i class="fa fa-trophy text-purple-600 dark:text-purple-400"></i>
+                        </div>
+                        <div class="flex-1">
+                            <h4 class="font-medium">高级词库</h4>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">适合英语熟练学习者，包含复杂专业词汇</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <button id="confirmWordlistBtn" class="w-full btn-primary" disabled>
+                确认选择
+            </button>
+        </div>
+    </div>
+
     <!-- 设置模态框 -->
     <div id="settingsModal" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center hidden">
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl w-full max-w-md p-6 transform transition-all scale-95 opacity-0">
@@ -297,6 +352,19 @@
                 </select>
             </div>
             
+            <!-- 词库设置 -->
+            <div class="mb-6">
+                <label for="wordlistSelect" class="block text-gray-700 dark:text-gray-300 mb-2">词库选择</label>
+                <select 
+                    id="wordlistSelect" 
+                    class="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg input-focus bg-white dark:bg-gray-900"
+                >
+                    <option value="beginner">初级词库</option>
+                    <option value="intermediate">中级词库</option>
+                    <option value="advanced">高级词库</option>
+                </select>
+            </div>
+            
             <!-- 重新登录按钮 -->
             <div class="mb-6">
                 <button id="logoutBtn" class="w-full btn-outline border-red-300 text-red-600 dark:text-red-400 dark:border-red-800 hover:bg-red-50 dark:hover:bg-red-900/30">
@@ -325,7 +393,10 @@
             closeSettingsModalBtn: document.getElementById('closeSettingsModalBtn'),
             logoutBtn: document.getElementById('logoutBtn'),
             applySettingsBtn: document.getElementById('applySettingsBtn'),
-            recentActivity: document.getElementById('recentActivity')
+            recentActivity: document.getElementById('recentActivity'),
+            wordlistSelectModal: document.getElementById('wordlistSelectModal'),
+            confirmWordlistBtn: document.getElementById('confirmWordlistBtn'),
+            wordlistOptions: document.querySelectorAll('.wordlist-option')
         };
 
         // 检查用户登录状态
@@ -357,6 +428,12 @@
             // 更新最近学习记录
             updateRecentActivity();
             
+            // 检查词库选择状态
+            checkWordlistSelection();
+            
+            // 显示当前词库信息
+            displayCurrentWordlist();
+            
             // 添加事件监听
             elements.themeToggle.addEventListener('click', toggleTheme);
             elements.reciteModeBtn.addEventListener('click', goToReciteMode);
@@ -365,6 +442,121 @@
             elements.closeSettingsModalBtn.addEventListener('click', closeSettingsModal);
             elements.logoutBtn.addEventListener('click', confirmLogout);
             elements.applySettingsBtn.addEventListener('click', applySettings);
+            
+            // 添加词库选择相关事件监听
+            setupWordlistSelectionEvents();
+        }
+        
+        // 设置词库选择事件
+        function setupWordlistSelectionEvents() {
+            let selectedWordlist = null;
+            
+            // 词库选项点击事件
+            elements.wordlistOptions.forEach(option => {
+                option.addEventListener('click', () => {
+                    // 移除其他选项的选中状态
+                    elements.wordlistOptions.forEach(opt => {
+                        opt.classList.remove('border-primary', 'bg-primary/5', 'dark:bg-primary/10');
+                        opt.classList.add('border-gray-200', 'dark:border-gray-700');
+                    });
+                    
+                    // 添加当前选项的选中状态
+                    option.classList.remove('border-gray-200', 'dark:border-gray-700');
+                    option.classList.add('border-primary', 'bg-primary/5', 'dark:bg-primary/10');
+                    
+                    // 记录选中的词库
+                    selectedWordlist = option.dataset.level;
+                    
+                    // 启用确认按钮
+                    elements.confirmWordlistBtn.disabled = false;
+                });
+            });
+            
+            // 确认按钮点击事件
+            elements.confirmWordlistBtn.addEventListener('click', () => {
+                if (selectedWordlist) {
+                    // 存储词库选择到localStorage
+                    saveWordlistSelection(selectedWordlist);
+                    
+                    // 隐藏词库选择模态框
+                    hideWordlistModal();
+                    
+                    // 显示成功提示
+                    showToast(`已选择${getWordlistName(selectedWordlist)}词库，开始你的学习之旅吧！`);
+                    
+                    // 更新当前词库显示
+                    displayCurrentWordlist();
+                }
+            });
+        }
+        
+        // 保存词库选择到localStorage
+        function saveWordlistSelection(wordlistLevel) {
+            const currentUser = localStorage.getItem('currentUser') || 'guest';
+            localStorage.setItem(`wordlist_${currentUser}`, wordlistLevel);
+            localStorage.setItem(`hasSelectedWordlist_${currentUser}`, 'true');
+        }
+        
+        // 获取词库名称
+        function getWordlistName(level) {
+            const names = {
+                beginner: '初级',
+                intermediate: '中级',
+                advanced: '高级'
+            };
+            return names[level] || '默认';
+        }
+        
+        // 获取当前用户的词库选择
+        function getCurrentWordlist() {
+            const currentUser = localStorage.getItem('currentUser');
+            return currentUser ? localStorage.getItem(`wordlist_${currentUser}`) || 'beginner' : 'beginner';
+        }
+        
+        // 显示当前词库信息
+        function displayCurrentWordlist() {
+            const currentWordlist = getCurrentWordlist();
+            const wordlistName = getWordlistName(currentWordlist);
+            
+            // 检查是否已存在显示元素，如果不存在则创建
+            let wordlistDisplay = document.getElementById('currentWordlistDisplay');
+            if (!wordlistDisplay) {
+                // 在欢迎区域添加词库显示
+                const welcomeArea = document.querySelector('.text-center.mb-12');
+                wordlistDisplay = document.createElement('div');
+                wordlistDisplay.id = 'currentWordlistDisplay';
+                wordlistDisplay.className = 'inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-primary/10 text-primary dark:bg-primary/20 mt-2';
+                welcomeArea.appendChild(wordlistDisplay);
+            }
+            
+            // 更新词库显示内容
+            wordlistDisplay.innerHTML = `
+                <i class="fa fa-book mr-1"></i>
+                当前词库: ${wordlistName}
+            `;
+        }
+        
+        // 隐藏词库选择模态框
+        function hideWordlistModal() {
+            elements.wordlistSelectModal.style.display = 'none';
+        }
+        
+        // 检查词库选择状态
+        function checkWordlistSelection() {
+            const currentUser = localStorage.getItem('currentUser');
+            
+            // 确保用户已登录
+            if (!currentUser) return;
+            
+            const hasSelected = localStorage.getItem(`hasSelectedWordlist_${currentUser}`);
+            
+            if (hasSelected === 'true') {
+                // 用户已经选择过词库，隐藏选择模态框
+                hideWordlistModal();
+            } else {
+                // 用户首次登录，显示词库选择模态框
+                elements.wordlistSelectModal.style.display = 'flex';
+            }
         }
 
         // 切换到记忆模式
@@ -443,10 +635,13 @@
             // 加载保存的设置
             const savedFontSize = localStorage.getItem('fontSize') || 'normal';
             const savedFontFamily = localStorage.getItem('fontFamily') || 'system';
+            const currentUser = localStorage.getItem('currentUser') || 'guest';
+            const savedWordlist = localStorage.getItem(`wordlist_${currentUser}`) || 'beginner';
             
             // 设置选项的值
             document.getElementById('fontSizeSelect').value = savedFontSize;
             document.getElementById('fontFamilySelect').value = savedFontFamily;
+            document.getElementById('wordlistSelect').value = savedWordlist;
             
             // 显示模态框
             elements.settingsModal.classList.remove('hidden');
@@ -471,10 +666,27 @@
         function applySettings() {
             const fontSize = document.getElementById('fontSizeSelect').value;
             const fontFamily = document.getElementById('fontFamilySelect').value;
+            const wordlist = document.getElementById('wordlistSelect').value;
+            const currentUser = localStorage.getItem('currentUser') || 'guest';
             
             // 保存设置到localStorage
             localStorage.setItem('fontSize', fontSize);
             localStorage.setItem('fontFamily', fontFamily);
+            
+            // 检查词库是否发生变化
+            const oldWordlist = localStorage.getItem(`wordlist_${currentUser}`);
+            if (oldWordlist !== wordlist) {
+                // 更新词库选择
+                localStorage.setItem(`wordlist_${currentUser}`, wordlist);
+                // 显示词库已更改的提示
+                showToast(`已切换到${getWordlistName(wordlist)}词库，你的学习进度将基于新词库重新计算`);
+                
+                // 更新当前词库显示
+                displayCurrentWordlist();
+            } else {
+                // 显示设置已应用的提示
+                showToast('设置已应用');
+            }
             
             // 应用字体大小设置
             switch(fontSize) {
