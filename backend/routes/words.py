@@ -1,17 +1,16 @@
 from flask import Blueprint, request, jsonify
 from datetime import datetime
 import random
-import requests
 import urllib.parse
 from models.word import Word
 from models.user import User
 from models.user_word_progress import UserWordProgress
-from app import db
+from database import db
 
 # 创建蓝图
 words_bp = Blueprint('words', __name__)
 
-@words_bp.route('', methods=['GET'])
+@words_bp.route('/', methods=['GET'])
 def get_words():
     """获取单词列表，支持分页和筛选"""
     try:
@@ -113,24 +112,11 @@ def get_word_image():
         # 构建完整的API请求URL
         image_url = f"{AI_IMAGE_API}{encoded_prompt}"
         
-        # 验证API是否可访问
-        response = requests.head(image_url, timeout=5)
-        if response.status_code == 200:
-            return jsonify({
-                'success': True,
-                'image_url': image_url
-            }), 200
-        else:
-            return jsonify({
-                'success': False,
-                'message': '图片生成服务暂时不可用'
-            }), 503
-    except requests.RequestException:
-        # 如果请求失败，返回友好错误信息
+        # 直接返回图片URL，不进行验证
         return jsonify({
-            'success': False,
-            'message': '生成图片时发生错误'
-        }), 500
+            'success': True,
+            'image_url': image_url
+        }), 200
     except Exception as e:
         return jsonify({'success': False, 'message': f'获取单词图片失败: {str(e)}'}), 500
 

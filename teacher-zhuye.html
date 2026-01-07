@@ -1,0 +1,2581 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>学生管理系统</title>
+    <!-- Tailwind CSS v3 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+    <!-- 统一的 Tailwind 配置 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#1E40AF',
+                        secondary: '#93C5FD',
+                        accent: '#1E3A8A',
+                        light: '#EFF6FF',
+                        dark: '#1E293B'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .transition-all {
+                transition-property: all;
+                transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+                transition-duration: 150ms;
+            }
+            .sidebar-active {
+                background-color: #1E40AF;
+                color: white;
+            }
+            .sidebar-icon {
+                margin-right: 0.75rem;
+                font-size: 1.125rem;
+            }
+            .btn-primary {
+                background-color: #1E40AF;
+                color: white;
+                font-weight: 500;
+                padding: 0.5rem 1rem;
+                border-radius: 0.25rem;
+                transition-property: all;
+                transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+                transition-duration: 150ms;
+            }
+            .btn-primary:hover {
+                background-color: #1D4ED8;
+            }
+            .btn-secondary {
+                background-color: #93C5FD;
+                color: #1E40AF;
+                font-weight: 500;
+                padding: 0.5rem 1rem;
+                border-radius: 0.25rem;
+                transition-property: all;
+                transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+                transition-duration: 150ms;
+            }
+            .btn-secondary:hover {
+                background-color: #BFDBFE;
+            }
+            .btn-danger {
+                background-color: #EF4444;
+                color: white;
+                font-weight: 500;
+                padding: 0.5rem 1rem;
+                border-radius: 0.25rem;
+                transition-property: all;
+                transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+                transition-duration: 150ms;
+            }
+            .btn-danger:hover {
+                background-color: #DC2626;
+            }
+            .input-field {
+                width: 100%;
+                padding: 0.5rem 1rem;
+                border: 1px solid #D1D5DB;
+                border-radius: 0.375rem;
+                outline: none;
+            }
+            .input-field:focus {
+                box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
+                border-color: #3B82F6;
+                outline: none;
+            }
+            .table-header {
+                padding: 0.75rem 1.5rem;
+                text-align: left;
+                font-size: 0.75rem;
+                font-weight: 500;
+                color: #6B7280;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+            }
+            .table-cell {
+                padding: 1rem 1.5rem;
+                white-space: nowrap;
+                font-size: 0.875rem;
+                color: #111827;
+            }
+            .card {
+                background-color: white;
+                border-radius: 0.5rem;
+                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+                padding: 1.5rem;
+            }
+            .badge {
+                padding: 0.25rem 0.5rem;
+                font-size: 0.75rem;
+                font-weight: 600;
+                border-radius: 9999px;
+            }
+            .badge-success {
+                background-color: #D1FAE5;
+                color: #065F46;
+            }
+            .badge-warning {
+                background-color: #FEF3C7;
+                color: #92400E;
+            }
+            .badge-danger {
+                background-color: #FEE2E2;
+                color: #991B1B;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans">
+    <div class="flex h-screen overflow-hidden">
+        <!-- 侧边导航栏 -->
+        <div class="w-64 bg-primary text-white shadow-lg hidden md:block">
+            <div class="flex items-center justify-center h-16 border-b border-blue-700">
+                <img src="backend/img/myspellpal.png" alt="MySpellPal" class="w-10 h-10 object-contain mr-2">
+                <h1 class="text-xl font-bold">学生管理系统</h1>
+            </div>
+            <nav class="mt-5">
+                <ul>
+                    <li>
+                        <a href="#dashboard" class="flex items-center px-6 py-3 sidebar-active" data-target="dashboard">
+                            <i class="fa fa-dashboard sidebar-icon"></i>
+                            <span>系统概览</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#students" class="flex items-center px-6 py-3 hover:bg-blue-700 transition-all" data-target="students">
+                            <i class="fa fa-users sidebar-icon"></i>
+                            <span>学生信息管理</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#classes" class="flex items-center px-6 py-3 hover:bg-blue-700 transition-all" data-target="classes" onclick="loadClasses()">
+                            <i class="fa fa-graduation-cap sidebar-icon"></i>
+                            <span>班级管理</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#grades" class="flex items-center px-6 py-3 hover:bg-blue-700 transition-all" data-target="grades">
+                            <i class="fa fa-graduation-cap sidebar-icon"></i>
+                            <span>成绩管理</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#attendance" class="flex items-center px-6 py-3 hover:bg-blue-700 transition-all" data-target="attendance">
+                            <i class="fa fa-calendar-check-o sidebar-icon"></i>
+                            <span>出勤管理</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#statistics" class="flex items-center px-6 py-3 hover:bg-blue-700 transition-all" data-target="statistics">
+                            <i class="fa fa-bar-chart sidebar-icon"></i>
+                            <span>数据统计</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#settings" class="flex items-center px-6 py-3 hover:bg-blue-700 transition-all" data-target="settings">
+                            <i class="fa fa-cog sidebar-icon"></i>
+                            <span>系统设置</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- 移动端导航菜单按钮 -->
+        <div class="md:hidden fixed bottom-4 right-4 z-50">
+            <button id="mobile-menu-button" class="bg-primary text-white p-3 rounded-full shadow-lg">
+                <i class="fa fa-bars"></i>
+            </button>
+        </div>
+
+        <!-- 移动端导航菜单 -->
+        <div id="mobile-menu" class="fixed inset-0 bg-gray-900 bg-opacity-50 z-40 hidden">
+            <div class="bg-primary w-64 h-full transform transition-transform duration-300 -translate-x-full" id="mobile-menu-content">
+                <div class="flex items-center justify-between p-4 border-b border-blue-700">
+                    <div class="flex items-center">
+                        <img src="backend/img/myspellpal.png" alt="MySpellPal" class="w-8 h-8 object-contain mr-2">
+                        <h1 class="text-lg font-bold text-white">学生管理系统</h1>
+                    </div>
+                    <button id="mobile-menu-close" class="text-white">
+                        <i class="fa fa-times"></i>
+                    </button>
+                </div>
+                <nav class="mt-5">
+                    <ul>
+                        <li>
+                            <a href="#dashboard" class="flex items-center px-6 py-3 sidebar-active mobile-nav-item" data-target="dashboard">
+                                <i class="fa fa-dashboard sidebar-icon"></i>
+                                <span>系统概览</span>
+                            </a>
+                        </li>
+                        <li>
+                        <a href="#students" class="flex items-center px-6 py-3 hover:bg-blue-700 transition-all mobile-nav-item" data-target="students">
+                            <i class="fa fa-users sidebar-icon"></i>
+                            <span>学生信息管理</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#classes" class="flex items-center px-6 py-3 hover:bg-blue-700 transition-all mobile-nav-item" data-target="classes">
+                            <i class="fa fa-graduation-cap sidebar-icon"></i>
+                            <span>班级管理</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#grades" class="flex items-center px-6 py-3 hover:bg-blue-700 transition-all mobile-nav-item" data-target="grades">
+                            <i class="fa fa-graduation-cap sidebar-icon"></i>
+                            <span>成绩管理</span>
+                        </a>
+                    </li>
+                        <li>
+                            <a href="#attendance" class="flex items-center px-6 py-3 hover:bg-blue-700 transition-all mobile-nav-item" data-target="attendance">
+                                <i class="fa fa-calendar-check-o sidebar-icon"></i>
+                                <span>出勤管理</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#statistics" class="flex items-center px-6 py-3 hover:bg-blue-700 transition-all mobile-nav-item" data-target="statistics">
+                                <i class="fa fa-bar-chart sidebar-icon"></i>
+                                <span>数据统计</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#settings" class="flex items-center px-6 py-3 hover:bg-blue-700 transition-all mobile-nav-item" data-target="settings">
+                                <i class="fa fa-cog sidebar-icon"></i>
+                                <span>系统设置</span>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+
+        <!-- 主内容区域 -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <!-- 顶部导航栏 -->
+            <header class="bg-white shadow-sm z-10">
+                <div class="flex items-center justify-between h-16 px-6">
+                    <div class="flex items-center">
+                        <button id="sidebar-toggle" class="text-gray-500 focus:outline-none md:hidden">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <h2 id="page-title" class="ml-4 text-lg font-medium text-gray-900">系统概览</h2>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <div class="relative">
+                            <button class="flex items-center text-gray-700 focus:outline-none">
+                                <span class="mr-2">管理员</span>
+                                <i class="fa fa-user-circle text-xl"></i>
+                            </button>
+                        </div>
+                        <button id="logout-btn" class="flex items-center text-gray-700 focus:outline-none hover:text-red-500 transition-colors">
+                            <i class="fa fa-sign-out mr-1"></i>
+                            <span>退出登录</span>
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            <!-- 内容区域 -->
+            <main class="flex-1 overflow-y-auto bg-gray-50 p-6">
+                <!-- 系统概览 -->
+                <div id="dashboard" class="page-content active">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                        <div class="bg-white rounded-lg shadow-md p-6">
+                            <div class="flex items-center">
+                                <div class="p-3 rounded-full bg-blue-100 text-blue-600">
+                                    <i class="fa fa-users fa-2x"></i>
+                                </div>
+                                <div class="ml-4">
+                                    <p class="text-sm font-medium text-gray-500">学生总数</p>
+                                    <p class="text-2xl font-semibold text-gray-900">248</p>
+                                </div>
+                            </div>
+                            <div class="mt-4">
+                                <div class="flex items-center">
+                                    <span class="text-green-500 text-sm font-medium">
+                                        <i class="fa fa-arrow-up mr-1"></i> 4.65%
+                                    </span>
+                                    <span class="text-gray-500 text-sm ml-2">较上月</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-lg shadow-md p-6">
+                            <div class="flex items-center">
+                                <div class="p-3 rounded-full bg-green-100 text-green-600">
+                                    <i class="fa fa-graduation-cap fa-2x"></i>
+                                </div>
+                                <div class="ml-4">
+                                    <p class="text-sm font-medium text-gray-500">课程总数</p>
+                                    <p class="text-2xl font-semibold text-gray-900">36</p>
+                                </div>
+                            </div>
+                            <div class="mt-4">
+                                <div class="flex items-center">
+                                    <span class="text-green-500 text-sm font-medium">
+                                        <i class="fa fa-arrow-up mr-1"></i> 2.8%
+                                    </span>
+                                    <span class="text-gray-500 text-sm ml-2">较上学期</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-lg shadow-md p-6">
+                            <div class="flex items-center">
+                                <div class="p-3 rounded-full bg-yellow-100 text-yellow-600">
+                                    <i class="fa fa-calendar-check-o fa-2x"></i>
+                                </div>
+                                <div class="ml-4">
+                                    <p class="text-sm font-medium text-gray-500">今日出勤</p>
+                                    <p class="text-2xl font-semibold text-gray-900">96.8%</p>
+                                </div>
+                            </div>
+                            <div class="mt-4">
+                                <div class="flex items-center">
+                                    <span class="text-red-500 text-sm font-medium">
+                                        <i class="fa fa-arrow-down mr-1"></i> 1.2%
+                                    </span>
+                                    <span class="text-gray-500 text-sm ml-2">较昨日</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-lg shadow-md p-6">
+                            <div class="flex items-center">
+                                <div class="p-3 rounded-full bg-red-100 text-red-600">
+                                    <i class="fa fa-exclamation-triangle fa-2x"></i>
+                                </div>
+                                <div class="ml-4">
+                                    <p class="text-sm font-medium text-gray-500">待处理事项</p>
+                                    <p class="text-2xl font-semibold text-gray-900">12</p>
+                                </div>
+                            </div>
+                            <div class="mt-4">
+                                <div class="flex items-center">
+                                    <span class="text-green-500 text-sm font-medium">
+                                        <i class="fa fa-arrow-down mr-1"></i> 8.3%
+                                    </span>
+                                    <span class="text-gray-500 text-sm ml-2">较上周</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                        <div class="bg-white rounded-lg shadow-md p-6">
+                            <h3 class="text-lg font-medium text-gray-900 mb-4">学生成绩分布</h3>
+                            <div class="h-64">
+                                <canvas id="gradesChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-lg shadow-md p-6">
+                            <h3 class="text-lg font-medium text-gray-900 mb-4">出勤趋势</h3>
+                            <div class="h-64">
+                                <canvas id="attendanceChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow-md p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-lg font-medium text-gray-900">最近活动</h3>
+                            <button class="text-blue-600 hover:text-blue-800 text-sm font-medium">查看全部</button>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th scope="col" class="table-header">活动类型</th>
+                                        <th scope="col" class="table-header">描述</th>
+                                        <th scope="col" class="table-header">操作人</th>
+                                        <th scope="col" class="table-header">时间</th>
+                                        <th scope="col" class="table-header">状态</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200">
+                                    <tr>
+                                        <td class="table-cell">
+                                            <div class="flex items-center">
+                                                <div class="flex-shrink-0 h-8 w-8 bg-blue-100 rounded-full flex items-center justify-center">
+                                                    <i class="fa fa-user-plus text-blue-600"></i>
+                                                </div>
+                                                <div class="ml-3">
+                                                    <p class="text-sm font-medium text-gray-900">添加学生</p>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="table-cell">添加了新学生 张三</td>
+                                        <td class="table-cell">王老师</td>
+                                        <td class="table-cell">2023-06-15 09:45</td>
+                                        <td class="table-cell">
+                                            <span class="badge badge-success">已完成</span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="table-cell">
+                                            <div class="flex items-center">
+                                                <div class="flex-shrink-0 h-8 w-8 bg-green-100 rounded-full flex items-center justify-center">
+                                                    <i class="fa fa-graduation-cap text-green-600"></i>
+                                                </div>
+                                                <div class="ml-3">
+                                                    <p class="text-sm font-medium text-gray-900">成绩录入</p>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="table-cell">录入了高等数学成绩</td>
+                                        <td class="table-cell">李老师</td>
+                                        <td class="table-cell">2023-06-14 14:30</td>
+                                        <td class="table-cell">
+                                            <span class="badge badge-success">已完成</span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="table-cell">
+                                            <div class="flex items-center">
+                                                <div class="flex-shrink-0 h-8 w-8 bg-yellow-100 rounded-full flex items-center justify-center">
+                                                    <i class="fa fa-calendar-check-o text-yellow-600"></i>
+                                                </div>
+                                                <div class="ml-3">
+                                                    <p class="text-sm font-medium text-gray-900">出勤记录</p>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="table-cell">记录了2023-06-15的出勤情况</td>
+                                        <td class="table-cell">张老师</td>
+                                        <td class="table-cell">2023-06-15 12:15</td>
+                                        <td class="table-cell">
+                                            <span class="badge badge-warning">处理中</span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="table-cell">
+                                            <div class="flex items-center">
+                                                <div class="flex-shrink-0 h-8 w-8 bg-red-100 rounded-full flex items-center justify-center">
+                                                    <i class="fa fa-exclamation-circle text-red-600"></i>
+                                                </div>
+                                                <div class="ml-3">
+                                                    <p class="text-sm font-medium text-gray-900">请假申请</p>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="table-cell">李四提交了请假申请</td>
+                                        <td class="table-cell">李四</td>
+                                        <td class="table-cell">2023-06-15 10:20</td>
+                                        <td class="table-cell">
+                                            <span class="badge badge-danger">待审批</span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 班级管理 -->
+                <div id="classes" class="page-content hidden">
+                    <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+                        <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
+                            <h3 class="text-lg font-medium text-gray-900 mb-4 md:mb-0">班级管理</h3>
+                            <div class="flex flex-col md:flex-row space-y-3 md:space-y-0 md:space-x-3">
+                                <div class="relative">
+                                    <input type="text" placeholder="搜索班级..." class="input-field pl-10">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <i class="fa fa-search text-gray-400"></i>
+                                    </div>
+                                </div>
+                                <button id="add-class-btn" class="btn-primary flex items-center justify-center">
+                                    <i class="fa fa-plus mr-2"></i> 创建班级
+                                </button>
+                            </div>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th scope="col" class="table-header">班级ID</th>
+                                        <th scope="col" class="table-header">班级名称</th>
+                                        <th scope="col" class="table-header">教师</th>
+                                        <th scope="col" class="table-header">邀请码</th>
+                                        <th scope="col" class="table-header">学生人数</th>
+                                        <th scope="col" class="table-header">创建时间</th>
+                                        <th scope="col" class="table-header">操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200" id="classes-table-body">
+                                    <!-- 班级数据将通过JavaScript动态生成 -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="flex items-center justify-between mt-6">
+                            <div class="text-sm text-gray-700">
+                                显示 <span class="font-medium">1</span> 到 <span class="font-medium">10</span> 条，共 <span class="font-medium">0</span> 条
+                            </div>
+                            <div class="flex space-x-2">
+                                <button class="px-3 py-1 border border-gray-300 rounded-md text-sm disabled:opacity-50" disabled>上一页</button>
+                                <button class="px-3 py-1 bg-blue-600 text-white border border-blue-600 rounded-md text-sm">1</button>
+                                <button class="px-3 py-1 border border-gray-300 rounded-md text-sm">2</button>
+                                <button class="px-3 py-1 border border-gray-300 rounded-md text-sm">3</button>
+                                <button class="px-3 py-1 border border-gray-300 rounded-md text-sm">下一页</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 学生信息管理 -->
+                <div id="students" class="page-content hidden">
+                    <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+                        <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
+                            <h3 class="text-lg font-medium text-gray-900 mb-4 md:mb-0">学生信息管理</h3>
+                            <div class="flex flex-col md:flex-row space-y-3 md:space-y-0 md:space-x-3">
+                                <div class="relative">
+                                    <input type="text" placeholder="搜索学生..." class="input-field pl-10">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <i class="fa fa-search text-gray-400"></i>
+                                    </div>
+                                </div>
+                                <button id="add-student-btn" class="btn-primary flex items-center justify-center">
+                                    <i class="fa fa-plus mr-2"></i> 添加学生
+                                </button>
+                            </div>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th scope="col" class="table-header">
+                                            <input type="checkbox" class="h-4 w-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500">
+                                        </th>
+                                        <th scope="col" class="table-header">学号</th>
+                                        <th scope="col" class="table-header">姓名</th>
+                                        <th scope="col" class="table-header">性别</th>
+                                        <th scope="col" class="table-header">出生日期</th>
+                                        <th scope="col" class="table-header">班级</th>
+                                        <th scope="col" class="table-header">专业</th>
+                                        <th scope="col" class="table-header">操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200" id="students-table-body">
+                                    <!-- 学生数据将通过JavaScript动态生成 -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="flex items-center justify-between mt-6">
+                            <div class="text-sm text-gray-700">
+                                显示 <span class="font-medium">1</span> 到 <span class="font-medium">10</span> 条，共 <span class="font-medium">248</span> 条
+                            </div>
+                            <div class="flex space-x-2">
+                                <button class="px-3 py-1 border border-gray-300 rounded-md text-sm disabled:opacity-50" disabled>上一页</button>
+                                <button class="px-3 py-1 bg-blue-600 text-white border border-blue-600 rounded-md text-sm">1</button>
+                                <button class="px-3 py-1 border border-gray-300 rounded-md text-sm">2</button>
+                                <button class="px-3 py-1 border border-gray-300 rounded-md text-sm">3</button>
+                                <button class="px-3 py-1 border border-gray-300 rounded-md text-sm">...</button>
+                                <button class="px-3 py-1 border border-gray-300 rounded-md text-sm">25</button>
+                                <button class="px-3 py-1 border border-gray-300 rounded-md text-sm">下一页</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 成绩管理 -->
+                <div id="grades" class="page-content hidden">
+                    <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+                        <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
+                            <h3 class="text-lg font-medium text-gray-900 mb-4 md:mb-0">成绩管理</h3>
+                            <div class="flex flex-col md:flex-row space-y-3 md:space-y-0 md:space-x-3">
+                                <div class="relative">
+                                    <input type="text" placeholder="搜索学生或科目..." class="input-field pl-10">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <i class="fa fa-search text-gray-400"></i>
+                                    </div>
+                                </div>
+                                <button id="add-grade-btn" class="btn-primary flex items-center justify-center">
+                                    <i class="fa fa-plus mr-2"></i> 添加成绩
+                                </button>
+                            </div>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th scope="col" class="table-header">学号</th>
+                                        <th scope="col" class="table-header">姓名</th>
+                                        <th scope="col" class="table-header">班级</th>
+                                        <th scope="col" class="table-header">科目</th>
+                                        <th scope="col" class="table-header">成绩</th>
+                                        <th scope="col" class="table-header">学期</th>
+                                        <th scope="col" class="table-header">考试日期</th>
+                                        <th scope="col" class="table-header">操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200" id="grades-table-body">
+                                    <!-- 成绩数据将通过JavaScript动态生成 -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="flex items-center justify-between mt-6">
+                            <div class="text-sm text-gray-700">
+                                显示 <span class="font-medium">1</span> 到 <span class="font-medium">10</span> 条，共 <span class="font-medium">1240</span> 条
+                            </div>
+                            <div class="flex space-x-2">
+                                <button class="px-3 py-1 border border-gray-300 rounded-md text-sm disabled:opacity-50" disabled>上一页</button>
+                                <button class="px-3 py-1 bg-blue-600 text-white border border-blue-600 rounded-md text-sm">1</button>
+                                <button class="px-3 py-1 border border-gray-300 rounded-md text-sm">2</button>
+                                <button class="px-3 py-1 border border-gray-300 rounded-md text-sm">3</button>
+                                <button class="px-3 py-1 border border-gray-300 rounded-md text-sm">...</button>
+                                <button class="px-3 py-1 border border-gray-300 rounded-md text-sm">124</button>
+                                <button class="px-3 py-1 border border-gray-300 rounded-md text-sm">下一页</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 出勤管理 -->
+                <div id="attendance" class="page-content hidden">
+                    <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+                        <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
+                            <h3 class="text-lg font-medium text-gray-900 mb-4 md:mb-0">出勤管理</h3>
+                            <div class="flex flex-col md:flex-row space-y-3 md:space-y-0 md:space-x-3">
+                                <div class="relative">
+                                    <input type="text" placeholder="搜索学生..." class="input-field pl-10">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <i class="fa fa-search text-gray-400"></i>
+                                    </div>
+                                </div>
+                                <div>
+                                    <input type="date" class="input-field">
+                                </div>
+                                <button id="record-attendance-btn" class="btn-primary flex items-center justify-center">
+                                    <i class="fa fa-plus mr-2"></i> 记录出勤
+                                </button>
+                            </div>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th scope="col" class="table-header">学号</th>
+                                        <th scope="col" class="table-header">姓名</th>
+                                        <th scope="col" class="table-header">班级</th>
+                                        <th scope="col" class="table-header">日期</th>
+                                        <th scope="col" class="table-header">状态</th>
+                                        <th scope="col" class="table-header">原因</th>
+                                        <th scope="col" class="table-header">操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200" id="attendance-table-body">
+                                    <!-- 出勤数据将通过JavaScript动态生成 -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="flex items-center justify-between mt-6">
+                            <div class="text-sm text-gray-700">
+                                显示 <span class="font-medium">1</span> 到 <span class="font-medium">10</span> 条，共 <span class="font-medium">744</span> 条
+                            </div>
+                            <div class="flex space-x-2">
+                                <button class="px-3 py-1 border border-gray-300 rounded-md text-sm disabled:opacity-50" disabled>上一页</button>
+                                <button class="px-3 py-1 bg-blue-600 text-white border border-blue-600 rounded-md text-sm">1</button>
+                                <button class="px-3 py-1 border border-gray-300 rounded-md text-sm">2</button>
+                                <button class="px-3 py-1 border border-gray-300 rounded-md text-sm">3</button>
+                                <button class="px-3 py-1 border border-gray-300 rounded-md text-sm">...</button>
+                                <button class="px-3 py-1 border border-gray-300 rounded-md text-sm">75</button>
+                                <button class="px-3 py-1 border border-gray-300 rounded-md text-sm">下一页</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 数据统计 -->
+                <div id="statistics" class="page-content hidden">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                        <div class="bg-white rounded-lg shadow-md p-6">
+                            <h3 class="text-lg font-medium text-gray-900 mb-4">学生成绩分布</h3>
+                            <div class="h-64">
+                                <canvas id="gradeDistributionChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-lg shadow-md p-6">
+                            <h3 class="text-lg font-medium text-gray-900 mb-4">各班级成绩对比</h3>
+                            <div class="h-64">
+                                <canvas id="classComparisonChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                        <div class="bg-white rounded-lg shadow-md p-6">
+                            <h3 class="text-lg font-medium text-gray-900 mb-4">出勤情况趋势</h3>
+                            <div class="h-64">
+                                <canvas id="attendanceTrendChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-lg shadow-md p-6">
+                            <h3 class="text-lg font-medium text-gray-900 mb-4">学生综合表现</h3>
+                            <div class="h-64">
+                                <canvas id="studentPerformanceChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-lg shadow-md p-6">
+                        <h3 class="text-lg font-medium text-gray-900 mb-4">成绩详情统计</h3>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th scope="col" class="table-header">科目</th>
+                                        <th scope="col" class="table-header">参考人数</th>
+                                        <th scope="col" class="table-header">平均分</th>
+                                        <th scope="col" class="table-header">最高分</th>
+                                        <th scope="col" class="table-header">最低分</th>
+                                        <th scope="col" class="table-header">及格率</th>
+                                        <th scope="col" class="table-header">优秀率</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200">
+                                    <tr>
+                                        <td class="table-cell">高等数学</td>
+                                        <td class="table-cell">248</td>
+                                        <td class="table-cell">78.5</td>
+                                        <td class="table-cell">98</td>
+                                        <td class="table-cell">52</td>
+                                        <td class="table-cell">86.3%</td>
+                                        <td class="table-cell">24.6%</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="table-cell">大学物理</td>
+                                        <td class="table-cell">248</td>
+                                        <td class="table-cell">75.2</td>
+                                        <td class="table-cell">96</td>
+                                        <td class="table-cell">48</td>
+                                        <td class="table-cell">82.7%</td>
+                                        <td class="table-cell">19.8%</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="table-cell">计算机基础</td>
+                                        <td class="table-cell">248</td>
+                                        <td class="table-cell">82.4</td>
+                                        <td class="table-cell">100</td>
+                                        <td class="table-cell">62</td>
+                                        <td class="table-cell">94.3%</td>
+                                        <td class="table-cell">38.7%</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="table-cell">英语</td>
+                                        <td class="table-cell">248</td>
+                                        <td class="table-cell">76.8</td>
+                                        <td class="table-cell">95</td>
+                                        <td class="table-cell">55</td>
+                                        <td class="table-cell">88.3%</td>
+                                        <td class="table-cell">22.2%</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="table-cell">思想政治</td>
+                                        <td class="table-cell">248</td>
+                                        <td class="table-cell">80.1</td>
+                                        <td class="table-cell">97</td>
+                                        <td class="table-cell">60</td>
+                                        <td class="table-cell">92.8%</td>
+                                        <td class="table-cell">31.5%</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 系统设置 -->
+                <div id="settings" class="page-content hidden">
+                    <div class="bg-white rounded-lg shadow-md p-6">
+                        <h3 class="text-lg font-medium text-gray-900 mb-6">系统设置</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <h4 class="text-md font-medium text-gray-700 mb-4">基本设置</h4>
+                                <div class="space-y-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">系统名称</label>
+                                        <input type="text" value="学生管理系统" class="input-field">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">学校名称</label>
+                                        <input type="text" value="示例大学" class="input-field">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">联系邮箱</label>
+                                        <input type="email" value="admin@example.edu" class="input-field">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">联系电话</label>
+                                        <input type="tel" value="010-12345678" class="input-field">
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <h4 class="text-md font-medium text-gray-700 mb-4">高级设置</h4>
+                                <div class="space-y-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">数据备份频率</label>
+                                        <select class="input-field">
+                                            <option>每天</option>
+                                            <option selected>每周</option>
+                                            <option>每月</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">系统语言</label>
+                                        <select class="input-field">
+                                            <option selected>简体中文</option>
+                                            <option>English</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">时区设置</label>
+                                        <select class="input-field">
+                                            <option selected>(GMT+8:00) 北京时间</option>
+                                            <option>(GMT+0:00) 格林威治标准时间</option>
+                                            <option>(GMT-5:00) 东部标准时间</option>
+                                        </select>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <input type="checkbox" id="enable-notifications" class="h-4 w-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500" checked>
+                                        <label for="enable-notifications" class="ml-2 block text-sm text-gray-700">启用系统通知</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-8 flex justify-end">
+                            <button class="btn-secondary mr-3">取消</button>
+                            <button class="btn-primary">保存设置</button>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- 创建班级模态框 -->
+    <div id="add-class-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+            <div class="flex items-center justify-between p-6 border-b border-gray-200">
+                <h3 class="text-lg font-medium text-gray-900">创建班级</h3>
+                <button id="close-class-modal" class="text-gray-400 hover:text-gray-500">
+                    <i class="fa fa-times"></i>
+                </button>
+            </div>
+            <div class="p-6">
+                <form id="add-class-form">
+                    <div class="grid grid-cols-1 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">班级名称</label>
+                            <input type="text" id="class-name" class="input-field" placeholder="例如：计算机科学2023级1班" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">班级描述</label>
+                            <textarea id="class-description" class="input-field" rows="3" placeholder="请输入班级描述信息"></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">教师姓名</label>
+                            <input type="text" id="class-teacher" class="input-field" placeholder="请输入教师姓名" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">邀请码</label>
+                            <div class="flex">
+                                <input type="text" id="class-invite-code" class="input-field rounded-r-none" placeholder="自动生成或手动输入" required>
+                                <button type="button" id="generate-code-btn" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-r-md border border-l-0 border-gray-300">
+                                    生成
+                                </button>
+                            </div>
+                            <p class="text-xs text-gray-500 mt-1">邀请码用于学生加入班级，请分享给学生</p>
+                        </div>
+                    </div>
+                    <div class="mt-6 flex justify-end">
+                        <button type="button" id="cancel-add-class" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-4 rounded mr-3">
+                            取消
+                        </button>
+                        <button type="submit" class="btn-primary">
+                            创建班级
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- 添加学生模态框 -->
+    <div id="add-student-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+            <div class="flex items-center justify-between p-6 border-b border-gray-200">
+                <h3 class="text-lg font-medium text-gray-900">添加学生</h3>
+                <button id="close-student-modal" class="text-gray-400 hover:text-gray-500">
+                    <i class="fa fa-times"></i>
+                </button>
+            </div>
+            <div class="p-6">
+                <form id="add-student-form">
+                    <div class="grid grid-cols-1 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">学号</label>
+                            <input type="text" id="student-id" class="input-field" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">姓名</label>
+                            <input type="text" id="student-name" class="input-field" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">性别</label>
+                            <select id="student-gender" class="input-field" required>
+                                <option value="">请选择</option>
+                                <option value="男">男</option>
+                                <option value="女">女</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">出生日期</label>
+                            <input type="date" id="student-birthdate" class="input-field" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">班级</label>
+                            <input type="text" id="student-class" class="input-field" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">专业</label>
+                            <input type="text" id="student-major" class="input-field" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">联系方式</label>
+                            <input type="tel" id="student-contact" class="input-field" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">地址</label>
+                            <textarea id="student-address" class="input-field" rows="3" required></textarea>
+                        </div>
+                    </div>
+                    <div class="mt-6 flex justify-end">
+                        <button type="button" id="cancel-add-student" class="btn-secondary mr-3">取消</button>
+                        <button type="submit" class="btn-primary">保存</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- 添加成绩模态框 -->
+    <div id="add-grade-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+            <div class="flex items-center justify-between p-6 border-b border-gray-200">
+                <h3 class="text-lg font-medium text-gray-900">添加成绩</h3>
+                <button id="close-grade-modal" class="text-gray-400 hover:text-gray-500">
+                    <i class="fa fa-times"></i>
+                </button>
+            </div>
+            <div class="p-6">
+                <form id="add-grade-form">
+                    <div class="grid grid-cols-1 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">学号</label>
+                            <input type="text" id="grade-student-id" class="input-field" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">姓名</label>
+                            <input type="text" id="grade-student-name" class="input-field" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">班级</label>
+                            <input type="text" id="grade-student-class" class="input-field" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">科目</label>
+                            <select id="grade-subject" class="input-field" required>
+                                <option value="">请选择</option>
+                                <option value="高等数学">高等数学</option>
+                                <option value="大学物理">大学物理</option>
+                                <option value="计算机基础">计算机基础</option>
+                                <option value="英语">英语</option>
+                                <option value="思想政治">思想政治</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">成绩</label>
+                            <input type="number" id="grade-score" min="0" max="100" class="input-field" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">学期</label>
+                            <select id="grade-semester" class="input-field" required>
+                                <option value="">请选择</option>
+                                <option value="2022-2023-1">2022-2023学年第一学期</option>
+                                <option value="2022-2023-2">2022-2023学年第二学期</option>
+                                <option value="2023-2024-1">2023-2024学年第一学期</option>
+                                <option value="2023-2024-2">2023-2024学年第二学期</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">考试日期</label>
+                            <input type="date" id="grade-date" class="input-field" required>
+                        </div>
+                    </div>
+                    <div class="mt-6 flex justify-end">
+                        <button type="button" id="cancel-add-grade" class="btn-secondary mr-3">取消</button>
+                        <button type="submit" class="btn-primary">保存</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- 记录出勤模态框 -->
+    <div id="record-attendance-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+            <div class="flex items-center justify-between p-6 border-b border-gray-200">
+                <h3 class="text-lg font-medium text-gray-900">记录出勤</h3>
+                <button id="close-attendance-modal" class="text-gray-400 hover:text-gray-500">
+                    <i class="fa fa-times"></i>
+                </button>
+            </div>
+            <div class="p-6">
+                <form id="record-attendance-form">
+                    <div class="grid grid-cols-1 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">学号</label>
+                            <input type="text" id="attendance-student-id" class="input-field" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">姓名</label>
+                            <input type="text" id="attendance-student-name" class="input-field" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">班级</label>
+                            <input type="text" id="attendance-student-class" class="input-field" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">日期</label>
+                            <input type="date" id="attendance-date" class="input-field" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">状态</label>
+                            <select id="attendance-status" class="input-field" required>
+                                <option value="">请选择</option>
+                                <option value="出勤">出勤</option>
+                                <option value="迟到">迟到</option>
+                                <option value="早退">早退</option>
+                                <option value="缺勤">缺勤</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">原因</label>
+                            <textarea id="attendance-reason" class="input-field" rows="3"></textarea>
+                        </div>
+                    </div>
+                    <div class="mt-6 flex justify-end">
+                        <button type="button" id="cancel-record-attendance" class="btn-secondary mr-3">取消</button>
+                        <button type="submit" class="btn-primary">保存</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- 布置作业模态框 (显示在最上层) -->
+    <div id="assign-homework-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-60 hidden">
+        <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+            <div class="flex items-center justify-between p-6 border-b border-gray-200">
+                <h3 class="text-lg font-medium text-gray-900">布置作业</h3>
+                <button id="close-homework-modal" class="text-gray-400 hover:text-gray-500">
+                    <i class="fa fa-times"></i>
+                </button>
+            </div>
+            <div class="p-6">
+                <form id="assign-homework-form">
+                    <input type="hidden" id="homework-class-id">
+                    <div class="grid grid-cols-1 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">作业标题</label>
+                            <input type="text" id="homework-title" class="input-field" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">单词数量</label>
+                            <input type="number" id="homework-word-count" class="input-field" min="1" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">单词难度</label>
+                            <select id="homework-word-level" class="input-field" required>
+                                <option value="beginner">初级</option>
+                                <option value="intermediate">中级</option>
+                                <option value="advanced">高级</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">截止时间</label>
+                            <input type="datetime-local" id="homework-deadline" class="input-field" required>
+                        </div>
+                    </div>
+                    <div class="mt-6 flex justify-end">
+                        <button type="button" id="cancel-homework" class="btn-secondary mr-3">取消</button>
+                        <button type="submit" class="btn-primary">保存</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- 查看作业完成情况模态框 -->
+    <div id="homework-status-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[80vh] overflow-y-auto">
+            <div class="flex items-center justify-between p-6 border-b border-gray-200">
+                <h3 class="text-lg font-medium text-gray-900">作业完成情况</h3>
+                <button id="close-homework-status-modal" class="text-gray-400 hover:text-gray-500">
+                    <i class="fa fa-times"></i>
+                </button>
+            </div>
+            <div class="p-6">
+                <h4 id="homework-status-title" class="text-md font-medium text-gray-900 mb-3"></h4>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">序号</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">学生用户名</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">提交状态</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">提交时间</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="homework-status-list" class="bg-white divide-y divide-gray-200">
+                            <!-- 作业完成情况将通过JavaScript动态生成 -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 模拟数据
+        const students = [
+            { id: '2023001', name: '张三', gender: '男', birthdate: '2005-01-15', class: '计算机2301', major: '计算机科学与技术', contact: '13800138001', address: '北京市海淀区' },
+            { id: '2023002', name: '李四', gender: '女', birthdate: '2005-03-22', class: '计算机2301', major: '计算机科学与技术', contact: '13800138002', address: '上海市浦东新区' },
+            { id: '2023003', name: '王五', gender: '男', birthdate: '2004-12-10', class: '计算机2302', major: '计算机科学与技术', contact: '13800138003', address: '广州市天河区' },
+            { id: '2023004', name: '赵六', gender: '女', birthdate: '2005-05-08', class: '计算机2302', major: '计算机科学与技术', contact: '13800138004', address: '深圳市南山区' },
+            { id: '2023005', name: '钱七', gender: '男', birthdate: '2005-02-17', class: '电子2301', major: '电子信息工程', contact: '13800138005', address: '成都市锦江区' },
+            { id: '2023006', name: '孙八', gender: '女', birthdate: '2005-04-30', class: '电子2301', major: '电子信息工程', contact: '13800138006', address: '武汉市洪山区' },
+            { id: '2023007', name: '周九', gender: '男', birthdate: '2004-11-25', class: '电子2302', major: '电子信息工程', contact: '13800138007', address: '西安市雁塔区' },
+            { id: '2023008', name: '吴十', gender: '女', birthdate: '2005-06-12', class: '电子2302', major: '电子信息工程', contact: '13800138008', address: '重庆市渝中区' },
+            { id: '2023009', name: '郑十一', gender: '男', birthdate: '2005-07-05', class: '自动化2301', major: '自动化', contact: '13800138009', address: '南京市鼓楼区' },
+            { id: '2023010', name: '王十二', gender: '女', birthdate: '2005-08-18', class: '自动化2301', major: '自动化', contact: '13800138010', address: '杭州市西湖区' }
+        ];
+
+        const grades = [
+            { studentId: '2023001', name: '张三', class: '计算机2301', subject: '高等数学', score: 85, semester: '2023-2024-1', date: '2023-12-15' },
+            { studentId: '2023001', name: '张三', class: '计算机2301', subject: '大学物理', score: 78, semester: '2023-2024-1', date: '2023-12-18' },
+            { studentId: '2023001', name: '张三', class: '计算机2301', subject: '计算机基础', score: 92, semester: '2023-2024-1', date: '2023-12-20' },
+            { studentId: '2023002', name: '李四', class: '计算机2301', subject: '高等数学', score: 90, semester: '2023-2024-1', date: '2023-12-15' },
+            { studentId: '2023002', name: '李四', class: '计算机2301', subject: '大学物理', score: 88, semester: '2023-2024-1', date: '2023-12-18' },
+            { studentId: '2023002', name: '李四', class: '计算机2301', subject: '计算机基础', score: 95, semester: '2023-2024-1', date: '2023-12-20' },
+            { studentId: '2023003', name: '王五', class: '计算机2302', subject: '高等数学', score: 75, semester: '2023-2024-1', date: '2023-12-15' },
+            { studentId: '2023003', name: '王五', class: '计算机2302', subject: '大学物理', score: 68, semester: '2023-2024-1', date: '2023-12-18' },
+            { studentId: '2023003', name: '王五', class: '计算机2302', subject: '计算机基础', score: 82, semester: '2023-2024-1', date: '2023-12-20' },
+            { studentId: '2023004', name: '赵六', class: '计算机2302', subject: '高等数学', score: 88, semester: '2023-2024-1', date: '2023-12-15' }
+        ];
+
+        const attendance = [
+            { studentId: '2023001', name: '张三', class: '计算机2301', date: '2023-06-15', status: '出勤', reason: '' },
+            { studentId: '2023002', name: '李四', class: '计算机2301', date: '2023-06-15', status: '缺勤', reason: '请假' },
+            { studentId: '2023003', name: '王五', class: '计算机2302', date: '2023-06-15', status: '迟到', reason: '交通拥堵' },
+            { studentId: '2023004', name: '赵六', class: '计算机2302', date: '2023-06-15', status: '出勤', reason: '' },
+            { studentId: '2023005', name: '钱七', class: '电子2301', date: '2023-06-15', status: '出勤', reason: '' },
+            { studentId: '2023006', name: '孙八', class: '电子2301', date: '2023-06-15', status: '早退', reason: '家中有事' },
+            { studentId: '2023007', name: '周九', class: '电子2302', date: '2023-06-15', status: '出勤', reason: '' },
+            { studentId: '2023008', name: '吴十', class: '电子2302', date: '2023-06-15', status: '出勤', reason: '' },
+            { studentId: '2023009', name: '郑十一', class: '自动化2301', date: '2023-06-15', status: '迟到', reason: '睡过头' },
+            { studentId: '2023010', name: '王十二', class: '自动化2301', date: '2023-06-15', status: '出勤', reason: '' }
+        ];
+
+        // DOM 加载完成后执行
+        document.addEventListener('DOMContentLoaded', function() {
+            // 初始化页面
+            initPage();
+            
+            // 初始化图表
+            initCharts();
+            
+            // 初始化事件监听
+            initEventListeners();
+        });
+
+        // 初始化页面
+        function initPage() {
+            // 设置默认教师用户
+            if (!localStorage.getItem('currentUser')) {
+                localStorage.setItem('currentUser', 'teacher');
+            }
+            
+            // 加载学生数据
+            loadStudents();
+            
+            // 加载成绩数据
+            loadGrades();
+            
+            // 加载出勤数据
+            loadAttendance();
+        }
+
+        // 加载学生数据
+        function loadStudents() {
+            const tableBody = document.getElementById('students-table-body');
+            tableBody.innerHTML = '';
+            
+            students.forEach(student => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="table-cell">
+                        <input type="checkbox" class="h-4 w-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500">
+                    </td>
+                    <td class="table-cell">${student.id}</td>
+                    <td class="table-cell">${student.name}</td>
+                    <td class="table-cell">${student.gender}</td>
+                    <td class="table-cell">${student.birthdate}</td>
+                    <td class="table-cell">${student.class}</td>
+                    <td class="table-cell">${student.major}</td>
+                    <td class="table-cell">
+                        <div class="flex space-x-2">
+                            <button class="text-blue-600 hover:text-blue-800 edit-student" data-id="${student.id}">
+                                <i class="fa fa-edit"></i>
+                            </button>
+                            <button class="text-red-600 hover:text-red-800 delete-student" data-id="${student.id}">
+                                <i class="fa fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+            
+            // 添加编辑和删除事件监听
+            document.querySelectorAll('.edit-student').forEach(button => {
+                button.addEventListener('click', function() {
+                    const studentId = this.getAttribute('data-id');
+                    editStudent(studentId);
+                });
+            });
+            
+            document.querySelectorAll('.delete-student').forEach(button => {
+                button.addEventListener('click', function() {
+                    const studentId = this.getAttribute('data-id');
+                    deleteStudent(studentId);
+                });
+            });
+        }
+
+        // 加载成绩数据
+        function loadGrades() {
+            const tableBody = document.getElementById('grades-table-body');
+            tableBody.innerHTML = '';
+            
+            grades.forEach(grade => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="table-cell">${grade.studentId}</td>
+                    <td class="table-cell">${grade.name}</td>
+                    <td class="table-cell">${grade.class}</td>
+                    <td class="table-cell">${grade.subject}</td>
+                    <td class="table-cell">${grade.score}</td>
+                    <td class="table-cell">${grade.semester}</td>
+                    <td class="table-cell">${grade.date}</td>
+                    <td class="table-cell">
+                        <div class="flex space-x-2">
+                            <button class="text-blue-600 hover:text-blue-800 edit-grade" data-id="${grade.studentId}" data-subject="${grade.subject}">
+                                <i class="fa fa-edit"></i>
+                            </button>
+                            <button class="text-red-600 hover:text-red-800 delete-grade" data-id="${grade.studentId}" data-subject="${grade.subject}">
+                                <i class="fa fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+            
+            // 添加编辑和删除事件监听
+            document.querySelectorAll('.edit-grade').forEach(button => {
+                button.addEventListener('click', function() {
+                    const studentId = this.getAttribute('data-id');
+                    const subject = this.getAttribute('data-subject');
+                    editGrade(studentId, subject);
+                });
+            });
+            
+            document.querySelectorAll('.delete-grade').forEach(button => {
+                button.addEventListener('click', function() {
+                    const studentId = this.getAttribute('data-id');
+                    const subject = this.getAttribute('data-subject');
+                    deleteGrade(studentId, subject);
+                });
+            });
+        }
+
+        // 加载出勤数据
+        function loadAttendance() {
+            const tableBody = document.getElementById('attendance-table-body');
+            tableBody.innerHTML = '';
+            
+            attendance.forEach(record => {
+                const row = document.createElement('tr');
+                
+                // 根据状态设置标签样式
+                let statusBadge = '';
+                if (record.status === '出勤') {
+                    statusBadge = '<span class="badge badge-success">出勤</span>';
+                } else if (record.status === '迟到') {
+                    statusBadge = '<span class="badge badge-warning">迟到</span>';
+                } else if (record.status === '早退') {
+                    statusBadge = '<span class="badge badge-warning">早退</span>';
+                } else if (record.status === '缺勤') {
+                    statusBadge = '<span class="badge badge-danger">缺勤</span>';
+                }
+                
+                row.innerHTML = `
+                    <td class="table-cell">${record.studentId}</td>
+                    <td class="table-cell">${record.name}</td>
+                    <td class="table-cell">${record.class}</td>
+                    <td class="table-cell">${record.date}</td>
+                    <td class="table-cell">${statusBadge}</td>
+                    <td class="table-cell">${record.reason || '-'}</td>
+                    <td class="table-cell">
+                        <div class="flex space-x-2">
+                            <button class="text-blue-600 hover:text-blue-800 edit-attendance" data-id="${record.studentId}" data-date="${record.date}">
+                                <i class="fa fa-edit"></i>
+                            </button>
+                            <button class="text-red-600 hover:text-red-800 delete-attendance" data-id="${record.studentId}" data-date="${record.date}">
+                                <i class="fa fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+            
+            // 添加编辑和删除事件监听
+            document.querySelectorAll('.edit-attendance').forEach(button => {
+                button.addEventListener('click', function() {
+                    const studentId = this.getAttribute('data-id');
+                    const date = this.getAttribute('data-date');
+                    editAttendance(studentId, date);
+                });
+            });
+            
+            document.querySelectorAll('.delete-attendance').forEach(button => {
+                button.addEventListener('click', function() {
+                    const studentId = this.getAttribute('data-id');
+                    const date = this.getAttribute('data-date');
+                    deleteAttendance(studentId, date);
+                });
+            });
+        }
+
+        // 初始化图表
+        function initCharts() {
+            // 成绩分布图表
+            const gradesCtx = document.getElementById('gradesChart').getContext('2d');
+            new Chart(gradesCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['0-59', '60-69', '70-79', '80-89', '90-100'],
+                    datasets: [{
+                        label: '学生人数',
+                        data: [12, 35, 86, 78, 37],
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.6)',
+                            'rgba(255, 159, 64, 0.6)',
+                            'rgba(255, 205, 86, 0.6)',
+                            'rgba(75, 192, 192, 0.6)',
+                            'rgba(54, 162, 235, 0.6)'
+                        ],
+                        borderColor: [
+                            'rgb(255, 99, 132)',
+                            'rgb(255, 159, 64)',
+                            'rgb(255, 205, 86)',
+                            'rgb(75, 192, 192)',
+                            'rgb(54, 162, 235)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+            // 出勤趋势图表
+            const attendanceCtx = document.getElementById('attendanceChart').getContext('2d');
+            new Chart(attendanceCtx, {
+                type: 'line',
+                data: {
+                    labels: ['周一', '周二', '周三', '周四', '周五', '周六', '周日'],
+                    datasets: [{
+                        label: '出勤人数',
+                        data: [242, 245, 240, 248, 238, 220, 210],
+                        fill: false,
+                        borderColor: 'rgb(75, 192, 192)',
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: false
+                        }
+                    }
+                }
+            });
+
+            // 数据统计页面的图表
+            if (document.getElementById('gradeDistributionChart')) {
+                const gradeDistributionCtx = document.getElementById('gradeDistributionChart').getContext('2d');
+                new Chart(gradeDistributionCtx, {
+                    type: 'pie',
+                    data: {
+                        labels: ['0-59', '60-69', '70-79', '80-89', '90-100'],
+                        datasets: [{
+                            data: [12, 35, 86, 78, 37],
+                            backgroundColor: [
+                                'rgba(255, 99, 132, 0.6)',
+                                'rgba(255, 159, 64, 0.6)',
+                                'rgba(255, 205, 86, 0.6)',
+                                'rgba(75, 192, 192, 0.6)',
+                                'rgba(54, 162, 235, 0.6)'
+                            ],
+                            borderColor: [
+                                'rgb(255, 99, 132)',
+                                'rgb(255, 159, 64)',
+                                'rgb(255, 205, 86)',
+                                'rgb(75, 192, 192)',
+                                'rgb(54, 162, 235)'
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false
+                    }
+                });
+            }
+
+            if (document.getElementById('classComparisonChart')) {
+                const classComparisonCtx = document.getElementById('classComparisonChart').getContext('2d');
+                new Chart(classComparisonCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['计算机2301', '计算机2302', '电子2301', '电子2302', '自动化2301'],
+                        datasets: [{
+                            label: '平均分',
+                            data: [82, 78, 80, 76, 84],
+                            backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                            borderColor: 'rgb(54, 162, 235)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: false,
+                                min: 60,
+                                max: 100
+                            }
+                        }
+                    }
+                });
+            }
+
+            if (document.getElementById('attendanceTrendChart')) {
+                const attendanceTrendCtx = document.getElementById('attendanceTrendChart').getContext('2d');
+                new Chart(attendanceTrendCtx, {
+                    type: 'line',
+                    data: {
+                        labels: ['1月', '2月', '3月', '4月', '5月', '6月'],
+                        datasets: [{
+                            label: '出勤人数',
+                            data: [240, 242, 238, 245, 243, 248],
+                            fill: false,
+                            borderColor: 'rgb(75, 192, 192)',
+                            tension: 0.1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: false
+                            }
+                        }
+                    }
+                });
+            }
+
+            if (document.getElementById('studentPerformanceChart')) {
+                const studentPerformanceCtx = document.getElementById('studentPerformanceChart').getContext('2d');
+                new Chart(studentPerformanceCtx, {
+                    type: 'radar',
+                    data: {
+                        labels: ['高等数学', '大学物理', '计算机基础', '英语', '思想政治'],
+                        datasets: [{
+                            label: '班级平均',
+                            data: [78, 75, 82, 77, 80],
+                            fill: true,
+                            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                            borderColor: 'rgb(54, 162, 235)',
+                            pointBackgroundColor: 'rgb(54, 162, 235)',
+                            pointBorderColor: '#fff',
+                            pointHoverBackgroundColor: '#fff',
+                            pointHoverBorderColor: 'rgb(54, 162, 235)'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        elements: {
+                            line: {
+                                borderWidth: 3
+                            }
+                        },
+                        scales: {
+                            r: {
+                                angleLines: {
+                                    display: true
+                                },
+                                suggestedMin: 60,
+                                suggestedMax: 100
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        // 初始化事件监听
+        function initEventListeners() {
+            // 导航菜单切换
+            document.querySelectorAll('[data-target]').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // 获取目标页面ID
+                    const targetId = this.getAttribute('data-target');
+                    
+                    // 更新页面标题
+                    document.getElementById('page-title').textContent = this.querySelector('span').textContent;
+                    
+                    // 隐藏所有页面
+                    document.querySelectorAll('.page-content').forEach(page => {
+                        page.classList.add('hidden');
+                    });
+                    
+                    // 显示目标页面
+                    document.getElementById(targetId).classList.remove('hidden');
+                    
+                    // 更新导航菜单激活状态
+                    document.querySelectorAll('[data-target]').forEach(navLink => {
+                        navLink.classList.remove('sidebar-active');
+                    });
+                    document.querySelectorAll(`[data-target="${targetId}"]`).forEach(navLink => {
+                        navLink.classList.add('sidebar-active');
+                    });
+                    
+                    // 如果是班级管理页面，刷新班级列表
+                    if (targetId === 'classes') {
+                        loadClasses();
+                    }
+                    
+                    // 如果是移动端，点击后关闭菜单
+                    document.getElementById('mobile-menu').classList.add('hidden');
+                    document.getElementById('mobile-menu-content').classList.add('-translate-x-full');
+                });
+            });
+
+            // 移动端菜单按钮
+            document.getElementById('mobile-menu-button').addEventListener('click', function() {
+                document.getElementById('mobile-menu').classList.remove('hidden');
+                setTimeout(() => {
+                    document.getElementById('mobile-menu-content').classList.remove('-translate-x-full');
+                }, 10);
+            });
+
+            // 移动端菜单关闭按钮
+            document.getElementById('mobile-menu-close').addEventListener('click', function() {
+                document.getElementById('mobile-menu-content').classList.add('-translate-x-full');
+                setTimeout(() => {
+                    document.getElementById('mobile-menu').classList.add('hidden');
+                }, 300);
+            });
+
+            // 点击遮罩层关闭移动端菜单
+            document.getElementById('mobile-menu').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    document.getElementById('mobile-menu-content').classList.add('-translate-x-full');
+                    setTimeout(() => {
+                        this.classList.add('hidden');
+                    }, 300);
+                }
+            });
+
+            // 退出登录按钮事件监听器
+            document.getElementById('logout-btn').addEventListener('click', function() {
+                // 清除用户登录状态（如果有）
+                localStorage.removeItem('currentUser');
+                localStorage.removeItem('currentUserRole');
+                // 跳转到登录页面
+                window.location.href = 'index.html';
+            });
+
+            // 作业相关事件监听器
+            // 布置作业按钮点击事件（动态生成的按钮需要在生成后绑定）
+            
+            // 关闭作业模态框按钮点击事件
+            document.getElementById('close-homework-modal').addEventListener('click', function() {
+                document.getElementById('assign-homework-modal').classList.add('hidden');
+                document.getElementById('assign-homework-form').reset();
+            });
+            
+            // 取消布置作业按钮点击事件
+            document.getElementById('cancel-homework').addEventListener('click', function() {
+                document.getElementById('assign-homework-modal').classList.add('hidden');
+                document.getElementById('assign-homework-form').reset();
+            });
+            
+            // 布置作业表单提交事件
+            document.getElementById('assign-homework-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const classId = document.getElementById('homework-class-id').value;
+                const title = document.getElementById('homework-title').value;
+                const wordCount = document.getElementById('homework-word-count').value;
+                const wordLevel = document.getElementById('homework-word-level').value;
+                const deadline = document.getElementById('homework-deadline').value;
+                
+                // 添加作业
+                const homeworkId = addHomework(classId, { title, wordCount, wordLevel, deadline });
+                
+                // 关闭模态框并重置表单
+                document.getElementById('assign-homework-modal').classList.add('hidden');
+                this.reset();
+                
+                // 显示成功消息
+                showNotification('作业布置成功！', 'success');
+                
+                // 刷新班级详情页面的作业列表
+                viewClassDetails(classId);
+            });
+            
+            // 关闭作业完成情况模态框按钮点击事件
+            document.getElementById('close-homework-status-modal').addEventListener('click', function() {
+                document.getElementById('homework-status-modal').classList.add('hidden');
+            });
+
+            // 班级管理相关事件监听器
+            // 创建班级按钮
+            document.getElementById('add-class-btn').addEventListener('click', function() {
+                document.getElementById('add-class-modal').classList.remove('hidden');
+                // 自动生成邀请码
+                generateInviteCode();
+            });
+
+            // 关闭创建班级模态框
+            document.getElementById('close-class-modal').addEventListener('click', function() {
+                document.getElementById('add-class-modal').classList.add('hidden');
+            });
+
+            document.getElementById('cancel-add-class').addEventListener('click', function() {
+                document.getElementById('add-class-modal').classList.add('hidden');
+            });
+
+            // 生成邀请码按钮
+            document.getElementById('generate-code-btn').addEventListener('click', function() {
+                generateInviteCode();
+            });
+
+            // 创建班级表单提交
+            document.getElementById('add-class-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                addNewClass();
+            });
+
+            // 添加学生按钮
+            document.getElementById('add-student-btn').addEventListener('click', function() {
+                document.getElementById('add-student-modal').classList.remove('hidden');
+            });
+
+            // 关闭添加学生模态框
+            document.getElementById('close-student-modal').addEventListener('click', function() {
+                document.getElementById('add-student-modal').classList.add('hidden');
+            });
+
+            document.getElementById('cancel-add-student').addEventListener('click', function() {
+                document.getElementById('add-student-modal').classList.add('hidden');
+            });
+
+            // 班级管理相关函数
+            // 生成邀请码
+            function generateInviteCode() {
+                const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+                let code = '';
+                for (let i = 0; i < 6; i++) {
+                    code += chars.charAt(Math.floor(Math.random() * chars.length));
+                }
+                document.getElementById('class-invite-code').value = code;
+            }
+
+            // 添加新班级
+            function addNewClass() {
+                // 获取表单数据
+                const className = document.getElementById('class-name').value;
+                const classDescription = document.getElementById('class-description').value;
+                const classTeacher = document.getElementById('class-teacher').value;
+                const classInviteCode = document.getElementById('class-invite-code').value;
+                
+                // 生成班级ID
+                const classId = 'class_' + Date.now();
+                
+                // 创建班级对象
+                const newClass = {
+                    id: classId,
+                    name: className,
+                    description: classDescription,
+                    teacher: classTeacher,
+                    inviteCode: classInviteCode,
+                    studentCount: 0,
+                    createTime: new Date().toISOString()
+                };
+                
+                // 获取现有班级列表
+                const classes = JSON.parse(localStorage.getItem('classes') || '[]');
+                classes.push(newClass);
+                localStorage.setItem('classes', JSON.stringify(classes));
+                
+                // 保存班级信息，用于学生端验证
+                const classInfo = {
+                    classId: classId,
+                    className: className,
+                    teacherName: classTeacher,
+                    description: classDescription
+                };
+                localStorage.setItem(`class_${classInviteCode}`, JSON.stringify(classInfo));
+                
+                // 初始化班级成员列表
+                localStorage.setItem(`classMembers_${classId}`, JSON.stringify([]));
+                
+                // 添加全局班级列表，确保学生端可以访问
+                let globalClasses = JSON.parse(localStorage.getItem('globalClasses') || '[]');
+                globalClasses.push(newClass);
+                localStorage.setItem('globalClasses', JSON.stringify(globalClasses));
+                
+                // 同时将班级信息存储在单独的条目中，确保学生端可以找到
+                const classDataForStudent = {
+                    id: classId,
+                    name: className,
+                    description: classDescription,
+                    teacher: classTeacher,
+                    inviteCode: classInviteCode,
+                    studentCount: 0,
+                    createTime: new Date().toISOString()
+                };
+                localStorage.setItem(`class_${classInviteCode}`, JSON.stringify(classDataForStudent));
+                
+                // 使用多种方式确保数据可访问
+                // 1. 存储在全局可访问的位置
+                localStorage.setItem(`global_class_${classInviteCode}`, JSON.stringify(classDataForStudent));
+                
+                // 2. 创建一个特殊的标记，表示有新班级创建
+                localStorage.setItem('newClassCreated', JSON.stringify({
+                    timestamp: Date.now(),
+                    inviteCode: classInviteCode,
+                    classData: classDataForStudent
+                }));
+                
+                // 3. 尝试使用sessionStorage作为备用存储
+                sessionStorage.setItem(`class_${classInviteCode}`, JSON.stringify(classDataForStudent));
+                
+                // 添加调试信息
+                console.log('教师端创建班级成功:', newClass);
+                console.log('单独的班级条目:', classInfo);
+                console.log('用于学生端的班级数据:', classDataForStudent);
+                console.log('当前classes数组:', classes);
+                console.log('全局班级列表:', globalClasses);
+                
+                // 重新加载班级表格
+                loadClasses();
+                
+                // 关闭模态框
+                document.getElementById('add-class-modal').classList.add('hidden');
+                
+                // 显示成功消息
+                showNotification('班级创建成功！邀请码：' + classInviteCode, 'success');
+                
+                // 重置表单
+                document.getElementById('add-class-form').reset();
+            }
+
+            // 加载班级列表
+            function loadClasses() {
+                let classes = JSON.parse(localStorage.getItem('classes') || '[]');
+                
+                // 过滤并删除教师为undefined的班级
+                const classesToDelete = classes.filter(classItem => classItem.teacher === 'undefined' || classItem.teacher === undefined);
+                
+                if (classesToDelete.length > 0) {
+                    classesToDelete.forEach(classItem => {
+                        // 删除班级相关信息
+                        localStorage.removeItem(`class_${classItem.inviteCode}`);
+                        localStorage.removeItem(`classMembers_${classItem.id}`);
+                        localStorage.removeItem(`homework_${classItem.id}`);
+                        localStorage.removeItem(`global_class_${classItem.inviteCode}`);
+                    });
+                    
+                    // 从classes数组中移除这些班级
+                    classes = classes.filter(classItem => classItem.teacher !== 'undefined' && classItem.teacher !== undefined);
+                    localStorage.setItem('classes', JSON.stringify(classes));
+                    
+                    // 同时更新globalClasses
+                    let globalClasses = JSON.parse(localStorage.getItem('globalClasses') || '[]');
+                    globalClasses = globalClasses.filter(classItem => classItem.teacher !== 'undefined' && classItem.teacher !== undefined);
+                    localStorage.setItem('globalClasses', JSON.stringify(globalClasses));
+                    
+                    console.log(`已删除 ${classesToDelete.length} 个教师为undefined的班级`);
+                }
+                
+                const tableBody = document.getElementById('classes-table-body');
+                
+                // 清空表格
+                tableBody.innerHTML = '';
+                
+                // 如果没有班级，显示提示信息
+                if (classes.length === 0) {
+                    tableBody.innerHTML = `
+                        <tr>
+                            <td colspan="7" class="px-6 py-4 text-center text-gray-500">
+                                暂无班级数据，请点击"创建班级"按钮添加
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
+                
+                // 填充班级数据
+                classes.forEach(classItem => {
+                    // 获取班级成员数量
+                    const members = JSON.parse(localStorage.getItem(`classMembers_${classItem.id}`) || '[]');
+                    classItem.studentCount = members.length;
+                    
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${classItem.id}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${classItem.name}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${classItem.teacher}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${classItem.inviteCode}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${classItem.studentCount}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${new Date(classItem.createTime).toLocaleDateString()}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                            <button class="text-blue-600 hover:text-blue-900 mr-3 view-class-btn" data-id="${classItem.id}">查看</button>
+                            <button class="text-red-600 hover:text-red-900 delete-class-btn" data-id="${classItem.id}">删除</button>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+                
+                // 添加查看和删除按钮的事件监听器
+                document.querySelectorAll('.view-class-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const classId = this.getAttribute('data-id');
+                        viewClassDetails(classId);
+                    });
+                });
+                
+                document.querySelectorAll('.delete-class-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const classId = this.getAttribute('data-id');
+                        deleteClass(classId);
+                    });
+                });
+            }
+
+            // 查看班级详情
+            function viewClassDetails(classId) {
+                const classes = JSON.parse(localStorage.getItem('classes') || '[]');
+                const classItem = classes.find(c => c.id === classId);
+                
+                if (!classItem) {
+                    showNotification('班级不存在', 'error');
+                    return;
+                }
+                
+                // 移除已存在的班级详情模态框（如果存在）
+                const existingModal = document.getElementById('class-details-modal');
+                if (existingModal) {
+                    existingModal.remove();
+                }
+                
+                // 获取班级成员
+                const members = JSON.parse(localStorage.getItem(`classMembers_${classId}`) || '[]');
+                
+                // 创建班级详情模态框
+                const modalHtml = `
+                    <div id="class-details-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
+                        <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[80vh] overflow-y-auto">
+                            <div class="flex items-center justify-between p-6 border-b border-gray-200">
+                                <h3 class="text-lg font-medium text-gray-900">班级详情</h3>
+                                <button id="close-class-details-modal" class="text-gray-400 hover:text-gray-500">
+                                    <i class="fa fa-times"></i>
+                                </button>
+                            </div>
+                            <div class="p-6">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                                    <div>
+                                        <h4 class="text-sm font-medium text-gray-500">班级名称</h4>
+                                        <p class="mt-1 text-sm text-gray-900">${classItem.name}</p>
+                                    </div>
+                                    <div>
+                                        <h4 class="text-sm font-medium text-gray-500">教师</h4>
+                                        <p class="mt-1 text-sm text-gray-900">${classItem.teacher}</p>
+                                    </div>
+                                    <div>
+                                        <h4 class="text-sm font-medium text-gray-500">邀请码</h4>
+                                        <p class="mt-1 text-sm text-gray-900">${classItem.inviteCode}</p>
+                                    </div>
+                                    <div>
+                                        <h4 class="text-sm font-medium text-gray-500">学生人数</h4>
+                                        <p class="mt-1 text-sm text-gray-900">${members.length}</p>
+                                    </div>
+                                    <div class="md:col-span-2">
+                                        <h4 class="text-sm font-medium text-gray-500">班级描述</h4>
+                                        <p class="mt-1 text-sm text-gray-900">${classItem.description || '无'}</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex justify-between items-center mb-3">
+                                    <h4 class="text-md font-medium text-gray-900">班级成员</h4>
+                                    <button id="assign-homework-btn" class="btn-primary text-sm" data-class-id="${classId}">
+                                        <i class="fa fa-plus mr-1"></i> 布置作业
+                                    </button>
+                                </div>
+                                <div class="overflow-x-auto">
+                                    <table class="min-w-full divide-y divide-gray-200">
+                                        <thead class="bg-gray-50">
+                                            <tr>
+                                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">序号</th>
+                                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">学生用户名</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="bg-white divide-y divide-gray-200">
+                                            ${members.length === 0 ? 
+                                                '<tr><td colspan="2" class="px-6 py-4 text-center text-gray-500">暂无成员</td></tr>' :
+                                                members.map((member, index) => {
+                                                    // 兼容字符串和对象两种数据结构
+                                                    let memberName, memberRole;
+                                                    if (typeof member === 'string') {
+                                                        memberName = member;
+                                                        memberRole = 'student';
+                                                    } else {
+                                                        memberName = member.name || member.username || '未知用户';
+                                                        memberRole = member.role || 'student';
+                                                    }
+                                                    
+                                                    const roleLabel = memberRole === 'teacher' ? '教师' : '学生';
+                                                    const roleClass = memberRole === 'teacher' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800';
+                                                    
+                                                    return `<tr>
+                                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${index + 1}</td>
+                                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                                            ${memberName}
+                                                            <span class="ml-2 px-2 py-0.5 rounded-full text-xs ${roleClass}">${roleLabel}</span>
+                                                        </td>
+                                                    </tr>`;
+                                                }).join('')
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                                
+                                <div class="mt-6">
+                                    <h4 class="text-md font-medium text-gray-900 mb-3">班级作业</h4>
+                                    <div id="homework-list-${classId}" class="space-y-3">
+                                        <!-- 作业列表将通过JavaScript动态生成 -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                // 添加模态框到页面
+                document.body.insertAdjacentHTML('beforeend', modalHtml);
+                
+                // 添加关闭事件
+                document.getElementById('close-class-details-modal').addEventListener('click', function() {
+                    document.getElementById('class-details-modal').remove();
+                });
+                
+                // 加载作业列表
+                loadHomeworkList(classId);
+                
+                // 添加布置作业按钮事件
+                document.getElementById('assign-homework-btn').addEventListener('click', function() {
+                    classId = this.getAttribute('data-class-id');
+                    document.getElementById('homework-class-id').value = classId;
+                    // 关闭班级详情模态框
+                    document.getElementById('class-details-modal').classList.add('hidden');
+                    // 打开布置作业模态框
+                    document.getElementById('assign-homework-modal').classList.remove('hidden');
+                });
+                
+                // 加载作业列表
+                function loadHomeworkList(classId) {
+                    const homeworkList = getClassHomework(classId);
+                    const homeworkContainer = document.getElementById(`homework-list-${classId}`);
+                    
+                    if (homeworkList.length === 0) {
+                        homeworkContainer.innerHTML = '<p class="text-gray-500">暂无作业</p>';
+                        return;
+                    }
+                    
+                    homeworkContainer.innerHTML = homeworkList.map(homework => {
+                        const deadline = new Date(homework.deadline);
+                        const now = new Date();
+                        const isExpired = deadline < now;
+                        
+                        return `
+                            <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <h5 class="font-medium text-gray-900">${homework.title}</h5>
+                                        <p class="text-sm text-gray-600 mt-1">${homework.content}</p>
+                                    </div>
+                                    <span class="text-xs ${isExpired ? 'text-red-600' : 'text-blue-600'}">
+                                        ${isExpired ? '已截止' : '未截止'}
+                                    </span>
+                                </div>
+                                <div class="flex justify-between items-center mt-3">
+                                    <div class="text-sm text-gray-500">
+                                        截止时间：${deadline.toLocaleString()}
+                                    </div>
+                                    <button class="text-sm text-blue-600 hover:text-blue-800" onclick="viewHomeworkStatus('${homework.id}', '${classId}', '${homework.title}')">
+                                        查看完成情况
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+                }
+            }
+
+            // 删除班级
+            function deleteClass(classId) {
+                if (!confirm('确定要删除这个班级吗？此操作不可恢复！')) {
+                    return;
+                }
+                
+                // 获取班级列表
+                const classes = JSON.parse(localStorage.getItem('classes') || '[]');
+                const classIndex = classes.findIndex(c => c.id === classId);
+                
+                if (classIndex === -1) {
+                    showNotification('班级不存在', 'error');
+                    return;
+                }
+                
+                const classItem = classes[classIndex];
+                
+                // 删除班级数据
+                classes.splice(classIndex, 1);
+                localStorage.setItem('classes', JSON.stringify(classes));
+                
+                // 删除班级相关信息
+                localStorage.removeItem(`class_${classItem.inviteCode}`);
+                localStorage.removeItem(`classMembers_${classId}`);
+                localStorage.removeItem(`homework_${classId}`);
+                
+                // 重新加载班级列表
+                loadClasses();
+                
+                showNotification('班级删除成功', 'success');
+            }
+            
+            // 作业管理相关函数
+            // 获取班级作业列表
+            function getClassHomework(classId) {
+                return JSON.parse(localStorage.getItem(`homework_${classId}`) || '[]');
+            }
+            
+            // 保存班级作业列表
+            function saveClassHomework(classId, homeworkList) {
+                localStorage.setItem(`homework_${classId}`, JSON.stringify(homeworkList));
+            }
+            
+            // 添加新作业
+            function addHomework(classId, homework) {
+                const homeworkList = getClassHomework(classId);
+                homework.id = 'homework_' + Date.now();
+                homework.createTime = new Date().toISOString();
+                homework.status = 'published';
+                
+                // 兼容学生端的数据结构
+                // 如果只有wordCount和wordLevel，生成title和description
+                if (!homework.content && homework.wordCount) {
+                    const levelNames = {
+                        'beginner': '初级',
+                        'intermediate': '中级',
+                        'advanced': '高级'
+                    };
+                    homework.content = `朗读${levelNames[homework.wordLevel] || ''}词库中的${homework.wordCount}个单词`;
+                    homework.description = `朗读${levelNames[homework.wordLevel] || ''}词库中的${homework.wordCount}个单词`;
+                }
+                
+                homeworkList.push(homework);
+                saveClassHomework(classId, homeworkList);
+                return homework.id;
+            }
+            
+            // 获取作业完成情况
+            function getHomeworkStatus(homeworkId, classId) {
+                return JSON.parse(localStorage.getItem(`homeworkStatus_${homeworkId}`) || '[]');
+            }
+            
+            // 保存作业完成情况
+            function saveHomeworkStatus(homeworkId, statusList) {
+                localStorage.setItem(`homeworkStatus_${homeworkId}`, JSON.stringify(statusList));
+            }
+            
+            // 查看作业完成情况
+            function viewHomeworkStatus(homeworkId, classId, homeworkTitle) {
+                const modal = document.getElementById('homework-status-modal');
+                const titleElement = document.getElementById('homework-status-title');
+                const statusListElement = document.getElementById('homework-status-list');
+                
+                // 设置作业标题
+                titleElement.textContent = homeworkTitle;
+                
+                // 获取班级成员
+                const classMembers = JSON.parse(localStorage.getItem(`classMembers_${classId}`) || '[]');
+                
+                // 获取作业完成情况
+                const homeworkStatus = getHomeworkStatus(homeworkId, classId);
+                
+                // 生成作业完成情况表格
+                statusListElement.innerHTML = '';
+                
+                classMembers.forEach((member, index) => {
+                    if (member.role === 'student') {
+                        const statusItem = homeworkStatus.find(s => s.studentId === member.id) || {
+                            studentId: member.id,
+                            studentName: member.name,
+                            status: '未提交',
+                            submitTime: '',
+                            score: ''
+                        };
+                        
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td class="table-cell">${index + 1}</td>
+                            <td class="table-cell">${statusItem.studentName}</td>
+                            <td class="table-cell">
+                                <span class="px-2 py-1 text-xs font-semibold rounded-full ${statusItem.status === '已提交' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
+                                    ${statusItem.status}
+                                </span>
+                            </td>
+                            <td class="table-cell">${statusItem.submitTime ? new Date(statusItem.submitTime).toLocaleString() : '-'}</td>
+                            <td class="table-cell">
+                                <button class="text-blue-600 hover:text-blue-800" onclick="gradeHomework('${homeworkId}', '${statusItem.studentId}', '${statusItem.studentName}')">
+                                    ${statusItem.status === '已提交' ? '评分' : '-'}        
+                                </button>
+                            </td>
+                        `;
+                        statusListElement.appendChild(row);
+                    }
+                });
+                
+                // 显示模态框
+                modal.classList.remove('hidden');
+            }
+            
+            // 评分作业
+            function gradeHomework(homeworkId, studentId, studentName) {
+                // 这里可以实现评分功能
+                showNotification(`评分功能待实现：${studentName}的作业`, 'info');
+            }
+
+            // 显示通知消息
+            function showNotification(message, type = 'info') {
+                // 创建通知元素
+                const notification = document.createElement('div');
+                notification.className = `fixed top-4 right-4 p-4 rounded-md shadow-lg z-50 transform transition-all duration-300 translate-x-full`;
+                
+                // 根据类型设置样式
+                if (type === 'success') {
+                    notification.classList.add('bg-green-500', 'text-white');
+                } else if (type === 'error') {
+                    notification.classList.add('bg-red-500', 'text-white');
+                } else {
+                    notification.classList.add('bg-blue-500', 'text-white');
+                }
+                
+                notification.textContent = message;
+                document.body.appendChild(notification);
+                
+                // 显示动画
+                setTimeout(() => {
+                    notification.classList.remove('translate-x-full');
+                    notification.classList.add('translate-x-0');
+                }, 10);
+                
+                // 3秒后自动消失
+                setTimeout(() => {
+                    notification.classList.remove('translate-x-0');
+                    notification.classList.add('translate-x-full');
+                    setTimeout(() => {
+                        document.body.removeChild(notification);
+                    }, 300);
+                }, 3000);
+            }
+
+            // 添加学生表单提交
+            document.getElementById('add-student-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // 获取表单数据
+                const student = {
+                    id: document.getElementById('student-id').value,
+                    name: document.getElementById('student-name').value,
+                    gender: document.getElementById('student-gender').value,
+                    birthdate: document.getElementById('student-birthdate').value,
+                    class: document.getElementById('student-class').value,
+                    major: document.getElementById('student-major').value,
+                    contact: document.getElementById('student-contact').value,
+                    address: document.getElementById('student-address').value
+                };
+                
+                // 添加学生数据
+                students.push(student);
+                
+                // 重新加载学生表格
+                loadStudents();
+                
+                // 关闭模态框
+                document.getElementById('add-student-modal').classList.add('hidden');
+                
+                // 重置表单
+                this.reset();
+                
+                // 显示成功提示
+                alert('学生添加成功！');
+            });
+
+            // 添加成绩按钮
+            document.getElementById('add-grade-btn').addEventListener('click', function() {
+                document.getElementById('add-grade-modal').classList.remove('hidden');
+            });
+
+            // 关闭添加成绩模态框
+            document.getElementById('close-grade-modal').addEventListener('click', function() {
+                document.getElementById('add-grade-modal').classList.add('hidden');
+            });
+
+            document.getElementById('cancel-add-grade').addEventListener('click', function() {
+                document.getElementById('add-grade-modal').classList.add('hidden');
+            });
+
+            // 添加成绩表单提交
+            document.getElementById('add-grade-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // 获取表单数据
+                const grade = {
+                    studentId: document.getElementById('grade-student-id').value,
+                    name: document.getElementById('grade-student-name').value,
+                    class: document.getElementById('grade-student-class').value,
+                    subject: document.getElementById('grade-subject').value,
+                    score: parseInt(document.getElementById('grade-score').value),
+                    semester: document.getElementById('grade-semester').value,
+                    date: document.getElementById('grade-date').value
+                };
+                
+                // 添加成绩数据
+                grades.push(grade);
+                
+                // 重新加载成绩表格
+                loadGrades();
+                
+                // 关闭模态框
+                document.getElementById('add-grade-modal').classList.add('hidden');
+                
+                // 重置表单
+                this.reset();
+                
+                // 显示成功提示
+                alert('成绩添加成功！');
+            });
+
+            // 记录出勤按钮
+            document.getElementById('record-attendance-btn').addEventListener('click', function() {
+                document.getElementById('record-attendance-modal').classList.remove('hidden');
+            });
+
+            // 关闭记录出勤模态框
+            document.getElementById('close-attendance-modal').addEventListener('click', function() {
+                document.getElementById('record-attendance-modal').classList.add('hidden');
+            });
+
+            document.getElementById('cancel-record-attendance').addEventListener('click', function() {
+                document.getElementById('record-attendance-modal').classList.add('hidden');
+            });
+
+            // 记录出勤表单提交
+            document.getElementById('record-attendance-form').addEventListener('submit', function(e){
+                e.preventDefault();
+                
+                // 获取表单数据
+                const record = {
+                    studentId: document.getElementById('attendance-student-id').value,
+                    name: document.getElementById('attendance-student-name').value,
+                    class: document.getElementById('attendance-student-class').value,
+                    date: document.getElementById('attendance-date').value,
+                    status: document.getElementById('attendance-status').value,
+                    reason: document.getElementById('attendance-reason').value
+                };
+                
+                // 添加出勤记录
+                attendance.push(record);
+                
+                // 重新加载出勤表格
+                loadAttendance();
+                
+                // 关闭模态框
+                document.getElementById('record-attendance-modal').classList.add('hidden');
+                
+                // 重置表单
+                this.reset();
+                
+                // 显示成功提示
+            alert('出勤记录添加成功！');
+        })
+        
+        // 关闭作业完成情况模态框
+        document.getElementById('close-homework-status-modal').addEventListener('click', function() {
+            document.getElementById('homework-status-modal').classList.add('hidden');
+        });
+
+        // 编辑学生
+        function editStudent(studentId) {
+            // 查找学生
+            const student = students.find(s => s.id === studentId);
+            
+            if (student) {
+                // 填充表单数据
+                document.getElementById('student-id').value = student.id;
+                document.getElementById('student-name').value = student.name;
+                document.getElementById('student-gender').value = student.gender;
+                document.getElementById('student-birthdate').value = student.birthdate;
+                document.getElementById('student-class').value = student.class;
+                document.getElementById('student-major').value = student.major;
+                document.getElementById('student-contact').value = student.contact;
+                document.getElementById('student-address').value = student.address;
+                
+                // 显示模态框
+                document.getElementById('add-student-modal').classList.remove('hidden');
+                
+                // 修改表单提交处理
+                const originalSubmitHandler = document.getElementById('add-student-form').onsubmit;
+                document.getElementById('add-student-form').onsubmit = function(e) {
+                    e.preventDefault();
+                    
+                    // 更新学生数据
+                    student.name = document.getElementById('student-name').value;
+                    student.gender = document.getElementById('student-gender').value;
+                    student.birthdate = document.getElementById('student-birthdate').value;
+                    student.class = document.getElementById('student-class').value;
+                    student.major = document.getElementById('student-major').value;
+                    student.contact = document.getElementById('student-contact').value;
+                    student.address = document.getElementById('student-address').value;
+                    
+                    // 重新加载学生表格
+                    loadStudents();
+                    
+                    // 关闭模态框
+                    document.getElementById('add-student-modal').classList.add('hidden');
+                    
+                    // 重置表单
+                    this.reset();
+                    
+                    // 恢复原始提交处理
+                    this.onsubmit = originalSubmitHandler;
+                    
+                    // 显示成功提示
+                    alert('学生信息更新成功！');
+                };
+            }
+        }
+
+        // 删除学生
+        function deleteStudent(studentId) {
+            if (confirm('确定要删除该学生吗？')) {
+                // 删除学生
+                const index = students.findIndex(s => s.id === studentId);
+                if (index !== -1) {
+                    students.splice(index, 1);
+                    
+                    // 重新加载学生表格
+                    loadStudents();
+                    
+                    // 显示成功提示
+                    alert('学生删除成功！');
+                }
+            }
+        }
+
+        // 编辑成绩
+        function editGrade(studentId, subject) {
+            // 查找成绩
+            const grade = grades.find(g => g.studentId === studentId && g.subject === subject);
+            
+            if (grade) {
+                // 填充表单数据
+                document.getElementById('grade-student-id').value = grade.studentId;
+                document.getElementById('grade-student-name').value = grade.name;
+                document.getElementById('grade-student-class').value = grade.class;
+                document.getElementById('grade-subject').value = grade.subject;
+                document.getElementById('grade-score').value = grade.score;
+                document.getElementById('grade-semester').value = grade.semester;
+                document.getElementById('grade-date').value = grade.date;
+                
+                // 显示模态框
+                document.getElementById('add-grade-modal').classList.remove('hidden');
+                
+                // 修改表单提交处理
+                const originalSubmitHandler = document.getElementById('add-grade-form').onsubmit;
+                document.getElementById('add-grade-form').onsubmit = function(e) {
+                    e.preventDefault();
+                    
+                    // 更新成绩数据
+                    grade.name = document.getElementById('grade-student-name').value;
+                    grade.class = document.getElementById('grade-student-class').value;
+                    grade.subject = document.getElementById('grade-subject').value;
+                    grade.score = parseInt(document.getElementById('grade-score').value);
+                    grade.semester = document.getElementById('grade-semester').value;
+                    grade.date = document.getElementById('grade-date').value;
+                    
+                    // 重新加载成绩表格
+                    loadGrades();
+                    
+                    // 关闭模态框
+                    document.getElementById('add-grade-modal').classList.add('hidden');
+                    
+                    // 重置表单
+                    this.reset();
+                    
+                    // 恢复原始提交处理
+                    this.onsubmit = originalSubmitHandler;
+                    
+                    // 显示成功提示
+                    alert('成绩更新成功！');
+                };
+            }
+        }
+
+        // 删除成绩
+        function deleteGrade(studentId, subject) {
+            if (confirm('确定要删除该成绩吗？')) {
+                // 删除成绩
+                const index = grades.findIndex(g => g.studentId === studentId && g.subject === subject);
+                if (index !== -1) {
+                    grades.splice(index, 1);
+                    
+                    // 重新加载成绩表格
+                    loadGrades();
+                    
+                    // 显示成功提示
+                    alert('成绩删除成功！');
+                }
+            }
+        }
+
+        // 编辑出勤记录
+        function editAttendance(studentId, date) {
+            // 查找出勤记录
+            const record = attendance.find(a => a.studentId === studentId && a.date === date);
+            
+            if (record) {
+                // 填充表单数据
+                document.getElementById('attendance-student-id').value = record.studentId;
+                document.getElementById('attendance-student-name').value = record.name;
+                document.getElementById('attendance-student-class').value = record.class;
+                document.getElementById('attendance-date').value = record.date;
+                document.getElementById('attendance-status').value = record.status;
+                document.getElementById('attendance-reason').value = record.reason;
+                
+                // 显示模态框
+                document.getElementById('record-attendance-modal').classList.remove('hidden');
+                
+                // 修改表单提交处理
+                const originalSubmitHandler = document.getElementById('record-attendance-form').onsubmit;
+                document.getElementById('record-attendance-form').onsubmit = function(e) {
+                    e.preventDefault();
+                    
+                    // 更新出勤记录
+                    record.name = document.getElementById('attendance-student-name').value;
+                    record.class = document.getElementById('attendance-student-class').value;
+                    record.date = document.getElementById('attendance-date').value;
+                    record.status = document.getElementById('attendance-status').value;
+                    record.reason = document.getElementById('attendance-reason').value;
+                    
+                    // 重新加载出勤表格
+                    loadAttendance();
+                    
+                    // 关闭模态框
+                    document.getElementById('record-attendance-modal').classList.add('hidden');
+                    
+                    // 重置表单
+                    this.reset();
+                    
+                    // 恢复原始提交处理
+                    this.onsubmit = originalSubmitHandler;
+                    
+                    // 显示成功提示
+                    alert('出勤记录更新成功！');
+                };
+            }
+        }
+
+        // 删除出勤记录
+        function deleteAttendance(studentId, date) {
+            if (confirm('确定要删除该出勤记录吗？')) {
+                // 删除出勤记录
+                const index = attendance.findIndex(a => a.studentId === studentId && a.date === date);
+                if (index !== -1) {
+                    attendance.splice(index, 1);
+                    
+                    // 重新加载出勤表格
+                    loadAttendance();
+                    
+                    // 显示成功提示
+                    alert('出勤记录删除成功！');
+                }
+            }
+        }}
+    </script>
+</body>
+</html>

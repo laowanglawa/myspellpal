@@ -178,6 +178,37 @@
                 </div>
             </div>
             
+            <!-- 身份选择 -->
+            <div class="rounded-md -space-y-px">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        注册身份
+                    </label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fa fa-id-card text-gray-400"></i>
+                        </div>
+                        <div class="w-full pl-10 pr-3">
+                            <input type="hidden" id="userRole" name="userRole" required value="">
+                            <div class="grid grid-cols-2 gap-3">
+                                <button type="button" id="studentRegBtn" 
+                                    class="py-3 px-4 rounded-lg border border-gray-300 dark:border-gray-600 
+                                           bg-white dark:bg-dark-card text-gray-900 dark:text-dark-text 
+                                           transition-all duration-300 hover:border-primary hover:bg-primary/10 dark:hover:bg-primary/20">
+                                    学生
+                                </button>
+                                <button type="button" id="teacherRegBtn" 
+                                    class="py-3 px-4 rounded-lg border border-gray-300 dark:border-gray-600 
+                                           bg-white dark:bg-dark-card text-gray-900 dark:text-dark-text 
+                                           transition-all duration-300 hover:border-primary hover:bg-primary/10 dark:hover:bg-primary/20">
+                                    教师
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
             <!-- 注册按钮 -->
             <div>
                 <button type="submit" 
@@ -231,6 +262,37 @@
             this.querySelector('i').classList.toggle('fa-eye-slash');
         });
         
+        // 注册身份选择按钮功能
+        const studentRegBtn = document.getElementById('studentRegBtn');
+        const teacherRegBtn = document.getElementById('teacherRegBtn');
+        const userRole = document.getElementById('userRole');
+        
+        // 学生按钮点击事件
+        studentRegBtn.addEventListener('click', function() {
+            // 设置注册身份为学生
+            userRole.value = 'student';
+            
+            // 更新按钮样式
+            studentRegBtn.classList.remove('border-gray-300', 'dark:border-gray-600', 'bg-white', 'dark:bg-dark-card');
+            studentRegBtn.classList.add('border-primary', 'bg-primary/20', 'dark:bg-primary/30');
+            
+            teacherRegBtn.classList.remove('border-primary', 'bg-primary/20', 'dark:bg-primary/30');
+            teacherRegBtn.classList.add('border-gray-300', 'dark:border-gray-600', 'bg-white', 'dark:bg-dark-card');
+        });
+        
+        // 教师按钮点击事件
+        teacherRegBtn.addEventListener('click', function() {
+            // 设置注册身份为教师
+            userRole.value = 'teacher';
+            
+            // 更新按钮样式
+            teacherRegBtn.classList.remove('border-gray-300', 'dark:border-gray-600', 'bg-white', 'dark:bg-dark-card');
+            teacherRegBtn.classList.add('border-primary', 'bg-primary/20', 'dark:bg-primary/30');
+            
+            studentRegBtn.classList.remove('border-primary', 'bg-primary/20', 'dark:bg-primary/30');
+            studentRegBtn.classList.add('border-gray-300', 'dark:border-gray-600', 'bg-white', 'dark:bg-dark-card');
+        });
+        
         // 表单提交处理
         const registerForm = document.getElementById('registerForm');
         const successModal = document.getElementById('successModal');
@@ -244,10 +306,16 @@
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
             const confirmPassword = document.getElementById('confirmPassword').value;
+            const userRole = document.getElementById('userRole').value;
             
             // 简单的表单验证
             if (!username || !email || !password || !confirmPassword) {
                 alert('请填写所有必填字段');
+                return;
+            }
+            
+            if (!userRole) {
+                alert('请选择注册身份');
                 return;
             }
             
@@ -268,7 +336,7 @@
             
             // 使用localStorage保存注册信息
             // 获取现有用户列表，如果不存在则创建空数组
-            const users = JSON.parse(localStorage.getItem('registeredUsers')) || [];
+            const users = JSON.parse(localStorage.getItem('users')) || [];
             
             // 检查用户名是否已存在
             const userExists = users.some(user => user.username === username);
@@ -278,10 +346,10 @@
             }
             
             // 添加新用户
-            users.push({ username, email, password });
+            users.push({ username, password, role: userRole });
             
             // 保存到localStorage
-            localStorage.setItem('registeredUsers', JSON.stringify(users));
+            localStorage.setItem('users', JSON.stringify(users));
             
             // 显示成功提示
             successModal.classList.remove('hidden');

@@ -16,6 +16,16 @@ class User(db.Model):
     # 关系
     word_progress = db.relationship('UserWordProgress', backref='user', lazy=True, cascade="all, delete-orphan")
     
+    def to_dict(self):
+        """将用户对象转换为字典"""
+        return {
+            'id': self.id,
+            'username': self.username,
+            'email': self.email,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'last_login': self.last_login.isoformat() if self.last_login else None
+        }
+    
     def set_password(self, password):
         """设置密码，使用哈希存储"""
         self.password_hash = generate_password_hash(password)

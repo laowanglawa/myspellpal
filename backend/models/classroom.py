@@ -1,7 +1,14 @@
 from datetime import datetime
 import random
 import string
-from ..app import db
+from database import db
+
+# 用户-班级关联表
+user_classroom = db.Table('user_classroom',
+    db.Column('user_id', db.Integer, db.ForeignKey('users.id'), primary_key=True),
+    db.Column('classroom_id', db.Integer, db.ForeignKey('classrooms.id'), primary_key=True),
+    db.Column('role', db.String(20), default='student')  # student或teacher
+)
 
 class Classroom(db.Model):
     """班级模型"""
@@ -15,6 +22,7 @@ class Classroom(db.Model):
     
     # 关系
     creator = db.relationship('User', foreign_keys=[created_by], backref='created_classrooms')
+    members = db.relationship('User', secondary=user_classroom, backref=db.backref('classrooms', lazy='dynamic'))
     
     @staticmethod
     def generate_unique_code():

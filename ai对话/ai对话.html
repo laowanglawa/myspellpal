@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 交流助手 - Pollinations AI</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="chat-container">
+        <header class="chat-header">
+            <div class="header-content">
+                <div class="header-title">
+                    <h1>AI 交流助手</h1>
+                </div>
+                <div class="header-controls">
+                    <div class="voice-toggle">
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="voiceToggle">
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <span class="toggle-label">语音朗读</span>
+                    </div>
+                    <button class="settings-btn" id="settingsBtn" title="设置">⚙️</button>
+                </div>
+            </div>
+        </header>
+        
+        <!-- 设置弹窗 -->
+        <div class="settings-modal" id="settingsModal">
+            <div class="settings-modal-overlay" id="settingsOverlay"></div>
+            <div class="settings-modal-content">
+                <div class="settings-modal-header">
+                    <h3>语音设置</h3>
+                    <button class="close-btn" id="closeSettings">✕</button>
+                </div>
+                <div class="settings-modal-body">
+                    <div class="setting-item">
+                        <label>语速</label>
+                        <input type="range" id="rateRange" min="0.5" max="2" step="0.1" value="1">
+                        <span class="setting-value" id="rateValue">1.0</span>
+                    </div>
+                    <div class="setting-item">
+                        <label>音调</label>
+                        <input type="range" id="pitchRange" min="0.5" max="2" step="0.1" value="1">
+                        <span class="setting-value" id="pitchValue">1.0</span>
+                    </div>
+                    <div class="setting-item">
+                        <label>音量</label>
+                        <input type="range" id="volumeRange" min="0" max="1" step="0.1" value="1">
+                        <span class="setting-value" id="volumeValue">1.0</span>
+                    </div>
+                    <div class="setting-item">
+                        <label>语音选择</label>
+                        <select id="voiceSelect">
+                            <option value="">加载中...</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="settings-modal-footer">
+                    <button class="modal-btn modal-btn-cancel" id="cancelSettings">取消</button>
+                    <button class="modal-btn modal-btn-save" id="saveSettings">保存</button>
+                </div>
+            </div>
+        </div>
+        <main class="chat-messages" id="chatMessages">
+            <div class="message bot-message">
+                <div class="message-content">
+                    <p>你好！我是 AI 助手，有什么可以帮助你的吗？</p>
+                </div>
+            </div>
+        </main>
+        <footer class="chat-footer">
+            <div class="input-container">
+                <input type="text" id="userInput" placeholder="输入你的问题或消息..." autocomplete="off">
+                <button id="sendBtn">发送</button>
+            </div>
+        </footer>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

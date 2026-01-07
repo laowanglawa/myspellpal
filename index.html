@@ -60,8 +60,8 @@
             <div class="p-8">
                 <!-- 登录标题 -->
                 <div class="text-center mb-8">
-                    <div class="inline-flex items-center justify-center w-16 h-16 bg-primary/10 rounded-full mb-4">
-                        <i class="fa fa-user-circle text-3xl text-primary"></i>
+                    <div class="inline-flex items-center justify-center w-24 h-24 bg-primary/10 rounded-full mb-4">
+                        <img src="backend/img/myspellpal.png" alt="MySpellPal" class="w-24 h-24 object-contain">
                     </div>
                     <h1 class="text-[clamp(1.5rem,3vw,2rem)] font-bold text-dark dark:text-white">欢迎回来</h1>
                     <p class="text-gray-500 dark:text-gray-400 mt-2">请输入您的账号信息登录</p>
@@ -96,6 +96,25 @@
                         </button>
                     </div>
                     
+                    <!-- 登录身份选择 -->
+                    <div class="relative">
+                        <input type="hidden" id="loginRole" value="">
+                        <div class="grid grid-cols-2 gap-3">
+                            <button type="button" id="studentRoleBtn" 
+                                class="w-full py-3 px-4 rounded-lg border border-gray-300 dark:border-gray-700 
+                                       bg-gray-50 dark:bg-gray-900 dark:text-white 
+                                       transition-all-300 input-focus">
+                                学生
+                            </button>
+                            <button type="button" id="teacherRoleBtn" 
+                                class="w-full py-3 px-4 rounded-lg border border-gray-300 dark:border-gray-700 
+                                       bg-gray-50 dark:bg-gray-900 dark:text-white 
+                                       transition-all-300 input-focus">
+                                教师
+                            </button>
+                        </div>
+                    </div>
+                    
                     <!-- 记住我和忘记密码 -->
                     <div class="flex items-center justify-between">
                         <div class="flex items-center">
@@ -111,11 +130,18 @@
                     </div>
                     
                     <!-- 登录按钮 -->
-                    <button type="submit" 
-                        class="w-full bg-primary hover:bg-primary/90 text-white font-medium py-3 px-4 rounded-lg 
-                               transition-all-300 transform hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center">
-                        <i class="fa fa-sign-in mr-2"></i> 登录
-                    </button>
+                <button type="submit" 
+                    class="w-full bg-primary hover:bg-primary/90 text-white font-medium py-3 px-4 rounded-lg 
+                           transition-all-300 transform hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center">
+                    <i class="fa fa-sign-in mr-2"></i> 登录
+                </button>
+                
+                <!-- 快速登录按钮 -->
+                <!-- <button id="quickLoginBtn" 
+                    class="w-full bg-secondary hover:bg-secondary/90 text-white font-medium py-3 px-4 rounded-lg 
+                           transition-all-300 transform hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center mt-3">
+                    <i class="fa fa-magic mr-2"></i> 快速登录（测试账号）
+                </button> -->
                 </form>
                 
 
@@ -154,6 +180,54 @@
             this.querySelector('i').classList.toggle('fa-eye-slash');
         });
         
+        // 登录身份选择按钮功能
+        const studentRoleBtn = document.getElementById('studentRoleBtn');
+        const teacherRoleBtn = document.getElementById('teacherRoleBtn');
+        const loginRole = document.getElementById('loginRole');
+        
+        // 学生按钮点击事件
+        studentRoleBtn.addEventListener('click', function() {
+            // 设置登录身份为学生
+            loginRole.value = 'student';
+            
+            // 更新按钮样式
+            studentRoleBtn.classList.remove('border-gray-300', 'dark:border-gray-700', 'bg-gray-50', 'dark:bg-gray-900');
+            studentRoleBtn.classList.add('border-primary', 'bg-primary/20', 'dark:bg-primary/30');
+            
+            teacherRoleBtn.classList.remove('border-primary', 'bg-primary/20', 'dark:bg-primary/30');
+            teacherRoleBtn.classList.add('border-gray-300', 'dark:border-gray-700', 'bg-gray-50', 'dark:bg-gray-900');
+        });
+        
+        // 教师按钮点击事件
+        teacherRoleBtn.addEventListener('click', function() {
+            // 设置登录身份为教师
+            loginRole.value = 'teacher';
+            
+            // 更新按钮样式
+            teacherRoleBtn.classList.remove('border-gray-300', 'dark:border-gray-700', 'bg-gray-50', 'dark:bg-gray-900');
+            teacherRoleBtn.classList.add('border-primary', 'bg-primary/20', 'dark:bg-primary/30');
+            
+            studentRoleBtn.classList.remove('border-primary', 'bg-primary/20', 'dark:bg-primary/30');
+            studentRoleBtn.classList.add('border-gray-300', 'dark:border-gray-700', 'bg-gray-50', 'dark:bg-gray-900');
+        });
+        
+        // 初始化时添加测试账号
+        function initializeTestAccount() {
+            let users = JSON.parse(localStorage.getItem('users')) || [];
+            // 检查测试账号是否已存在
+            const testTeacherExists = users.some(user => user.username === 'js');
+            const testStudentExists = users.some(user => user.username === 'xs');
+            if (!testTeacherExists) {
+                // 添加测试教师账号：用户名js，密码123456，身份教师
+                users.push({ username: 'js', password: '123456', role: 'teacher' });
+            }
+            if (!testStudentExists) {
+                // 添加测试学生账号：用户名xs，密码123456，身份学生
+                users.push({ username: 'xs', password: '123456', role: 'student' });
+            }
+            localStorage.setItem('users', JSON.stringify(users));
+        }
+        
         // 表单提交处理
         const loginForm = document.getElementById('loginForm');
         
@@ -162,27 +236,18 @@
             
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
+            const loginRole = document.getElementById('loginRole').value;
             
-            // 简单的表单验证
-            if (!username || !password) {
-                alert('请输入用户名和密码');
+            if (!loginRole) {
+                alert('请选择登录身份！');
                 return;
             }
             
-            // 获取注册用户列表
-            const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers')) || [];
+            // 从localStorage获取用户数据
+            let users = JSON.parse(localStorage.getItem('users')) || [];
             
-            // 预设的测试账号（实际应用中应该连接后端验证）
-            const validAccounts = [
-                { username: 'test', password: '123456' },
-                { username: 'admin', password: 'admin123' },
-                ...registeredUsers // 合并注册的用户
-            ];
-            
-            // 检查账号密码是否正确
-            const isValidLogin = validAccounts.some(account => 
-                account.username === username && account.password === password
-            );
+            // 检查用户是否存在且密码正确且身份匹配
+            const user = users.find(user => user.username === username && user.password === password && user.role === loginRole);
             
             // 显示提交动画效果
             const submitButton = this.querySelector('button[type="submit"]');
@@ -193,7 +258,7 @@
             
             // 模拟登录请求
             setTimeout(() => {
-                if (isValidLogin) {
+                if (user) {
                     // 登录成功
                     submitButton.innerHTML = '<i class="fa fa-check mr-2"></i> 登录成功';
                     submitButton.classList.remove('bg-primary', 'hover:bg-primary/90');
@@ -213,12 +278,15 @@
                     
                     // 保存当前登录用户信息
                     localStorage.setItem('currentUser', username);
+                    localStorage.setItem('currentUserRole', loginRole);
                     
-                    // 登录成功后跳转到主页
-                    setTimeout(() => {
-                        // 跳转到系统主页
+                    // 登录成功后跳转到相应页面
+                    // 立即执行跳转，不使用setTimeout以避免可能的问题
+                    if (loginRole === 'teacher') {
+                        window.location.href = 'teacher-zhuye.html';
+                    } else if (loginRole === 'student') {
                         window.location.href = 'zhuye.html';
-                    }, 1000);
+                    }
                 } else {
                     // 登录失败
                     submitButton.innerHTML = '<i class="fa fa-times mr-2"></i> 登录失败';
@@ -235,6 +303,9 @@
                 }
             }, 1500);
         });
+        
+        // 页面加载时初始化测试账号
+        initializeTestAccount();
         
         // 输入框聚焦时的额外动效
         const inputs = document.querySelectorAll('input');
@@ -296,6 +367,59 @@
             
             // 跳转到忘记密码页面
             window.location.href = 'forgot-password.html';
+        });
+        
+        // 快速登录功能
+        const quickLoginBtn = document.getElementById('quickLoginBtn');
+        
+        quickLoginBtn.addEventListener('click', function() {
+            // 添加一个简单的交互，让用户选择快速登录的角色
+            const role = prompt('请选择快速登录角色：\n1. 教师\n2. 学生\n\n输入 1 或 2：');
+            
+            if (role === '1') {
+                // 填充测试教师账号信息：用户名js，密码123456，身份教师
+                document.getElementById('username').value = 'js';
+                document.getElementById('password').value = '123456';
+                
+                // 更新身份选择按钮状态
+                teacherRoleBtn.click(); // 触发教师按钮点击事件
+            } else if (role === '2') {
+                // 填充测试学生账号信息：用户名xs，密码123456，身份学生
+                document.getElementById('username').value = 'xs';
+                document.getElementById('password').value = '123456';
+                
+                // 更新身份选择按钮状态
+                studentRoleBtn.click(); // 触发学生按钮点击事件
+            } else {
+                alert('无效选择，请输入 1 或 2');
+                return;
+            }
+            
+            // 提交登录表单
+            loginForm.dispatchEvent(new Event('submit'));
+        });
+        
+        // 重置登录状态功能
+        function resetLoginStatus() {
+            // 清除localStorage中的登录信息
+            localStorage.removeItem('currentUser');
+            localStorage.removeItem('currentUserRole');
+            localStorage.removeItem('rememberedUsername');
+            localStorage.removeItem('rememberedPassword');
+            
+            console.log('登录状态已重置');
+        }
+        
+        // 页面加载时检查登录状态，如果有问题则重置
+        document.addEventListener('DOMContentLoaded', function() {
+            // 检查localStorage中的登录信息是否完整
+            const currentUser = localStorage.getItem('currentUser');
+            const currentUserRole = localStorage.getItem('currentUserRole');
+            
+            // 如果只有部分登录信息，可能导致登录问题，重置登录状态
+            if ((currentUser && !currentUserRole) || (!currentUser && currentUserRole)) {
+                resetLoginStatus();
+            }
         });
     </script>
 </body>

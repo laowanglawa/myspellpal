@@ -1,8 +1,9 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 from flask_cors import CORS
 from dotenv import load_dotenv
 import os
 import sys
+import urllib.parse
 
 # 添加当前目录到Python路径，以支持绝对导入
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
@@ -10,22 +11,29 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 # 加载环境变量
 load_dotenv()
 
-# 创建Flask应用实例，为Python 3.14兼容性，指定instance_path参数
-app = Flask(__name__, instance_path=os.path.join(os.path.abspath(os.path.dirname(__file__)), 'instance'))
-
-# 配置应用
-app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev_key')
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///words.db')
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
 # 从database.py导入数据库实例
 from database import db
 
-# 初始化数据库
-db.init_app(app)
+# 创建应用工厂函数
+def create_app(config_name=None):
+    # 创建Flask应用实例，为Python 3.14兼容性，指定instance_path参数
+    app = Flask(__name__, instance_path=os.path.join(os.path.abspath(os.path.dirname(__file__)), 'instance'))
 
-# 配置CORS
-CORS(app, resources={r"/api/*": {"origins": "*"}})
+    # 配置应用
+    app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev_key')
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///words.db')
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+    # 初始化数据库
+    db.init_app(app)
+
+    # 配置CORS
+    CORS(app, resources={r"/api/*": {"origins": "*"}})
+    
+    return app
+
+# 创建应用实例
+app = create_app()
 
 # 定义AI图片生成API端点
 @app.route('/api/v1/words/image', methods=['GET'])
@@ -63,6 +71,8 @@ def init_db():
         from models.user import User
         from models.word import Word
         from models.user_word_progress import UserWordProgress
+        from models.classroom import Classroom
+        from models.assignment import Assignment, StudentAssignment
         
         # 创建所有表
         db.create_all()
@@ -97,6 +107,19 @@ def init_db():
 # 导入必要的模块用于API端点
 from flask import request
 import urllib.parse
+
+# 注册路由
+from routes.auth import auth_bp
+from routes.user import user_bp
+from routes.words import words_bp
+from routes.classrooms import classrooms_bp
+from routes.assignments import assignments_bp
+
+app.register_blueprint(auth_bp, url_prefix='/api/v1/auth')
+app.register_blueprint(user_bp, url_prefix='/api/v1/user')
+app.register_blueprint(words_bp, url_prefix='/api/v1/words')
+app.register_blueprint(classrooms_bp, url_prefix='/api/v1/classrooms')
+app.register_blueprint(assignments_bp, url_prefix='/api/v1/assignments')
 
 # 初始化数据库
 init_db()

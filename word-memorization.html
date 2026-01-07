@@ -70,8 +70,8 @@
     <nav class="bg-white dark:bg-gray-800 shadow-md fixed w-full top-0 z-50 transition-all duration-300">
         <div class="container mx-auto px-4 py-3 flex justify-between items-center">
             <div class="flex items-center space-x-2">
-                <i class="fa fa-book text-primary text-2xl"></i>
-                <h1 class="text-xl font-bold text-primary">WordMaster</h1>
+                <img src="backend/img/myspellpal.png" alt="MySpellPal" class="w-14 h-14 object-contain">
+                <h1 class="text-xl font-bold text-primary">MySpellPal</h1>
             </div>
             <div class="flex items-center space-x-4">
                 <button id="themeToggle" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
@@ -80,14 +80,69 @@
                 <button id="homeBtn" class="flex items-center btn-outline text-sm">
                     <i class="fa fa-home mr-2"></i> 首页
                 </button>
-                <button id="settingsBtn" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-                    <i class="fa fa-cog text-xl"></i>
-                </button>
+                <!-- 用户账户区域 -->
+                <div class="relative">
+                    <button id="userProfileBtn" class="flex items-center space-x-2 p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer">
+                        <div class="w-10 h-10 rounded-full bg-primary/20 dark:bg-primary/30 flex items-center justify-center text-primary">
+                            <i class="fa fa-user text-xl"></i>
+                        </div>
+                        <span id="currentUsername" class="text-sm font-medium hidden md:inline">用户</span>
+                    </button>
+                </div>
             </div>
         </div>
         
 
     </nav>
+    
+    <!-- 账户详情模态框 -->
+    <div id="accountModal" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center hidden">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl w-full max-w-md p-6 transform transition-all scale-95 opacity-0">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-bold">我的账户</h3>
+                <button id="closeAccountModalBtn" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+                    <i class="fa fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <!-- 用户信息卡片 -->
+            <div class="flex flex-col items-center mb-8">
+                <div class="w-24 h-24 rounded-full bg-primary/20 dark:bg-primary/30 flex items-center justify-center text-primary mb-4">
+                    <i class="fa fa-user text-4xl"></i>
+                </div>
+                <h4 id="accountUsername" class="text-xl font-bold mb-1">用户名</h4>
+                <p id="accountJoinDate" class="text-gray-500 dark:text-gray-400 text-sm">注册时间: 2023-01-01</p>
+            </div>
+            
+            <!-- 账户功能选项 -->
+            <div class="space-y-4 mb-8">
+
+                <button id="learningStatsBtn" class="w-full flex items-center justify-between p-4 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                    <div class="flex items-center">
+                        <div class="w-10 h-10 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center mr-3">
+                            <i class="fa fa-line-chart text-secondary"></i>
+                        </div>
+                        <span class="font-medium">学习统计</span>
+                    </div>
+                    <i class="fa fa-chevron-right text-gray-400"></i>
+                </button>
+                <button id="wordListBtn" class="w-full flex items-center justify-between p-4 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                    <div class="flex items-center">
+                        <div class="w-10 h-10 bg-purple-100 dark:bg-purple-900 rounded-full flex items-center justify-center mr-3">
+                            <i class="fa fa-book text-purple-600"></i>
+                        </div>
+                        <span class="font-medium">我的词库</span>
+                    </div>
+                    <i class="fa fa-chevron-right text-gray-400"></i>
+                </button>
+            </div>
+            
+            <!-- 退出登录按钮 -->
+            <button id="logoutBtn" class="w-full btn-outline border-red-300 text-red-600 dark:text-red-400 dark:border-red-800 hover:bg-red-50 dark:hover:bg-red-900/30">
+                <i class="fa fa-sign-out mr-2"></i> 退出登录
+            </button>
+        </div>
+    </div>
 
     <!-- 主要内容 -->
     <main class="container mx-auto px-4 pt-24 pb-16 max-w-4xl">
@@ -155,6 +210,23 @@
                         <span id="wordPronunciation" class="text-gray-400 text-lg font-normal ml-2 hidden"></span>
                     </h2>
                     <p id="wordExample" class="text-gray-500 dark:text-gray-400 text-center italic"></p>
+                </div>
+                
+                <!-- 单词朗读功能 -->
+                <div class="mb-8 bg-gray-50 dark:bg-gray-700/50 rounded-lg p-6 shadow-inner">
+                    <div class="flex flex-col md:flex-row justify-between items-center">
+                        <div class="mb-4 md:mb-0">
+                            <label for="voiceSelect" class="text-sm text-gray-600 dark:text-gray-300 mr-2">选择语音：</label>
+                            <select id="voiceSelect" class="border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 bg-white dark:bg-gray-800 text-sm">
+                                <option value="">加载中...</option>
+                            </select>
+                        </div>
+                        <div>
+                            <button id="readBtn" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm">
+                                <i class="fa fa-volume-up mr-1"></i> 朗读
+                            </button>
+                        </div>
+                    </div>
                 </div>
                 
                 <!-- AI生成图片区域 - 仅在背诵模式显示 -->
@@ -237,34 +309,7 @@
                     </button>
             </div>
         </div>        
-        <!-- 功能区域 -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-            <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-6 card-hover">
-                <div class="text-center mb-4">
-                    <div class="w-14 h-14 mx-auto bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center mb-3">
-                        <i class="fa fa-random text-primary text-xl"></i>
-                    </div>
-                    <h3 class="font-semibold">随机模式</h3>
-                    <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">随机抽取单词进行默写</p>
-                </div>
-                <button id="randomModeBtn" class="w-full btn-outline">
-                    开始练习
-                </button>
-            </div>
-            <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-6 card-hover">
-                <div class="text-center mb-4">
-                    <div class="w-14 h-14 mx-auto bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center mb-3">
-                        <i class="fa fa-sort-amount-asc text-secondary text-xl"></i>
-                    </div>
-                    <h3 class="font-semibold">难度模式</h3>
-                    <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">按难度级别选择单词</p>
-                </div>
-                <button id="difficultyModeBtn" class="w-full btn-outline">
-                    选择难度
-                </button>
-            </div>
 
-        </div>
         
         <!-- 最近练习记录 -->
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-6 mb-8">
@@ -299,59 +344,11 @@
     <!-- 页脚 -->
     <footer class="bg-white dark:bg-gray-800 py-6 shadow-inner">
         <div class="container mx-auto px-4 text-center text-gray-500 dark:text-gray-400 text-sm">
-            <p>&copy; 2023 WordMaster 英语单词默写网站. 让学习更高效！</p>
+            <p>&copy; 2023 MySpellPal 英语单词默写网站. 让学习更高效！</p>
         </div>
     </footer>
 
-    <!-- 难度选择模态框 -->
-    <div id="difficultyModal" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center hidden">
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl w-full max-w-md p-6 transform transition-all scale-95 opacity-0" id="modalContent">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-xl font-bold">选择难度</h3>
-                <button id="closeModalBtn" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
-                    <i class="fa fa-times text-xl"></i>
-                </button>
-            </div>
-            <div class="space-y-3 mb-6">
-                <button class="difficulty-option w-full text-left p-4 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors" data-level="easy">
-                    <div class="flex items-center">
-                        <div class="w-10 h-10 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center mr-3">
-                            <i class="fa fa-smile-o text-green-600"></i>
-                        </div>
-                        <div>
-                            <h4 class="font-medium">简单</h4>
-                            <p class="text-sm text-gray-500 dark:text-gray-400">基础词汇，适合初学者</p>
-                        </div>
-                    </div>
-                </button>
-                <button class="difficulty-option w-full text-left p-4 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors" data-level="medium">
-                    <div class="flex items-center">
-                        <div class="w-10 h-10 rounded-full bg-yellow-100 dark:bg-yellow-900 flex items-center justify-center mr-3">
-                            <i class="fa fa-meh-o text-yellow-600"></i>
-                        </div>
-                        <div>
-                            <h4 class="font-medium">中等</h4>
-                            <p class="text-sm text-gray-500 dark:text-gray-400">常用词汇，适合中级学习者</p>
-                        </div>
-                    </div>
-                </button>
-                <button class="difficulty-option w-full text-left p-4 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors" data-level="hard">
-                    <div class="flex items-center">
-                        <div class="w-10 h-10 rounded-full bg-red-100 dark:bg-red-900 flex items-center justify-center mr-3">
-                            <i class="fa fa-frown-o text-red-600"></i>
-                        </div>
-                        <div>
-                            <h4 class="font-medium">困难</h4>
-                            <p class="text-sm text-gray-500 dark:text-gray-400">高级词汇，适合进阶学习者</p>
-                        </div>
-                    </div>
-                </button>
-            </div>
-            <button id="startPracticeBtn" class="w-full btn-primary">
-                开始练习
-            </button>
-        </div>
-    </div>
+
     
     <!-- 单词数量设置模态框 -->
     <div id="wordCountModal" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center hidden">
@@ -517,6 +514,54 @@
             { word: 'sun', definition: '太阳', pronunciation: '/sʌn/', example: 'The ____ is shining brightly.', level: 'easy' },
             { word: 'moon', definition: '月亮', pronunciation: '/muːn/', example: 'The ____ is in the sky.', level: 'easy' },
             { word: 'star', definition: '星星', pronunciation: '/stɑː/', example: 'I can see a ____ in the sky.', level: 'easy' },
+            { word: 'milk', definition: '牛奶', pronunciation: '/mɪlk/', example: 'I drink ____ every morning.', level: 'easy' },
+            { word: 'bread', definition: '面包', pronunciation: '/bred/', example: 'I eat ____ for breakfast.', level: 'easy' },
+            { word: 'egg', definition: '鸡蛋', pronunciation: '/eɡ/', example: 'I had an ____ for breakfast.', level: 'easy' },
+            { word: 'rice', definition: '米饭', pronunciation: '/raɪs/', example: 'We eat ____ with dinner.', level: 'easy' },
+            { word: 'fish', definition: '鱼', pronunciation: '/fɪʃ/', example: 'The ____ is swimming in the pond.', level: 'easy' },
+            { word: 'meat', definition: '肉', pronunciation: '/miːt/', example: 'I like chicken ____.', level: 'easy' },
+            { word: 'vegetable', definition: '蔬菜', pronunciation: '/ˈvedʒtəbl/', example: 'Eat more ____ for health.', level: 'easy' },
+            { word: 'fruit', definition: '水果', pronunciation: '/fruːt/', example: 'An apple is a ____.', level: 'easy' },
+            { word: 'hat', definition: '帽子', pronunciation: '/hæt/', example: 'The ____ keeps my head warm.', level: 'easy' },
+            { word: 'shoe', definition: '鞋子', pronunciation: '/ʃuː/', example: 'I need new ____.', level: 'easy' },
+            { word: 'sock', definition: '袜子', pronunciation: '/sɒk/', example: 'My feet are cold without ____.', level: 'easy' },
+            { word: 'hand', definition: '手', pronunciation: '/hænd/', example: 'Write with your ____.', level: 'easy' },
+            { word: 'foot', definition: '脚', pronunciation: '/fʊt/', example: 'I have two ____.', level: 'easy' },
+            { word: 'eye', definition: '眼睛', pronunciation: '/aɪ/', example: 'I see with my ____.', level: 'easy' },
+            { word: 'ear', definition: '耳朵', pronunciation: '/ɪə/', example: 'I hear with my ____.', level: 'easy' },
+            { word: 'nose', definition: '鼻子', pronunciation: '/nəʊz/', example: 'I smell with my ____.', level: 'easy' },
+            { word: 'mouth', definition: '嘴巴', pronunciation: '/maʊθ/', example: 'Speak with your ____.', level: 'easy' },
+            { word: 'face', definition: '脸', pronunciation: '/feɪs/', example: 'Wash your ____ every day.', level: 'easy' },
+            { word: 'arm', definition: '手臂', pronunciation: '/ɑːm/', example: 'I lift things with my ____.', level: 'easy' },
+            { word: 'leg', definition: '腿', pronunciation: '/leɡ/', example: 'I walk with my ____.', level: 'easy' },
+            { word: 'road', definition: '道路', pronunciation: '/rəʊd/', example: 'The ____ is very wide.', level: 'easy' },
+            { word: 'street', definition: '街道', pronunciation: '/striːt/', example: 'The ____ has many shops.', level: 'easy' },
+            { word: 'city', definition: '城市', pronunciation: '/ˈsɪti/', example: 'I live in a big ____.', level: 'easy' },
+            { word: 'village', definition: '村庄', pronunciation: '/ˈvɪlɪdʒ/', example: 'My grandparents live in a small ____.', level: 'easy' },
+            { word: 'country', definition: '国家', pronunciation: '/ˈkʌntri/', example: 'China is a beautiful ____.', level: 'easy' },
+            { word: 'world', definition: '世界', pronunciation: '/wɜːld/', example: 'Travel around the ____.', level: 'easy' },
+            { word: 'beach', definition: '海滩', pronunciation: '/biːtʃ/', example: 'We play on the ____.', level: 'easy' },
+            { word: 'river', definition: '河流', pronunciation: '/ˈrɪvə/', example: 'The ____ flows to the sea.', level: 'easy' },
+            { word: 'lake', definition: '湖泊', pronunciation: '/leɪk/', example: 'The ____ is very clear.', level: 'easy' },
+            { word: 'mountain', definition: '山', pronunciation: '/ˈmaʊntɪn/', example: 'The ____ is very high.', level: 'easy' },
+            { word: 'rain', definition: '雨', pronunciation: '/reɪn/', example: 'The ____ is falling.', level: 'easy' },
+            { word: 'snow', definition: '雪', pronunciation: '/snəʊ/', example: 'The ground is white with ____.', level: 'easy' },
+            { word: 'wind', definition: '风', pronunciation: '/wɪnd/', example: 'The ____ is blowing hard.', level: 'easy' },
+            { word: 'cloud', definition: '云', pronunciation: '/klaʊd/', example: 'The sky has many ____.', level: 'easy' },
+            { word: 'summer', definition: '夏天', pronunciation: '/ˈsʌmə/', example: 'It is hot in ____.', level: 'easy' },
+            { word: 'winter', definition: '冬天', pronunciation: '/ˈwɪntə/', example: 'It is cold in ____.', level: 'easy' },
+            { word: 'spring', definition: '春天', pronunciation: '/sprɪŋ/', example: 'Flowers bloom in ____.', level: 'easy' },
+            { word: 'autumn', definition: '秋天', pronunciation: '/ˈɔːtəm/', example: 'Leaves fall in ____.', level: 'easy' },
+            { word: 'music', definition: '音乐', pronunciation: '/ˈmjuːzɪk/', example: 'I listen to ____ every day.', level: 'easy' },
+            { word: 'song', definition: '歌曲', pronunciation: '/sɒŋ/', example: 'She sings a beautiful ____.', level: 'easy' },
+            { word: 'game', definition: '游戏', pronunciation: '/ɡeɪm/', example: 'Let us play a ____.', level: 'easy' },
+            { word: 'toy', definition: '玩具', pronunciation: '/tɔɪ/', example: 'Children love ____.', level: 'easy' },
+            { word: 'gift', definition: '礼物', pronunciation: '/ɡɪft/', example: 'I received a birthday ____.', level: 'easy' },
+            { word: 'party', definition: '派对', pronunciation: '/ˈpɑːti/', example: 'We had a ____ yesterday.', level: 'easy' },
+            { word: 'holiday', definition: '假期', pronunciation: '/ˈhɒlədeɪ/', example: 'We go on vacation during ____.', level: 'easy' },
+            { word: 'week', definition: '周', pronunciation: '/wiːk/', example: 'There are seven days in a ____.', level: 'easy' },
+            { word: 'month', definition: '月', pronunciation: '/mʌnθ/', example: 'There are twelve ____ in a year.', level: 'easy' },
+            { word: 'year', definition: '年', pronunciation: '/jɪə/', example: 'How old are you in ____?', level: 'easy' },
             
             // 中等难度单词
             { word: 'intelligence', definition: '智力', pronunciation: '/ɪnˈtelɪdʒəns/', example: 'She has great ____.', level: 'medium' },
@@ -549,6 +594,47 @@
             { word: 'wisdom', definition: '智慧', pronunciation: '/ˈwɪzdəm/', example: 'Age brings ____.', level: 'medium' },
             { word: 'leadership', definition: '领导力', pronunciation: '/ˈliːdəʃɪp/', example: 'He has good ____ skills.', level: 'medium' },
             { word: 'confidence', definition: '信心', pronunciation: '/ˈkɒnfɪdəns/', example: 'She speaks with ____.', level: 'medium' },
+            { word: 'flexibility', definition: '灵活性', pronunciation: '/ˌfleksəˈbɪləti/', example: '____ is important in modern workplace.', level: 'medium' },
+            { word: 'productivity', definition: '生产力', pronunciation: '/ˌprɒdʌkˈtɪvəti/', example: 'We need to increase our ____.', level: 'medium' },
+            { word: 'performance', definition: '表现', pronunciation: '/pəˈfɔːməns/', example: 'His ____ exceeded expectations.', level: 'medium' },
+            { word: 'improvement', definition: '改进', pronunciation: '/ɪmˈpruːvmənt/', example: 'There is room for ____.', level: 'medium' },
+            { word: 'competition', definition: '竞争', pronunciation: '/ˌkɒmpəˈtɪʃn/', example: '____ drives innovation.', level: 'medium' },
+            { word: 'collaboration', definition: '合作', pronunciation: '/kəˌlæbəˈreɪʃn/', example: '____ leads to better results.', level: 'medium' },
+            { word: 'contribution', definition: '贡献', pronunciation: '/ˌkɒntrɪˈbjuːʃn/', example: 'He made a significant ____.', level: 'medium' },
+            { word: 'commitment', definition: '承诺', pronunciation: '/kəˈmɪtmənt/', example: 'Her ____ to the project was great.', level: 'medium' },
+            { word: 'determination', definition: '决心', pronunciation: '/dɪˌtɜːmɪˈneɪʃn/', example: '____ is key to success.', level: 'medium' },
+            { word: 'dedication', definition: '奉献', pronunciation: '/ˌdedɪˈkeɪʃn/', example: 'Her ____ to teaching is admirable.', level: 'medium' },
+            { word: 'persistence', definition: '坚持', pronunciation: '/pəˈsɪstəns/', example: '____ pays off in the end.', level: 'medium' },
+            { word: 'ambition', definition: '雄心', pronunciation: '/æmˈbɪʃn/', example: 'Her ____ drives her forward.', level: 'medium' },
+            { word: 'courage', definition: '勇气', pronunciation: '/ˈkʌrɪdʒ/', example: 'It takes ____ to try new things.', level: 'medium' },
+            { word: 'enthusiasm', definition: '热情', pronunciation: '/ɪnˈθjuːziæzəm/', example: 'His ____ is contagious.', level: 'medium' },
+            { word: 'optimism', definition: '乐观', pronunciation: '/ˈɒptɪmɪzəm/', example: '____ helps us face challenges.', level: 'medium' },
+            { word: 'perspective', definition: '观点', pronunciation: '/pəˈspektɪv/', example: 'We need a different ____.', level: 'medium' },
+            { word: 'understanding', definition: '理解', pronunciation: '/ˌʌndəˈstændɪŋ/', example: '____ comes with time.', level: 'medium' },
+            { word: 'appreciate', definition: '欣赏', pronunciation: '/əˈpriːʃieɪt/', example: 'I ____ your help.', level: 'medium' },
+            { word: 'communicate', definition: '交流', pronunciation: '/kəˈmjuːnɪkeɪt/', example: 'We need to ____ better.', level: 'medium' },
+            { word: 'concentrate', definition: '集中', pronunciation: '/ˈkɒnsəntreɪt/', example: 'You need to ____ on your work.', level: 'medium' },
+            { word: 'contribute', definition: '贡献', pronunciation: '/kənˈtrɪbjuːt/', example: 'Everyone can ____ to the team.', level: 'medium' },
+            { word: 'coordinate', definition: '协调', pronunciation: '/kəˈɔːrdɪneɪt/', example: 'We need to ____ our efforts.', level: 'medium' },
+            { word: 'cooperate', definition: '合作', pronunciation: '/kəʊˈɒpəreɪt/', example: 'We must ____ to finish this.', level: 'medium' },
+            { word: 'demonstrate', definition: '展示', pronunciation: '/ˈdemənstreɪt/', example: 'Please ____ your skills.', level: 'medium' },
+            { word: 'determine', definition: '决定', pronunciation: '/dɪˈtɜːmɪn/', example: 'We need to ____ the best approach.', level: 'medium' },
+            { word: 'encourage', definition: '鼓励', pronunciation: '/ɪnˈkʌrɪdʒ/', example: 'Parents should ____ their children.', level: 'medium' },
+            { word: 'evaluate', definition: '评估', pronunciation: '/ɪˈvæljueɪt/', example: 'We need to ____ the results.', level: 'medium' },
+            { word: 'facilitate', definition: '促进', pronunciation: '/fəˈsɪlɪteɪt/', example: 'This tool will ____ the process.', level: 'medium' },
+            { word: 'generate', definition: '产生', pronunciation: '/ˈdʒenəreɪt/', example: 'We need to ____ new ideas.', level: 'medium' },
+            { word: 'implement', definition: '实施', pronunciation: '/ˈɪmplɪment/', example: 'We will ____ the plan.', level: 'medium' },
+            { word: 'improve', definition: '改进', pronunciation: '/ɪmˈpruːv/', example: 'We need to ____ our service.', level: 'medium' },
+            { word: 'increase', definition: '增加', pronunciation: '/ɪnˈkriːs/', example: 'We need to ____ sales.', level: 'medium' },
+            { word: 'influence', definition: '影响', pronunciation: '/ˈɪnfluəns/', example: 'Weather can ____ our mood.', level: 'medium' },
+            { word: 'innovate', definition: '创新', pronunciation: '/ˈɪnəveɪt/', example: 'We need to ____ or die.', level: 'medium' },
+            { word: 'motivate', definition: '激励', pronunciation: '/ˈməʊtɪveɪt/', example: 'Good leaders ____ their team.', level: 'medium' },
+            { word: 'negotiate', definition: '谈判', pronunciation: '/nɪˈɡəʊʃieɪt/', example: 'We need to ____ a deal.', level: 'medium' },
+            { word: 'organize', definition: '组织', pronunciation: '/ˈɔːɡənaɪz/', example: 'Please ____ the meeting.', level: 'medium' },
+            { word: 'participate', definition: '参与', pronunciation: '/pɑːˈtɪsɪpeɪt/', example: 'Everyone should ____.', level: 'medium' },
+            { word: 'prioritize', definition: '优先考虑', pronunciation: '/praɪˈɒrətaɪz/', example: 'We must ____ the important tasks.', level: 'medium' },
+            { word: 'recognize', definition: '认可', pronunciation: '/ˈrekəɡnaɪz/', example: 'We should ____ his efforts.', level: 'medium' },
+            { word: 'significance', definition: '重要性', pronunciation: '/sɪɡˈnɪfɪkəns/', example: 'Understand the ____ of this event.', level: 'medium' },
             
             // 困难难度单词
             { word: 'ubiquitous', definition: '无处不在的', pronunciation: '/juːˈbɪkwɪtəs/', example: 'Smartphones are ____ today.', level: 'hard' },
@@ -580,19 +666,141 @@
             { word: 'ameliorate', definition: '改善', pronunciation: '/əˈmiːliəreɪt/', example: 'We need to ____ the situation.', level: 'hard' },
             { word: 'amiable', definition: '和蔼可亲的', pronunciation: '/ˈeɪmiəbl/', example: 'He is an ____ person.', level: 'hard' },
             { word: 'analogous', definition: '类似的', pronunciation: '/əˈnæləɡəs/', example: 'The two situations are ____.', level: 'hard' },
-            { word: 'anomalous', definition: '异常的', pronunciation: '/əˈnɒmələs/', example: 'This result is ____.', level: 'hard' }
+            { word: 'anomalous', definition: '异常的', pronunciation: '/əˈnɒmələs/', example: 'This result is ____.', level: 'hard' },
+            { word: 'archaic', definition: '古代的', pronunciation: '/ɑːˈkeɪɪk/', example: 'The museum displays ____ artifacts.', level: 'hard' },
+            { word: 'assiduous', definition: '勤勉的', pronunciation: '/əˈsɪdʒuəs/', example: 'She is an ____ worker.', level: 'hard' },
+            { word: 'august', definition: '威严的', pronunciation: '/ɔːˈɡʌst/', example: 'The ____ ceremony impressed everyone.', level: 'hard' },
+            { word: 'circuitous', definition: '迂回的', pronunciation: '/sɜːˈkjuːɪtəs/', example: 'We took a ____ route.', level: 'hard' },
+            { word: 'clandestine', definition: '秘密的', pronunciation: '/klænˈdestɪn/', example: 'They held a ____ meeting.', level: 'hard' },
+            { word: 'cogent', definition: '有说服力的', pronunciation: '/ˈkəʊdʒənt/', example: 'She presented a ____ argument.', level: 'hard' },
+            { word: 'commensurate', definition: '相等的', pronunciation: '/kəˈmenʃərət/', example: 'The pay should be ____ with the work.', level: 'hard' },
+            { word: 'comprehensive', definition: '全面的', pronunciation: '/ˌkɒmprɪˈhensɪv/', example: 'We need a ____ plan.', level: 'hard' },
+            { word: 'conundrum', definition: '难题', pronunciation: '/kəˈnʌndrəm/', example: 'This is a real ____.', level: 'hard' },
+            { word: 'culminate', definition: '达到顶点', pronunciation: '/ˈkʌlmɪneɪt/', example: 'The project will ____ next month.', level: 'hard' },
+            { word: 'deference', definition: '尊重', pronunciation: '/ˈdefərəns/', example: 'We show ____ to our elders.', level: 'hard' },
+            { word: 'dichotomy', definition: '二分法', pronunciation: '/daɪˈkɒtəmi/', example: 'There is a ____ between work and life.', level: 'hard' },
+            { word: 'disparate', definition: '不同的', pronunciation: '/ˈdɪspərət/', example: 'They hold ____ views.', level: 'hard' },
+            { word: 'divergent', definition: '分叉的', pronunciation: '/daɪˈvɜːdʒənt/', example: 'We have ____ opinions.', level: 'hard' },
+            { word: 'ebullient', definition: '热情洋溢的', pronunciation: '/ɪˈbʌliənt/', example: 'She has an ____ personality.', level: 'hard' },
+            { word: 'eclectic', definition: '折衷的', pronunciation: '/ɪˈklektɪk/', example: 'She has an ____ taste in music.', level: 'hard' },
+            { word: 'elucidate', definition: '阐明', pronunciation: '/ɪˈluːsɪdeɪt/', example: 'Please ____ your point.', level: 'hard' },
+            { word: 'empirical', definition: '经验的', pronunciation: '/ɪmˈpɪrɪkl/', example: 'We need ____ evidence.', level: 'hard' },
+            { word: 'enigmatic', definition: '神秘的', pronunciation: '/ˌenɪɡˈmætɪk/', example: 'She gave an ____ smile.', level: 'hard' },
+            { word: 'ephemeral', definition: '转瞬即逝的', pronunciation: '/ɪˈfemərəl/', example: 'Fame can be ____.', level: 'hard' },
+            { word: 'erudite', definition: '博学的', pronunciation: '/ˈeruːdaɪt/', example: 'He is an ____ scholar.', level: 'hard' },
+            { word: 'esoteric', definition: '深奥的', pronunciation: '/ˌesəˈterɪk/', example: 'This book contains ____ knowledge.', level: 'hard' },
+            { word: 'exacerbate', definition: '加剧', pronunciation: '/ɪɡˈzæsəbeɪt/', example: 'This will ____ the problem.', level: 'hard' },
+            { word: 'exemplary', definition: '典范的', pronunciation: '/ɪɡˈzempləri/', example: 'Her behavior is ____.', level: 'hard' },
+            { word: 'expedient', definition: '权宜的', pronunciation: '/ɪkˈspiːdiənt/', example: 'We need an ____ solution.', level: 'hard' },
+            { word: 'extemporaneous', definition: '即兴的', pronunciation: '/ekˌstem pəˈreɪniəs/', example: 'He gave an ____ speech.', level: 'hard' },
+            { word: 'fastidious', definition: '讲究的', pronunciation: '/fæˈstɪdiəs/', example: 'She is ____ about her appearance.', level: 'hard' },
+            { word: 'grandiloquent', definition: '夸张的', pronunciation: '/ɡrænˈdɪləkwənt/', example: 'His ____ style is too much.', level: 'hard' },
+            { word: 'harangue', definition: '长篇大论', pronunciation: '/həˈræŋ/', example: 'He delivered a ____ about politics.', level: 'hard' },
+            { word: 'haughty', definition: '傲慢的', pronunciation: '/ˈhɔːti/', example: 'She has a ____ manner.', level: 'hard' },
+            { word: 'imminent', definition: '即将发生的', pronunciation: '/ˈɪmɪnənt/', example: 'The storm is ____.', level: 'hard' },
+            { word: 'impede', definition: '阻碍', pronunciation: '/ɪmˈpiːd/', example: 'Nothing can ____ our progress.', level: 'hard' },
+            { word: 'impervious', definition: '不受影响的', pronunciation: '/ɪmˈpɜːviəs/', example: 'He is ____ to criticism.', level: 'hard' },
+            { word: 'impetuous', definition: '冲动的', pronunciation: '/ɪmˈpetʃuəs/', example: 'His ____ decision was a mistake.', level: 'hard' },
+            { word: 'implicate', definition: '牵连', pronunciation: '/ˈɪmplɪkeɪt/', example: 'The evidence ____ him in the crime.', level: 'hard' },
+            { word: 'indigenous', definition: '本土的', pronunciation: '/ɪnˈdɪdʒənəs/', example: '____ people live here.', level: 'hard' },
+            { word: 'indolent', definition: '懒惰的', pronunciation: '/ˈɪndələnt/', example: 'The ____ student failed the exam.', level: 'hard' },
+            { word: 'inexorable', definition: '不可阻挡的', pronunciation: '/ɪnˈeksərəbl/', example: 'The ____ tide is coming.', level: 'hard' },
+            { word: 'inimitable', definition: '无法模仿的', pronunciation: '/ɪˈnɪmɪtəbl/', example: 'Her style is ____.', level: 'hard' },
+            { word: 'innocuous', definition: '无害的', pronunciation: '/ɪˈnɒkjuəs/', example: 'It was just an ____ comment.', level: 'hard' },
+            { word: 'insidious', definition: '阴险的', pronunciation: '/ɪnˈsɪdiəs/', example: 'The ____ plot was uncovered.', level: 'hard' },
+            { word: 'intrepid', definition: '无畏的', pronunciation: '/ɪnˈtrepɪd/', example: 'The ____ explorers continued.', level: 'hard' },
+            { word: 'irascible', definition: '易怒的', pronunciation: '/ɪˈræsɪbl/', example: 'The ____ man shouted loudly.', level: 'hard' },
+            { word: 'laudable', definition: '值得称赞的', pronunciation: '/ˈlɔːdəbl/', example: 'Her ____ efforts were recognized.', level: 'hard' },
+            { word: 'lugubrious', definition: '悲哀的', pronunciation: '/ləˈɡuːbriəs/', example: 'He had a ____ expression.', level: 'hard' },
+            { word: 'magnanimous', definition: '宽宏大量的', pronunciation: '/mæɡˈnænɪməs/', example: 'She is a ____ person.', level: 'hard' },
+            { word: 'malign', definition: '诽谤', pronunciation: '/məˈlaɪn/', example: 'Do not ____ others.', level: 'hard' },
+            { word: 'meticulous', definition: '细心的', pronunciation: '/məˈtɪkjələs/', example: 'She is ____ in her work.', level: 'hard' },
+            { word: 'mitigate', definition: '减轻', pronunciation: '/ˈmɪtɪɡeɪt/', example: 'We need to ____ the risks.', level: 'hard' },
+            { word: 'moribund', definition: '垂死的', pronunciation: '/ˈmɒrɪbʌnd/', example: 'The ____ industry needs change.', level: 'hard' },
+            { word: 'nefarious', definition: '邪恶的', pronunciation: '/nɪˈfeəriəs/', example: 'They have a ____ plan.', level: 'hard' },
+            { word: 'neologism', definition: '新词', pronunciation: '/niːˈɒlədʒɪzəm/', example: '____ enters the language.', level: 'hard' },
+            { word: 'noxious', definition: '有害的', pronunciation: '/ˈnɒkʃəs/', example: 'This is a ____ substance.', level: 'hard' },
+            { word: 'obdurate', definition: '顽固的', pronunciation: '/ˈɒbdjʊrət/', example: 'He remained ____ despite warnings.', level: 'hard' },
+            { word: 'obsequious', definition: '谄媚的', pronunciation: '/əbˈsiːkwiəs/', example: 'The ____ assistant annoyed everyone.', level: 'hard' },
+            { word: 'obstinate', definition: '固执的', pronunciation: '/ˈɒbstɪnət/', example: 'The ____ child refused to listen.', level: 'hard' },
+            { word: 'odious', definition: '可憎的', pronunciation: '/ˈəʊdiəs/', example: 'He has an ____ reputation.', level: 'hard' },
+            { word: 'onerous', definition: '繁重的', pronunciation: '/ˈəʊnərəs/', example: 'This is an ____ task.', level: 'hard' },
+            { word: 'opprobrium', definition: '耻辱', pronunciation: '/əˈprəʊbriəm/', example: 'He faced public ____.', level: 'hard' },
+            { word: 'ostentatious', definition: '炫耀的', pronunciation: '/ˌɒstenˈteɪʃəs/', example: 'Her ____ display was unnecessary.', level: 'hard' },
+            { word: 'paradigm', definition: '范式', pronunciation: '/ˈpærədaɪm/', example: 'This is a new ____ for business.', level: 'hard' },
+            { word: 'paradox', definition: '悖论', pronunciation: '/ˈpærədɒks/', example: 'This is a famous ____.', level: 'hard' },
+            { word: 'pecuniary', definition: '金钱的', pronunciation: '/pɪˈkjuːniəri/', example: 'He has no ____ interest.', level: 'hard' },
+            { word: 'perfidious', definition: '不忠的', pronunciation: '/pəˈfɪdiəs/', example: 'The ____ friend betrayed us.', level: 'hard' },
+            { word: 'perfunctory', definition: '敷衍的', pronunciation: '/pəˈfʌŋktəri/', example: 'He gave a ____ response.', level: 'hard' },
+            { word: 'pernicious', definition: '有害的', pronunciation: '/pəˈnɪʃəs/', example: 'This has a ____ effect.', level: 'hard' },
+            { word: 'petrify', definition: '使石化', pronunciation: '/ˈpetrɪfaɪ/', example: 'The horror story will ____ you.', level: 'hard' },
+            { word: 'philanthropic', definition: '慈善的', pronunciation: '/ˌfɪlənˈθrɒpɪk/', example: 'He is a ____ person.', level: 'hard' },
+            { word: 'placate', definition: '安抚', pronunciation: '/pləˈkeɪt/', example: 'We need to ____ the angry customer.', level: 'hard' },
+            { word: 'plethora', definition: '过多', pronunciation: '/ˈpleθərə/', example: 'We have a ____ of options.', level: 'hard' },
+            { word: 'precipitate', definition: '仓促的', pronunciation: '/prɪˈsɪpɪtət/', example: 'His ____ action caused problems.', level: 'hard' },
+            { word: 'preclude', definition: '阻止', pronunciation: '/prɪˈkluːd/', example: 'This will ____ further discussion.', level: 'hard' },
+            { word: 'prodigious', definition: '巨大的', pronunciation: '/prəˈdɪdʒəs/', example: 'She has a ____ memory.', level: 'hard' },
+            { word: 'profligate', definition: '挥霍的', pronunciation: '/ˈprɒflɪɡət/', example: 'The ____ spender lost everything.', level: 'hard' },
+            { word: 'proliferate', definition: '激增', pronunciation: '/prəˈlɪfəreɪt/', example: 'The rumors began to ____.', level: 'hard' },
+            { word: 'propensity', definition: '倾向', pronunciation: '/prəˈpensəti/', example: 'He has a ____ for risk.', level: 'hard' },
+            { word: 'pulchritude', definition: '美丽', pronunciation: '/ˈpʌlkrɪtjuːd/', example: 'The ____ of the sunset amazed us.', level: 'hard' },
+            { word: 'quagmire', definition: '困境', pronunciation: '/ˈkwæɡmaɪə/', example: 'The project is in a ____.', level: 'hard' },
+            { word: 'recalcitrant', definition: '顽抗的', pronunciation: '/rɪˈkælsɪtrənt/', example: 'The ____ student refused to obey.', level: 'hard' },
+            { word: 'recondite', definition: '深奥的', pronunciation: '/rɪˈkɒndaɪt/', example: 'The book is too ____ for beginners.', level: 'hard' },
+            { word: 'refractory', definition: '难治的', pronunciation: '/rɪˈfræktəri/', example: 'The ____ disease resisted treatment.', level: 'hard' },
+            { word: 'remuneration', definition: '报酬', pronunciation: '/rɪˌmjuːnəˈreɪʃn/', example: 'The ____ is very competitive.', level: 'hard' },
+            { word: 'renege', definition: '违约', pronunciation: '/rɪˈneɡ/', example: 'Do not ____ on your promise.', level: 'hard' },
+            { word: 'reprobate', definition: '堕落者', pronunciation: '/ˈreprəbeɪt/', example: 'He has become a ____.', level: 'hard' },
+            { word: 'reticent', definition: '沉默的', pronunciation: '/ˈretɪsənt/', example: 'She is ____ about her past.', level: 'hard' },
+            { word: 'reverberate', definition: '回响', pronunciation: '/rɪˈvɜːbəreɪt/', example: 'The sound will ____ in the hall.', level: 'hard' },
+            { word: 'sanguine', definition: '乐观的', pronunciation: '/ˈsæŋɡwɪn/', example: 'He remains ____ about the future.', level: 'hard' },
+            { word: 'solicitous', definition: '关心的', pronunciation: '/səˈlɪsɪtəs/', example: 'She is ____ about your health.', level: 'hard' },
+            { word: 'solicitude', definition: '焦虑', pronunciation: '/səˈlɪsɪtjuːd/', example: 'Your ____ is appreciated.', level: 'hard' },
+            { word: 'sophistry', definition: '诡辩', pronunciation: '/ˈsɒfɪstri/', example: 'The ____ deceived many people.', level: 'hard' },
+            { word: 'specious', definition: '似是而非的', pronunciation: '/ˈspiːʃəs/', example: 'His ____ argument fooled no one.', level: 'hard' },
+            { word: 'spurious', definition: '伪造的', pronunciation: '/ˈspjʊəriəs/', example: 'This is a ____ document.', level: 'hard' },
+            { word: 'strident', definition: '刺耳的', pronunciation: '/ˈstraɪdənt/', example: 'Her ____ voice annoyed us.', level: 'hard' },
+            { word: 'subliminal', definition: '潜意识的', pronunciation: '/ˌsʌbˈlɪmɪnl/', example: 'The ____ message was detected.', level: 'hard' },
+            { word: 'superfluous', definition: '多余的', pronunciation: '/suːˈpɜːfluəs/', example: 'This paragraph is ____.', level: 'hard' },
+            { word: 'surreptitious', definition: '秘密的', pronunciation: '/ˌsʌrəpˈtɪʃəs/', example: 'He took a ____ photo.', level: 'hard' },
+            { word: 'sycophant', definition: '马屁精', pronunciation: '/ˈsɪkəfænt/', example: 'The ____ praised the boss constantly.', level: 'hard' },
+            { word: 'taciturn', definition: '沉默寡言的', pronunciation: '/ˈtæsɪtɜːn/', example: 'The ____ man rarely speaks.', level: 'hard' },
+            { word: 'tirade', definition: '长篇攻击', pronunciation: '/taɪˈreɪd/', example: 'He delivered a ____ against the policy.', level: 'hard' },
+            { word: 'torpid', definition: '迟钝的', pronunciation: '/ˈtɔːpɪd/', example: 'The ____ market showed no growth.', level: 'hard' },
+            { word: 'tractable', definition: '易处理的', pronunciation: '/ˈtræktəbl/', example: 'The ____ problem was solved quickly.', level: 'hard' },
+            { word: 'transient', definition: '短暂的', pronunciation: '/ˈtrænziənt/', example: 'Life is ____.', level: 'hard' },
+            { word: 'travesty', definition: '歪曲', pronunciation: '/ˈtrævəsti/', example: 'The trial was a ____ of justice.', level: 'hard' },
+            { word: 'truculent', definition: '好斗的', pronunciation: '/ˈtrʌkjələnt/', example: 'The ____ fighter scared everyone.', level: 'hard' },
+            { word: 'umbrage', definition: '不快', pronunciation: '/ˈʌmbrɪdʒ/', example: 'She took ____ at his remark.', level: 'hard' },
+            { word: 'valedictory', definition: '告别的', pronunciation: '/ˌvælɪˈdɪktəri/', example: 'The ____ speech was touching.', level: 'hard' },
+            { word: 'venerate', definition: '尊敬', pronunciation: '/ˈvenəreɪt/', example: 'We ____ our ancestors.', level: 'hard' },
+            { word: 'veracity', definition: '真实性', pronunciation: '/vəˈræsəti/', example: 'Question the ____ of this report.', level: 'hard' },
+            { word: 'verbose', definition: '啰嗦的', pronunciation: '/vɜːˈbəʊs/', example: 'His ____ writing is hard to read.', level: 'hard' },
+            { word: 'vicissitude', definition: '变迁', pronunciation: '/vɪˈsɪsɪtjuːd/', example: 'Life has many ____.', level: 'hard' },
+            { word: 'vindicate', definition: '证明无辜', pronunciation: '/ˈvɪndɪkeɪt/', example: 'The evidence will ____ him.', level: 'hard' },
+            { word: 'viscous', definition: '黏稠的', pronunciation: '/ˈvɪskəs/', example: 'The ____ liquid flowed slowly.', level: 'hard' },
+            { word: 'vitriolic', definition: '刻薄的', pronunciation: '/ˌvɪtriˈɒlɪk/', example: 'Her ____ remarks hurt him.', level: 'hard' },
+            { word: 'vociferous', definition: '大声的', pronunciation: '/vəˈsɪfərəs/', example: 'The ____ crowd demanded action.', level: 'hard' },
+            { word: 'voracious', definition: '贪婪的', pronunciation: '/vəˈreɪʃəs/', example: 'She is a ____ reader.', level: 'hard' },
+            { word: 'wary', definition: '谨慎的', pronunciation: '/ˈweəri/', example: 'Be ____ of strangers.', level: 'hard' },
+            { word: 'wavelength', definition: '波长', pronunciation: '/ˈweɪvleŋθ/', example: 'We are on the same ____.', level: 'hard' },
+            { word: 'wheedle', definition: '哄骗', pronunciation: '/ˈwiːdl/', example: 'Do not let them ____ you.', level: 'hard' },
+            { word: 'winsome', definition: '迷人的', pronunciation: '/ˈwɪnsəm/', example: 'She has a ____ smile.', level: 'hard' },
+            { word: 'wraith', definition: '幽灵', pronunciation: '/reɪθ/', example: 'The ____ appeared in the night.', level: 'hard' },
+            { word: 'xenophobia', definition: '排外', pronunciation: '/ˌzenəˈfəʊbiə/', example: '____ is a serious problem.', level: 'hard' },
+            { word: 'zealot', definition: '狂热者', pronunciation: '/ˈzelət/', example: 'The ____ refused to compromise.', level: 'hard' },
+            { word: 'zenith', definition: '顶峰', pronunciation: '/ˈzenɪθ/', example: 'She reached the ____ of her career.', level: 'hard' }
         ];
 
         // 应用状态
         let appState = {
-            currentMode: 'random', // random, difficulty, review
-            currentLevel: 'all', // easy, medium, hard, all
             currentWordIndex: 0,
             practiceWords: [],
             correctCount: 0,
             totalAttempted: 0,
             incorrectWords: [],
-            startTime: null
+            startTime: null,
+            isErrorReviewMode: false // 新增：错误单词复习模式标识
         };
 
         // DOM元素
@@ -616,12 +824,7 @@
             totalWords: document.getElementById('totalWords'),
             accuracyRate: document.getElementById('accuracyRate'),
             completedCount: document.getElementById('completedCount'),
-            randomModeBtn: document.getElementById('randomModeBtn'),
-            difficultyModeBtn: document.getElementById('difficultyModeBtn'),
-            difficultyModal: document.getElementById('difficultyModal'),
-            modalContent: document.getElementById('modalContent'),
-            closeModalBtn: document.getElementById('closeModalBtn'),
-            startPracticeBtn: document.getElementById('startPracticeBtn'),
+
             themeToggle: document.getElementById('themeToggle'),
             practiceHistory: document.getElementById('practiceHistory'),
             wordCountSettingsBtn: document.getElementById('wordCountSettingsBtn'),
@@ -641,7 +844,19 @@
             wordImageContainer: document.getElementById('wordImageContainer'),
             wordImage: document.getElementById('wordImage'),
             imageLoading: document.getElementById('imageLoading'),
-            refreshImageBtn: document.getElementById('refreshImageBtn')
+            refreshImageBtn: document.getElementById('refreshImageBtn'),
+            
+            // 账户相关元素
+            userProfileBtn: document.getElementById('userProfileBtn'),
+            currentUsername: document.getElementById('currentUsername'),
+            accountModal: document.getElementById('accountModal'),
+            closeAccountModalBtn: document.getElementById('closeAccountModalBtn'),
+            accountUsername: document.getElementById('accountUsername'),
+            accountJoinDate: document.getElementById('accountJoinDate'),
+            accountSettingsBtn: document.getElementById('accountSettingsBtn'),
+            learningStatsBtn: document.getElementById('learningStatsBtn'),
+            wordListBtn: document.getElementById('wordListBtn'),
+            logoutBtn: document.getElementById('logoutBtn')
         };
 
         // 应用状态
@@ -694,8 +909,8 @@
                 practiceMode = 'memorize'; // 默认默写模式
             }
             
-            // 默认开始随机模式
-            startRandomMode();
+            // 初始化练习
+            initPractice();
             
             // 添加事件监听
             elements.checkBtn.addEventListener('click', checkAnswer);
@@ -716,15 +931,15 @@
                 }
             });
             elements.hintBtn.addEventListener('click', showHint);
-            elements.randomModeBtn.addEventListener('click', startRandomMode);
-            elements.difficultyModeBtn.addEventListener('click', openDifficultyModal);
-            elements.closeModalBtn.addEventListener('click', closeDifficultyModal);
-            elements.startPracticeBtn.addEventListener('click', startDifficultyMode);
+
             elements.themeToggle.addEventListener('click', toggleTheme);
             elements.wordCountSettingsBtn.addEventListener('click', openWordCountModal);
             elements.closeWordCountModalBtn.addEventListener('click', closeWordCountModal);
             elements.confirmWordCountBtn.addEventListener('click', confirmWordCount);
-            elements.closeDetailsModalBtn.addEventListener('click', closeDetailsModal);
+            // 安全地绑定closeDetailsModalBtn事件监听器
+            if (elements.closeDetailsModalBtn) {
+                elements.closeDetailsModalBtn.addEventListener('click', closeDetailsModal);
+            }
             
             // 添加刷新图片按钮事件监听
             elements.refreshImageBtn.addEventListener('click', function() {
@@ -733,76 +948,791 @@
                 generateWordImage(currentWord, true);
             });
             
-            // 添加设置按钮事件监听
-            elements.settingsBtn.addEventListener('click', openSettingsModal);
+            // 安全地绑定settingsBtn事件监听器
+            if (elements.settingsBtn) {
+                elements.settingsBtn.addEventListener('click', openSettingsModal);
+            }
             
-            // 添加主页按钮事件监听
-            elements.homeBtn.addEventListener('click', function() {
-                window.location.href = 'zhuye.html';
+            // 安全地绑定homeBtn事件监听器
+            if (elements.homeBtn) {
+                elements.homeBtn.addEventListener('click', function() {
+                    window.location.href = 'zhuye.html';
+                });
+            }
+            
+            // 初始化账户功能
+            initAccountFunctionality();
+            
+        }
+        
+        // 初始化账户功能
+        function initAccountFunctionality() {
+            // 从localStorage获取用户信息并显示
+            const currentUser = localStorage.getItem('currentUser');
+            if (currentUser) {
+                elements.currentUsername.textContent = currentUser;
+                elements.accountUsername.textContent = currentUser;
+                
+                // 设置注册日期（实际项目中可能从服务器获取）
+                const joinDate = localStorage.getItem(`joinDate_${currentUser}`) || getCurrentDate();
+                elements.accountJoinDate.textContent = `注册时间: ${joinDate}`;
+                localStorage.setItem(`joinDate_${currentUser}`, joinDate);
+            }
+            
+            // 添加账户按钮事件监听
+            elements.userProfileBtn.addEventListener('click', openAccountModal);
+            elements.closeAccountModalBtn.addEventListener('click', closeAccountModal);
+            
+            // 添加账户功能按钮事件监听
+
+            
+            elements.learningStatsBtn.addEventListener('click', openLearningStats);
+            
+            elements.wordListBtn.addEventListener('click', openWordListModal);
+            
+            elements.logoutBtn.addEventListener('click', confirmLogout);
+            
+            // 点击模态框外部关闭
+            elements.accountModal.addEventListener('click', function(e) {
+                if (e.target === elements.accountModal) {
+                    closeAccountModal();
+                }
+            });
+        }
+        
+        // 打开账户模态框
+        function openAccountModal() {
+            elements.accountModal.classList.remove('hidden');
+            setTimeout(() => {
+                const modalContent = elements.accountModal.querySelector('div');
+                modalContent.classList.remove('scale-95', 'opacity-0');
+                modalContent.classList.add('scale-100', 'opacity-100');
+            }, 10);
+        }
+        
+        // 获取当前日期的格式化字符串
+        function getCurrentDate() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+        
+        // 确认退出登录
+        function confirmLogout() {
+            if (confirm('确定要退出登录吗？')) {
+                // 清除登录信息
+                localStorage.removeItem('currentUser');
+                // 可以添加更多需要清除的数据
+                localStorage.removeItem('currentWordList');
+                
+                // 显示退出成功提示
+                showToast('已成功退出登录');
+                
+                // 关闭账户模态框
+                closeAccountModal();
+                
+                // 延迟跳转，让用户看到提示
+                setTimeout(() => {
+                    window.location.href = 'zhuye.html';
+                }, 1500);
+            }
+        }
+        // 账户设置模态框
+        const accountSettingsModal = `
+        
+        // 账户设置模态框
+        <div id="accountSettingsModal" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center hidden">
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl w-full max-w-md p-6 transform transition-all scale-95 opacity-0">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-xl font-bold">账户设置</h3>
+                    <button id="closeAccountSettingsModalBtn" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+                        <i class="fa fa-times text-xl"></i>
+                    </button>
+                </div>
+                
+                <div class="space-y-6">
+                    <!-- 头像设置 -->
+                    <div class="text-center">
+                        <div class="w-24 h-24 rounded-full bg-primary/20 dark:bg-primary/30 flex items-center justify-center text-primary mx-auto mb-3">
+                            <i class="fa fa-user text-4xl"></i>
+                        </div>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">头像修改功能开发中</p>
+                    </div>
+                    
+                    <!-- 用户名设置 -->
+                    <div>
+                        <label for="usernameInput" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">用户名</label>
+                        <input type="text" id="usernameInput" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 dark:text-white input-focus" placeholder="输入新用户名">
+                    </div>
+                    
+                    <!-- 密码修改入口 -->
+                    <div>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">密码</p>
+                        <button id="changePasswordBtn" class="text-primary hover:underline">修改密码</button>
+                    </div>
+                    
+                    <!-- 保存按钮 -->
+                    <button id="saveAccountSettingsBtn" class="w-full btn-primary">保存设置</button>
+                </div>
+            </div>
+        </div>`;
+        
+        // 添加账户设置模态框到页面
+        document.addEventListener('DOMContentLoaded', function() {
+            const body = document.querySelector('body');
+            const tempContainer = document.createElement('div');
+            tempContainer.innerHTML = accountSettingsModal;
+            body.appendChild(tempContainer.firstElementChild);
+        });
+        
+        // 打开账户设置模态框
+        function openAccountSettings() {
+            closeAccountModal(); // 先关闭账户详情模态框
+            
+            // 获取并更新模态框元素引用
+            const accountSettingsModal = document.getElementById('accountSettingsModal');
+            const usernameInput = document.getElementById('usernameInput');
+            const currentUser = localStorage.getItem('currentUser');
+            
+            if (usernameInput && currentUser) {
+                usernameInput.value = currentUser;
+            }
+            
+            // 显示模态框
+            accountSettingsModal.classList.remove('hidden');
+            setTimeout(() => {
+                const modalContent = accountSettingsModal.querySelector('div');
+                modalContent.classList.remove('scale-95', 'opacity-0');
+                modalContent.classList.add('scale-100', 'opacity-100');
+            }, 10);
+            
+            // 添加事件监听
+            document.getElementById('closeAccountSettingsModalBtn').addEventListener('click', closeAccountSettingsModal);
+            document.getElementById('saveAccountSettingsBtn').addEventListener('click', saveAccountSettings);
+            document.getElementById('changePasswordBtn').addEventListener('click', function() {
+                showToast('密码修改功能开发中...');
             });
             
-            // 为难度选项添加事件监听
-            document.querySelectorAll('.difficulty-option').forEach(option => {
-                option.addEventListener('click', () => {
-                    document.querySelectorAll('.difficulty-option').forEach(opt => {
-                        opt.classList.remove('ring-2', 'ring-primary');
-                    });
-                    option.classList.add('ring-2', 'ring-primary');
-                    appState.currentLevel = option.dataset.level;
+            // 点击模态框外部关闭
+            accountSettingsModal.addEventListener('click', function(e) {
+                if (e.target === accountSettingsModal) {
+                    closeAccountSettingsModal();
+                }
+            });
+        }
+        
+        // 学习统计模态框
+        const learningStatsModal = `
+        <div id="learningStatsModal" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center hidden">
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl w-full max-w-2xl p-6 transform transition-all scale-95 opacity-0">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-xl font-bold">学习统计</h3>
+                    <button id="closeLearningStatsModalBtn" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+                        <i class="fa fa-times text-xl"></i>
+                    </button>
+                </div>
+                
+                <div class="space-y-8">
+                    <!-- 总体统计 -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="bg-blue-50 dark:bg-blue-900/30 rounded-lg p-4 text-center">
+                            <h4 class="text-sm text-gray-500 dark:text-gray-400 mb-1">总学习天数</h4>
+                            <p id="totalStudyDays" class="text-2xl font-bold text-primary">0</p>
+                        </div>
+                        <div class="bg-green-50 dark:bg-green-900/30 rounded-lg p-4 text-center">
+                            <h4 class="text-sm text-gray-500 dark:text-gray-400 mb-1">总学习单词数</h4>
+                            <p id="totalWordsLearned" class="text-2xl font-bold text-secondary">0</p>
+                        </div>
+                        <div class="bg-purple-50 dark:bg-purple-900/30 rounded-lg p-4 text-center">
+                            <h4 class="text-sm text-gray-500 dark:text-gray-400 mb-1">平均正确率</h4>
+                            <p id="avgAccuracy" class="text-2xl font-bold text-purple-600">0%</p>
+                        </div>
+                    </div>
+                    <!-- 学习进度图表占位 -->
+                    <div class="bg-gray-50 dark:bg-gray-700/30 rounded-lg p-4">
+                        <h4 class="text-lg font-medium mb-4">最近7天学习趋势</h4>
+                        <div id="learningChartContainer" class="h-64 flex items-center justify-center">
+                            <div class="text-center">
+                                <i class="fa fa-bar-chart text-3xl text-gray-400 mb-2"></i>
+                                <p class="text-gray-500 dark:text-gray-400">学习数据可视化图表</p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 最近学习记录 -->
+                    <div>
+                        <h4 class="text-lg font-medium mb-4">最近学习记录</h4>
+                        <div id="recentRecords" class="space-y-3 max-h-60 overflow-y-auto">
+                            <div class="text-center text-gray-500 dark:text-gray-400 py-6">
+                                暂无学习记录
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>`;
+        
+        // 添加学习统计模态框到页面
+        document.addEventListener('DOMContentLoaded', function() {
+            const body = document.querySelector('body');
+            const tempContainer = document.createElement('div');
+            tempContainer.innerHTML = learningStatsModal;
+            body.appendChild(tempContainer.firstElementChild);
+        });
+        
+        // 生成模拟学习记录数据
+        function generateMockStudyData() {
+            const currentUser = localStorage.getItem('currentUser');
+            const studyKey = `study_records_${currentUser}`;
+            
+            // 检查是否已有数据
+            if (!localStorage.getItem(studyKey)) {
+                const mockData = [];
+                const now = new Date();
+                
+                // 生成过去7天的模拟数据
+                for (let i = 6; i >= 0; i--) {
+                    const date = new Date(now);
+                    date.setDate(date.getDate() - i);
+                    const dateStr = date.toISOString().split('T')[0];
+                    
+                    // 随机生成学习记录
+                    if (Math.random() > 0.2) { // 80%概率有学习记录
+                        mockData.push({
+                            date: dateStr,
+                            wordCount: Math.floor(Math.random() * 50) + 10,
+                            accuracy: Math.floor(Math.random() * 30) + 70,
+                            duration: Math.floor(Math.random() * 30) + 10
+                        });
+                    }
+                }
+                
+                localStorage.setItem(studyKey, JSON.stringify(mockData));
+            }
+            
+            return JSON.parse(localStorage.getItem(studyKey) || '[]');
+        }
+        
+        // 计算学习统计数据
+        function calculateStudyStats(records) {
+            if (!records.length) {
+                return {
+                    totalDays: 0,
+                    totalWords: 0,
+                    avgAccuracy: 0
+                };
+            }
+            
+            const totalWords = records.reduce((sum, record) => sum + record.wordCount, 0);
+            const totalAccuracy = records.reduce((sum, record) => sum + record.accuracy, 0);
+            
+            return {
+                totalDays: records.length,
+                totalWords: totalWords,
+                avgAccuracy: Math.round(totalAccuracy / records.length)
+            };
+        }
+        
+        // 渲染学习统计
+        function renderStudyStats() {
+            const records = generateMockStudyData();
+            const stats = calculateStudyStats(records);
+            
+            // 更新统计数据
+            document.getElementById('totalStudyDays').textContent = stats.totalDays;
+            document.getElementById('totalWordsLearned').textContent = stats.totalWords;
+            document.getElementById('avgAccuracy').textContent = `${stats.avgAccuracy}%`;
+            
+            // 渲染最近学习记录
+            renderRecentRecords(records);
+        }
+        
+        // 渲染最近学习记录
+        function renderRecentRecords(records) {
+            const container = document.getElementById('recentRecords');
+            
+            if (!records.length) {
+                container.innerHTML = `
+                    <div class="text-center text-gray-500 dark:text-gray-400 py-6">
+                        暂无学习记录
+                    </div>
+                `;
+                return;
+            }
+            
+            // 按日期降序排列
+            const sortedRecords = [...records].sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            let html = '';
+            sortedRecords.forEach(record => {
+                const accuracyClass = record.accuracy >= 90 ? 'text-green-600' : 
+                                     record.accuracy >= 70 ? 'text-yellow-600' : 'text-red-600';
+                
+                html += `
+                    <div class="bg-gray-50 dark:bg-gray-700/30 rounded-lg p-4 flex justify-between items-center">
+                        <div>
+                            <h5 class="font-medium">${record.date}</h5>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">学习了 ${record.wordCount} 个单词，用时 ${record.duration} 分钟</p>
+                        </div>
+                        <span class="font-bold ${accuracyClass}">${record.accuracy}%</span>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+        
+        // 打开学习统计模态框
+        function openLearningStats() {
+            closeAccountModal(); // 先关闭账户详情模态框
+            
+            const learningStatsModal = document.getElementById('learningStatsModal');
+            
+            // 显示模态框
+            learningStatsModal.classList.remove('hidden');
+            setTimeout(() => {
+                const modalContent = learningStatsModal.querySelector('div');
+                modalContent.classList.remove('scale-95', 'opacity-0');
+                modalContent.classList.add('scale-100', 'opacity-100');
+            }, 10);
+            
+            // 渲染统计数据
+            renderStudyStats();
+            
+            // 添加事件监听
+            document.getElementById('closeLearningStatsModalBtn').addEventListener('click', closeLearningStatsModal);
+            
+            // 点击模态框外部关闭
+            learningStatsModal.addEventListener('click', function(e) {
+                if (e.target === learningStatsModal) {
+                    closeLearningStatsModal();
+                }
+            });
+        }
+        
+        // 我的词库模态框
+        const wordListModal = `
+        <div id="wordListModal" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center hidden">
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl w-full max-w-2xl p-6 transform transition-all scale-95 opacity-0">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-xl font-bold">我的词库</h3>
+                    <button id="closeWordListModalBtn" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+                        <i class="fa fa-times text-xl"></i>
+                    </button>
+                </div>
+                
+                <div class="space-y-6">
+                    <!-- 词库选择 -->
+                    <div class="bg-gray-50 dark:bg-gray-700/30 rounded-lg p-4">
+                        <h4 class="text-lg font-medium mb-4">选择词库</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <button class="wordlist-option" data-level="beginner">
+                                <div class="bg-blue-50 dark:bg-blue-900/30 rounded-lg p-4 text-center hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors">
+                                    <div class="w-12 h-12 bg-primary/20 dark:bg-primary/30 rounded-full flex items-center justify-center text-primary mx-auto mb-2">
+                                        <i class="fa fa-child text-2xl"></i>
+                                    </div>
+                                    <h5 class="font-medium">初级词库</h5>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">基础单词</p>
+                                </div>
+                            </button>
+                            <button class="wordlist-option" data-level="intermediate">
+                                <div class="bg-green-50 dark:bg-green-900/30 rounded-lg p-4 text-center hover:bg-green-100 dark:hover:bg-green-900/50 transition-colors">
+                                    <div class="w-12 h-12 bg-secondary/20 dark:bg-secondary/30 rounded-full flex items-center justify-center text-secondary mx-auto mb-2">
+                                        <i class="fa fa-rocket text-2xl"></i>
+                                    </div>
+                                    <h5 class="font-medium">中级词库</h5>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">进阶单词</p>
+                                </div>
+                            </button>
+                            <button class="wordlist-option" data-level="advanced">
+                                <div class="bg-purple-50 dark:bg-purple-900/30 rounded-lg p-4 text-center hover:bg-purple-100 dark:hover:bg-purple-900/50 transition-colors">
+                                    <div class="w-12 h-12 bg-purple-600/20 dark:bg-purple-600/30 rounded-full flex items-center justify-center text-purple-600 mx-auto mb-2">
+                                        <i class="fa fa-star text-2xl"></i>
+                                    </div>
+                                    <h5 class="font-medium">高级词库</h5>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">高级词汇</p>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+                    <!-- 词库学习进度 -->
+                    <div>
+                        <h4 class="text-lg font-medium mb-4">学习进度</h4>
+                        <div id="wordListProgress" class="space-y-4">
+                            <div class="bg-gray-50 dark:bg-gray-700/30 rounded-lg p-4">
+                                <div class="flex justify-between items-center mb-2">
+                                    <h5 class="font-medium">初级词库</h5>
+                                    <span id="beginnerProgressText" class="text-sm text-gray-500 dark:text-gray-400">0/200 单词</span>
+                                </div>
+                                <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
+                                    <div id="beginnerProgressBar" class="bg-primary h-2.5 rounded-full" style="width: 0%"></div>
+                                </div>
+                            </div>
+                            <div class="bg-gray-50 dark:bg-gray-700/30 rounded-lg p-4">
+                                <div class="flex justify-between items-center mb-2">
+                                    <h5 class="font-medium">中级词库</h5>
+                                    <span id="intermediateProgressText" class="text-sm text-gray-500 dark:text-gray-400">0/300 单词</span>
+                                </div>
+                                <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
+                                    <div id="intermediateProgressBar" class="bg-secondary h-2.5 rounded-full" style="width: 0%"></div>
+                                </div>
+                            </div>
+                            <div class="bg-gray-50 dark:bg-gray-700/30 rounded-lg p-4">
+                                <div class="flex justify-between items-center mb-2">
+                                    <h5 class="font-medium">高级词库</h5>
+                                    <span id="advancedProgressText" class="text-sm text-gray-500 dark:text-gray-400">0/500 单词</span>
+                                </div>
+                                <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
+                                    <div id="advancedProgressBar" class="bg-purple-600 h-2.5 rounded-full" style="width: 0%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>`;
+        
+        // 添加我的词库模态框到页面
+        document.addEventListener('DOMContentLoaded', function() {
+            const body = document.querySelector('body');
+            const tempContainer = document.createElement('div');
+            tempContainer.innerHTML = wordListModal;
+            body.appendChild(tempContainer.firstElementChild);
+        });
+        
+        // 获取词库学习进度
+        function getWordListProgress() {
+            const currentUser = localStorage.getItem('currentUser');
+            const progressKey = `wordlist_progress_${currentUser}`;
+            
+            // 检查是否已有进度数据
+            if (!localStorage.getItem(progressKey)) {
+                // 初始化进度数据
+                const initialProgress = {
+                    beginner: { learned: 0, total: 200 },
+                    intermediate: { learned: 0, total: 300 },
+                    advanced: { learned: 0, total: 500 }
+                };
+                localStorage.setItem(progressKey, JSON.stringify(initialProgress));
+            }
+            
+            return JSON.parse(localStorage.getItem(progressKey) || '{}');
+        }
+        
+        // 更新词库选择
+        function updateWordListSelection(level) {
+            const currentUser = localStorage.getItem('currentUser');
+            const selectionKey = `wordlist_${currentUser}`;
+            
+            // 保存选择的词库
+            localStorage.setItem(selectionKey, level);
+            localStorage.setItem('currentWordList', level); // 保持向后兼容
+            
+            // 显示选择成功提示
+            const levelNames = {
+                beginner: '初级词库',
+                intermediate: '中级词库',
+                advanced: '高级词库'
+            };
+            
+            showToast(`已选择${levelNames[level]}`);
+            
+            // 更新当前练习
+            initPractice();
+        }
+        
+        // 渲染词库进度
+        function renderWordListProgress() {
+            const progress = getWordListProgress();
+            
+            // 渲染各个词库的进度
+            ['beginner', 'intermediate', 'advanced'].forEach(level => {
+                const levelProgress = progress[level];
+                const progressPercent = (levelProgress.learned / levelProgress.total) * 100;
+                
+                const progressBar = document.getElementById(`${level}ProgressBar`);
+                const progressText = document.getElementById(`${level}ProgressText`);
+                
+                if (progressBar && progressText) {
+                    progressBar.style.width = `${progressPercent}%`;
+                    progressText.textContent = `${levelProgress.learned}/${levelProgress.total} 单词`;
+                }
+            });
+        }
+        
+        // 打开我的词库模态框
+        function openWordListModal() {
+            closeAccountModal(); // 先关闭账户详情模态框
+            
+            const wordListModal = document.getElementById('wordListModal');
+            
+            // 显示模态框
+            wordListModal.classList.remove('hidden');
+            setTimeout(() => {
+                const modalContent = wordListModal.querySelector('div');
+                modalContent.classList.remove('scale-95', 'opacity-0');
+                modalContent.classList.add('scale-100', 'opacity-100');
+            }, 10);
+            
+            // 渲染词库进度
+            renderWordListProgress();
+            
+            // 添加词库选择事件监听
+            const wordlistOptions = wordListModal.querySelectorAll('.wordlist-option');
+            wordlistOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    const level = this.getAttribute('data-level');
+                    updateWordListSelection(level);
+                    renderWordListProgress(); // 更新显示
                 });
             });
+            
+            // 添加关闭按钮事件监听
+            document.getElementById('closeWordListModalBtn').addEventListener('click', closeWordListModal);
+            
+            // 点击模态框外部关闭
+            wordListModal.addEventListener('click', function(e) {
+                if (e.target === wordListModal) {
+                    closeWordListModal();
+                }
+            });
+        }
+        
+        // 关闭我的词库模态框
+        function closeWordListModal() {
+            const wordListModal = document.getElementById('wordListModal');
+            const modalContent = wordListModal.querySelector('div');
+            modalContent.classList.remove('scale-100', 'opacity-100');
+            modalContent.classList.add('scale-95', 'opacity-0');
+            setTimeout(() => {
+                wordListModal.classList.add('hidden');
+            }, 300);
+        }
+        
+        // 更新词库学习进度
+        function updateWordListProgress(wordLevel, wordLearned = true) {
+            const currentUser = localStorage.getItem('currentUser');
+            const progressKey = `wordlist_progress_${currentUser}`;
+            
+            // 获取当前进度
+            const progress = getWordListProgress();
+            
+            // 验证词库级别
+            if (!progress[wordLevel]) {
+                console.warn(`Unknown word level: ${wordLevel}`);
+                return;
+            }
+            
+            // 更新学习进度
+            if (wordLearned) {
+                progress[wordLevel].learned = Math.min(
+                    progress[wordLevel].learned + 1,
+                    progress[wordLevel].total
+                );
+            } else {
+                progress[wordLevel].learned = Math.max(
+                    progress[wordLevel].learned - 1,
+                    0
+                );
+            }
+            
+            // 保存更新后的进度
+            localStorage.setItem(progressKey, JSON.stringify(progress));
+            
+            // 如果词库模态框是打开的，更新显示
+            const wordListModal = document.getElementById('wordListModal');
+            if (wordListModal && !wordListModal.classList.contains('hidden')) {
+                renderWordListProgress();
+            }
+            
+            // 返回更新后的进度百分比
+            return (progress[wordLevel].learned / progress[wordLevel].total) * 100;
+        }
+        
+        // 关闭学习统计模态框
+        function closeLearningStatsModal() {
+            const learningStatsModal = document.getElementById('learningStatsModal');
+            const modalContent = learningStatsModal.querySelector('div');
+            modalContent.classList.remove('scale-100', 'opacity-100');
+            modalContent.classList.add('scale-95', 'opacity-0');
+            setTimeout(() => {
+                learningStatsModal.classList.add('hidden');
+            }, 300);
+        }
+        
+        // 关闭账户设置模态框
+        function closeAccountSettingsModal() {
+            const accountSettingsModal = document.getElementById('accountSettingsModal');
+            const modalContent = accountSettingsModal.querySelector('div');
+            modalContent.classList.remove('scale-100', 'opacity-100');
+            modalContent.classList.add('scale-95', 'opacity-0');
+            setTimeout(() => {
+                accountSettingsModal.classList.add('hidden');
+            }, 300);
+        }
+        
+        // 保存账户设置
+        function saveAccountSettings() {
+            const usernameInput = document.getElementById('usernameInput');
+            const newUsername = usernameInput.value.trim();
+            
+            if (!newUsername) {
+                showToast('用户名不能为空');
+                return;
+            }
+            
+            if (newUsername.length < 2 || newUsername.length > 20) {
+                showToast('用户名长度应在2-20个字符之间');
+                return;
+            }
+            
+            // 获取旧用户名
+            const oldUsername = localStorage.getItem('currentUser');
+            
+            // 更新用户名
+            localStorage.setItem('currentUser', newUsername);
+            
+            // 如果有用户相关的数据，进行更新
+            if (oldUsername && oldUsername !== newUsername) {
+                const oldJoinDate = localStorage.getItem(`joinDate_${oldUsername}`);
+                if (oldJoinDate) {
+                    localStorage.setItem(`joinDate_${newUsername}`, oldJoinDate);
+                    localStorage.removeItem(`joinDate_${oldUsername}`);
+                }
+            }
+            
+            // 更新UI显示
+            if (elements.currentUsername) elements.currentUsername.textContent = newUsername;
+            if (elements.accountUsername) elements.accountUsername.textContent = newUsername;
+            
+            // 保存成功提示
+            showToast('账户设置已保存');
+            
+            // 关闭模态框
+            closeAccountSettingsModal();
+        }
+        
+        // 关闭账户模态框
+        function closeAccountModal() {
+            const modalContent = elements.accountModal.querySelector('div');
+            modalContent.classList.remove('scale-100', 'opacity-100');
+            modalContent.classList.add('scale-95', 'opacity-0');
+            setTimeout(() => {
+                elements.accountModal.classList.add('hidden');
+            }, 300);
+        }
+        
+        // 确认退出登录
+        function confirmLogout() {
+            if (confirm('确定要退出登录吗？')) {
+                localStorage.removeItem('currentUser');
+                window.location.href = 'index.html';
+            }
+        }
+        
+        // 获取当前日期
+        function getCurrentDate() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+            
+
             
             // 检查暗色模式
             checkDarkMode();
             
             // 加载练习历史记录
             updatePracticeHistory();
-        }
+        
 
-        // 开始随机模式
-        function startRandomMode() {
-            appState.currentMode = 'random';
-            appState.currentLevel = 'all';
-            appState.practiceWords = [...wordList]
-                .sort(() => Math.random() - 0.5)
-                .slice(0, wordCountLimit); // 限制单词数量
-            resetPractice();
-            showCurrentWord();
-            highlightActiveMode(elements.randomModeBtn);
-        }
-
-        // 打开难度选择模态框
-        function openDifficultyModal() {
-            elements.difficultyModal.classList.remove('hidden');
-            setTimeout(() => {
-                elements.modalContent.classList.remove('scale-95', 'opacity-0');
-                elements.modalContent.classList.add('scale-100', 'opacity-100');
-            }, 10);
-        }
-
-        // 关闭难度选择模态框
-        function closeDifficultyModal() {
-            elements.modalContent.classList.remove('scale-100', 'opacity-100');
-            elements.modalContent.classList.add('scale-95', 'opacity-0');
-            setTimeout(() => {
-                elements.difficultyModal.classList.add('hidden');
-            }, 300);
-        }
-
-        // 开始难度模式
-        function startDifficultyMode() {
-            appState.currentMode = 'difficulty';
-            if (appState.currentLevel === 'all') appState.currentLevel = 'easy';
+        // 初始化练习
+        function initPractice() {
+            // 获取用户选择的词库
+            const currentUser = localStorage.getItem('currentUser');
+            const selectedWordlist = currentUser ? localStorage.getItem(`wordlist_${currentUser}`) || 'beginner' : 'beginner';
             
-            appState.practiceWords = wordList
-                .filter(word => appState.currentLevel === 'all' || word.level === appState.currentLevel)
+            // 根据词库过滤单词
+            let filteredWords = [];
+            switch(selectedWordlist) {
+                case 'beginner':
+                    // 初级词库对应简单单词
+                    filteredWords = wordList.filter(word => word.level === 'easy');
+                    break;
+                case 'intermediate':
+                    // 中级词库对应中等难度单词
+                    filteredWords = wordList.filter(word => word.level === 'medium');
+                    break;
+                case 'advanced':
+                    // 高级词库对应困难单词
+                    filteredWords = wordList.filter(word => word.level === 'hard');
+                    break;
+                default:
+                    // 默认使用所有单词
+                    filteredWords = [...wordList];
+            }
+            
+            // 随机排序并限制数量
+            appState.practiceWords = [...filteredWords]
                 .sort(() => Math.random() - 0.5)
                 .slice(0, wordCountLimit); // 限制单词数量
             
+            // 初始化学习进度跟踪
+            if (currentUser) {
+                // 尝试获取当前用户已学习的单词集合
+                const learnedWordsKey = `learned_words_${currentUser}`;
+                appState.learnedWords = JSON.parse(localStorage.getItem(learnedWordsKey) || '{}');
+                
+                // 确保为当前词库初始化学习记录
+                if (!appState.learnedWords[selectedWordlist]) {
+                    appState.learnedWords[selectedWordlist] = {};
+                }
+                
+                // 同步到词库进度
+                updateCurrentWordListProgress(selectedWordlist);
+            }
+            
             resetPractice();
             showCurrentWord();
-            closeDifficultyModal();
-            highlightActiveMode(elements.difficultyModeBtn);
+        }
+        
+        // 更新当前词库的进度统计
+        function updateCurrentWordListProgress(wordlistType) {
+            if (!appState.learnedWords || !appState.learnedWords[wordlistType]) return;
+            
+            // 计算已学习单词数量
+            const learnedCount = Object.keys(appState.learnedWords[wordlistType]).filter(
+                word => appState.learnedWords[wordlistType][word] === true
+            ).length;
+            
+            // 根据词库类型获取总单词数
+            let totalWords = 0;
+            switch(wordlistType) {
+                case 'beginner':
+                    totalWords = wordList.filter(word => word.level === 'easy').length;
+                    break;
+                case 'intermediate':
+                    totalWords = wordList.filter(word => word.level === 'medium').length;
+                    break;
+                case 'advanced':
+                    totalWords = wordList.filter(word => word.level === 'hard').length;
+                    break;
+                default:
+                    totalWords = wordList.length;
+            }
+            
+            // 更新localStorage中的进度数据
+            const currentUser = localStorage.getItem('currentUser');
+            const progressKey = `wordlist_progress_${currentUser}`;
+            const progress = getWordListProgress();
+            
+            progress[wordlistType].learned = learnedCount;
+            progress[wordlistType].total = totalWords;
+            
+            localStorage.setItem(progressKey, JSON.stringify(progress));
         }
 
         // 打开单词数量设置模态框
@@ -841,12 +1771,8 @@
             localStorage.setItem('wordCountLimit', wordCountLimit);
             closeWordCountModal();
             
-            // 如果当前正在练习，重新开始当前模式
-            if (appState.currentMode === 'random') {
-                startRandomMode();
-            } else if (appState.currentMode === 'difficulty') {
-                startDifficultyMode();
-            }
+            // 重新初始化练习
+            initPractice();
         }
 
         // 重置练习状态
@@ -862,6 +1788,12 @@
             elements.inputSection.classList.remove('hidden');
             elements.resultSection.classList.add('hidden');
             elements.nextBtn.classList.add('hidden');
+            
+            // 移除"再练一次"按钮
+            const practiceAgainBtn = document.getElementById('practiceAgainBtn');
+            if (practiceAgainBtn) {
+                practiceAgainBtn.remove();
+            }
             
             updateStats();
         }
@@ -879,7 +1811,7 @@
             let prompt;
             if (useSentence && word.example) {
                 // 如果是重新生成图片且有例句，则使用英文例句作为提示词
-                prompt = word.example;
+                prompt = word.example.replace('____',word.word);
             } else {
                 // 默认使用单词本身作为提示词
                 prompt = word.word;
@@ -894,10 +1826,21 @@
             };
             
             elements.wordImage.onerror = function() {
-                console.error('生成图片时出错');
-                // 出错时使用备用图片
-                elements.wordImage.src = `https://picsum.photos/800/450?random=${Date.now()}`;
-                elements.imageLoading.classList.add('hidden');
+                console.error('生成图片时出错，尝试重新生成...');
+                // 出错时再次尝试使用AI生成图片，但使用不同的提示词策略
+                let retryPrompt = useSentence ? word.word : word.definition;
+                const retryImageUrl = `${aiImageApi}${encodeURIComponent(retryPrompt)}&seed=${Date.now()}`;
+                elements.wordImage.onload = function() {
+                    elements.imageLoading.classList.add('hidden');
+                };
+                elements.wordImage.onerror = function() {
+                    // 第二次失败时使用备用图片
+                    console.error('再次生成图片失败，使用备用图片');
+                    elements.wordImage.src = `https://picsum.photos/800/450?random=${Date.now()}`;
+                    elements.imageLoading.classList.add('hidden');
+                };
+                // 重试AI生成图片
+                elements.wordImage.src = retryImageUrl;
             };
             
             elements.wordImage.src = imageUrl;
@@ -916,6 +1859,9 @@
             elements.wordLevel.textContent = 
                 currentWord.level === 'easy' ? '简单' : 
                 currentWord.level === 'medium' ? '中等' : '困难';
+            
+            // 加载新单词时重置朗读模式为单词模式
+            readMode = 'word';
             
             // 在背诵模式下显示AI生成的图片
             if (practiceMode === 'recite') {
@@ -944,6 +1890,27 @@
             if (isCorrect) {
                 appState.correctCount++;
                 showCorrectResult();
+                
+                // 如果用户已登录，更新学习进度
+                const currentUser = localStorage.getItem('currentUser');
+                if (currentUser) {
+                    const selectedWordlist = localStorage.getItem(`wordlist_${currentUser}`) || 'beginner';
+                    
+                    // 确保学习记录对象存在
+                    if (!appState.learnedWords) appState.learnedWords = {};
+                    if (!appState.learnedWords[selectedWordlist]) appState.learnedWords[selectedWordlist] = {};
+                    
+                    // 标记单词为已学习
+                    appState.learnedWords[selectedWordlist][currentWord.word] = true;
+                    
+                    // 保存到localStorage
+                    const learnedWordsKey = `learned_words_${currentUser}`;
+                    localStorage.setItem(learnedWordsKey, JSON.stringify(appState.learnedWords));
+                    
+                    // 更新词库进度
+                    updateWordListProgress(selectedWordlist, true);
+                    updateCurrentWordListProgress(selectedWordlist);
+                }
             } else {
                 appState.incorrectWords.push(currentWord);
                 showIncorrectResult(currentWord);
@@ -997,6 +1964,18 @@
             elements.inputSection.classList.add('hidden');
             elements.resultSection.classList.add('hidden');
             elements.nextBtn.classList.add('hidden');
+            
+            // 隐藏图片容器和重新生成图片按钮
+            elements.wordImageContainer.classList.add('hidden');
+            elements.refreshImageBtn.classList.add('hidden');
+            
+            // 创建并添加"再练一次"按钮
+            const practiceAgainBtn = document.createElement('button');
+            practiceAgainBtn.id = 'practiceAgainBtn';
+            practiceAgainBtn.className = 'btn-primary mt-8 mx-auto block';
+            practiceAgainBtn.innerHTML = '<i class="fa fa-refresh mr-2"></i> 再练一次';
+            practiceAgainBtn.addEventListener('click', initPractice);
+            elements.wordDefinition.parentNode.appendChild(practiceAgainBtn);
             
             // 保存练习记录
             savePracticeRecord();
@@ -1364,12 +2343,198 @@
             }, 10);
         }
 
+        // 获取用户的所有错误单词
+        function getIncorrectWords() {
+            const currentUser = localStorage.getItem('currentUser') || 'guest';
+            const userHistoryKey = `practiceHistory_${currentUser}`;
+            const history = JSON.parse(localStorage.getItem(userHistoryKey) || '[]');
+            
+            // 创建一个Map来存储错误单词，确保去重
+            const incorrectWordsMap = new Map();
+            
+            history.forEach(record => {
+                if (record.incorrectWords && record.incorrectWords.length > 0) {
+                    record.incorrectWords.forEach(word => {
+                        // 使用单词作为键，确保每个单词只保存一次
+                        if (!incorrectWordsMap.has(word.word)) {
+                            incorrectWordsMap.set(word.word, word);
+                        }
+                    });
+                }
+            });
+            
+            // 转换为数组
+            return Array.from(incorrectWordsMap.values());
+        }
+
+        // 初始化错误单词复习模式
+        function initErrorWordReview() {
+            const incorrectWords = getIncorrectWords();
+            
+            if (incorrectWords.length === 0) {
+                showToast('您没有错误单词需要复习！', 'info');
+                return false;
+            }
+            
+            // 设置为错误单词复习模式
+            appState.isErrorReviewMode = true;
+            
+            // 打乱错误单词顺序
+            appState.practiceWords = shuffleArray([...incorrectWords]);
+            
+            // 设置练习参数
+            appState.totalAttempted = 0;
+            appState.correctCount = 0;
+            appState.incorrectWords = [];
+            appState.currentWordIndex = 0;
+            appState.startTime = new Date();
+            
+            // 更新界面
+            updateStats();
+            showCurrentWord();
+            
+            showToast(`开始复习${incorrectWords.length}个错误单词！`, 'success');
+            return true;
+        }
+
+        // 检查URL参数或localStorage以确定是否进入错误单词复习模式
+        function checkReviewMode() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const reviewMode = urlParams.get('review') || localStorage.getItem('reviewMode');
+            
+            if (reviewMode === 'errors') {
+                localStorage.removeItem('reviewMode'); // 只使用一次
+                initErrorWordReview();
+            }
+        }
+
+        // 单词朗读功能
+        // DOM元素获取
+        const readBtn = document.getElementById('readBtn');
+        const voiceSelect = document.getElementById('voiceSelect');
+
+        // 全局变量
+        let utterance = null;
+        let voices = [];
+        const synthesis = window.speechSynthesis;
+        let readMode = 'word'; // 朗读模式：'word' 或 'example'
+
+        // 初始化检查
+        if (!synthesis) {
+            console.log('你的浏览器不支持语音合成，请使用Chrome/Edge/Safari最新版');
+            if (readBtn) readBtn.disabled = true;
+        }
+
+        // 加载语音列表
+        function loadVoices() {
+            voices = synthesis.getVoices();
+            if (voiceSelect) {
+                voiceSelect.innerHTML = '';
+
+                // 筛选英语语音
+                const enVoices = voices.filter(voice => voice.lang.includes('en'));
+                
+                if (enVoices.length === 0) {
+                    console.log('未检测到英语语音引擎，请安装英语语音包');
+                    const option = document.createElement('option');
+                    option.value = '';
+                    option.textContent = '无可用英语语音';
+                    voiceSelect.appendChild(option);
+                    return;
+                }
+
+                // 添加英语语音选项
+                enVoices.forEach((voice, index) => {
+                    const option = document.createElement('option');
+                    option.value = index;
+                    option.textContent = `${voice.name} (${voice.lang})`;
+                    voiceSelect.appendChild(option);
+                });
+
+                // 默认选中第一个英语语音
+                voiceSelect.value = 0;
+            }
+        }
+
+        // 监听语音列表加载（解决延迟问题）
+        if (synthesis) {
+            synthesis.onvoiceschanged = loadVoices;
+            // 主动触发一次加载（兼容部分浏览器）
+            setTimeout(loadVoices, 100);
+        }
+
+        // 初始化语音实例
+        function initUtterance(text) {
+            utterance = new SpeechSynthesisUtterance(text);
+            // 基础配置
+            utterance.lang = 'en-US';
+            utterance.rate = 1;
+            utterance.pitch = 1;
+            utterance.volume = 1;
+            
+            // 选择指定语音
+            if (voiceSelect && voiceSelect.value !== '' && voices[voiceSelect.value]) {
+                utterance.voice = voices[voiceSelect.value];
+            }
+        }
+
+        // 朗读当前单词或例句（循环切换）
+        function readCurrentWord() {
+            if (appState && appState.currentWordIndex >= 0 && appState.practiceWords && appState.practiceWords.length > 0) {
+                const currentWord = appState.practiceWords[appState.currentWordIndex];
+                let textToRead;
+                
+                // 根据当前模式选择朗读内容
+                if (readMode === 'word') {
+                    textToRead = currentWord.word;
+                } else {
+                    textToRead = currentWord.example.replace('____', currentWord.word);
+                }
+                
+                if (textToRead) {
+                    // 停止当前朗读
+                    synthesis.cancel();
+                    // 初始化新的语音实例
+                    initUtterance(textToRead);
+                    // 开始朗读
+                    synthesis.speak(utterance);
+                    // 切换朗读模式
+                    readMode = readMode === 'word' ? 'example' : 'word';
+                }
+            }
+        }
+
+        // 朗读按钮
+        if (readBtn) {
+            readBtn.addEventListener('click', () => {
+                readCurrentWord();
+            });
+        }
+
+        // 语音选择切换
+        if (voiceSelect) {
+            voiceSelect.addEventListener('change', () => {
+                if (utterance && voiceSelect.value !== '') {
+                    utterance.voice = voices[voiceSelect.value];
+                }
+            });
+        }
+
+        // 移除自动朗读功能，加载单词时不朗读
+        // const originalShowCurrentWord = showCurrentWord;
+        // showCurrentWord = function() {
+        //     originalShowCurrentWord.apply(this, arguments);
+        // };
+        
+
+
         // 页面加载完成后初始化应用
         document.addEventListener('DOMContentLoaded', () => {
             checkDarkMode(); // 首先检查主题模式
             initPageSettings(); // 初始化页面设置
             initApp();
             updatePracticeHistory();
+            checkReviewMode(); // 检查是否进入错误单词复习模式
         });
     </script>
 </body>

@@ -1,10 +1,25 @@
 from flask import Blueprint, request, jsonify
-from ..models.user import User
-from ..models.classroom import Classroom
-from ..app import db
+from models.user import User
+from models.classroom import Classroom
+from database import db
 
 # 创建蓝图
 classrooms_bp = Blueprint('classrooms', __name__)
+
+@classrooms_bp.route('/', methods=['GET'])
+def get_classrooms():
+    """获取所有班级列表（仅老师可查看）"""
+    try:
+        # 获取所有班级
+        classrooms = Classroom.query.all()
+        classroom_list = [classroom.to_dict() for classroom in classrooms]
+        
+        return jsonify({
+            'success': True, 
+            'classrooms': classroom_list
+        }), 200
+    except Exception as e:
+        return jsonify({'success': False, 'message': f'获取班级列表失败: {str(e)}'}), 500
 
 @classrooms_bp.route('/create', methods=['POST'])
 def create_classroom():
