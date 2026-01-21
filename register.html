@@ -63,6 +63,62 @@
             .bg-gradient-custom-dark {
                 background-image: linear-gradient(135deg, #4F46E5, #8B5CF6);
             }
+            .glow-btn {
+                position: relative;
+                overflow: hidden;
+            }
+            .glow-btn::before {
+                content: '';
+                position: absolute;
+                top: -50%;
+                left: -50%;
+                width: 200%;
+                height: 200%;
+                background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 60%);
+                transform: scale(0);
+                transition: transform 0.6s ease-out;
+                pointer-events: none;
+            }
+            .glow-btn:hover::before {
+                transform: scale(1);
+            }
+            .glow-btn::after {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: -100%;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+                transition: left 0.5s ease;
+                pointer-events: none;
+            }
+            .glow-btn:hover::after {
+                left: 100%;
+            }
+            .glow-border {
+                position: relative;
+            }
+            .glow-border::before {
+                content: '';
+                position: absolute;
+                inset: -2px;
+                border-radius: inherit;
+                background: linear-gradient(45deg, #4F46E5, #7C3AED, #4F46E5);
+                background-size: 200% 200%;
+                animation: glow-animation 3s ease infinite;
+                opacity: 0;
+                transition: opacity 0.3s ease;
+                z-index: -1;
+            }
+            .glow-border:hover::before,
+            .glow-border.active::before {
+                opacity: 1;
+            }
+            @keyframes glow-animation {
+                0%, 100% { background-position: 0% 50%; }
+                50% { background-position: 100% 50%; }
+            }
         }
     </style>
     
@@ -192,15 +248,15 @@
                             <input type="hidden" id="userRole" name="userRole" required value="">
                             <div class="grid grid-cols-2 gap-3">
                                 <button type="button" id="studentRegBtn" 
-                                    class="py-3 px-4 rounded-lg border border-gray-300 dark:border-gray-600 
+                                    class="glow-border py-3 px-4 rounded-lg border border-gray-300 dark:border-gray-600 
                                            bg-white dark:bg-dark-card text-gray-900 dark:text-dark-text 
-                                           transition-all duration-300 hover:border-primary hover:bg-primary/10 dark:hover:bg-primary/20">
+                                           transition-all duration-300 hover:border-primary hover:bg-primary/10 dark:hover:bg-primary/20 relative z-10">
                                     学生
                                 </button>
                                 <button type="button" id="teacherRegBtn" 
-                                    class="py-3 px-4 rounded-lg border border-gray-300 dark:border-gray-600 
+                                    class="glow-border py-3 px-4 rounded-lg border border-gray-300 dark:border-gray-600 
                                            bg-white dark:bg-dark-card text-gray-900 dark:text-dark-text 
-                                           transition-all duration-300 hover:border-primary hover:bg-primary/10 dark:hover:bg-primary/20">
+                                           transition-all duration-300 hover:border-primary hover:bg-primary/10 dark:hover:bg-primary/20 relative z-10">
                                     教师
                                 </button>
                             </div>
@@ -212,7 +268,7 @@
             <!-- 注册按钮 -->
             <div>
                 <button type="submit" 
-                    class="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-gradient-custom hover:bg-gradient-to-br hover:from-primary hover:to-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary dark:focus:ring-dark-primary transition-all duration-300 hover:shadow-glow dark:hover:shadow-glow-dark">
+                    class="glow-btn group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-gradient-custom hover:bg-gradient-to-br hover:from-primary hover:to-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary dark:focus:ring-dark-primary transition-all duration-300 hover:shadow-glow dark:hover:shadow-glow-dark">
                     <span class="absolute left-0 inset-y-0 flex items-center pl-3">
                         <i class="fa fa-user-plus"></i>
                     </span>
@@ -240,7 +296,7 @@
                 </div>
                 <h3 class="text-xl font-bold text-gray-900 dark:text-dark-text mb-2">注册成功！</h3>
                 <p class="text-gray-600 dark:text-gray-400 mb-6">您的账号已创建成功，即将跳转到登录页面...</p>
-                <button id="closeSuccessModal" class="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors">
+                <button id="closeSuccessModal" class="glow-btn px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors">
                     确定
                 </button>
             </div>
@@ -269,28 +325,24 @@
         
         // 学生按钮点击事件
         studentRegBtn.addEventListener('click', function() {
-            // 设置注册身份为学生
             userRole.value = 'student';
             
-            // 更新按钮样式
-            studentRegBtn.classList.remove('border-gray-300', 'dark:border-gray-600', 'bg-white', 'dark:bg-dark-card');
-            studentRegBtn.classList.add('border-primary', 'bg-primary/20', 'dark:bg-primary/30');
+            studentRegBtn.classList.remove('border-gray-300', 'dark:border-gray-600', 'bg-white', 'dark:bg-dark-card', 'text-gray-900', 'dark:text-dark-text');
+            studentRegBtn.classList.add('border-primary', 'bg-primary', 'text-white', 'active');
             
-            teacherRegBtn.classList.remove('border-primary', 'bg-primary/20', 'dark:bg-primary/30');
-            teacherRegBtn.classList.add('border-gray-300', 'dark:border-gray-600', 'bg-white', 'dark:bg-dark-card');
+            teacherRegBtn.classList.remove('border-primary', 'bg-primary', 'text-white', 'active');
+            teacherRegBtn.classList.add('border-gray-300', 'dark:border-gray-600', 'bg-white', 'dark:bg-dark-card', 'text-gray-900', 'dark:text-dark-text');
         });
         
         // 教师按钮点击事件
         teacherRegBtn.addEventListener('click', function() {
-            // 设置注册身份为教师
             userRole.value = 'teacher';
             
-            // 更新按钮样式
-            teacherRegBtn.classList.remove('border-gray-300', 'dark:border-gray-600', 'bg-white', 'dark:bg-dark-card');
-            teacherRegBtn.classList.add('border-primary', 'bg-primary/20', 'dark:bg-primary/30');
+            teacherRegBtn.classList.remove('border-gray-300', 'dark:border-gray-600', 'bg-white', 'dark:bg-dark-card', 'text-gray-900', 'dark:text-dark-text');
+            teacherRegBtn.classList.add('border-primary', 'bg-primary', 'text-white', 'active');
             
-            studentRegBtn.classList.remove('border-primary', 'bg-primary/20', 'dark:bg-primary/30');
-            studentRegBtn.classList.add('border-gray-300', 'dark:border-gray-600', 'bg-white', 'dark:bg-dark-card');
+            studentRegBtn.classList.remove('border-primary', 'bg-primary', 'text-white', 'active');
+            studentRegBtn.classList.add('border-gray-300', 'dark:border-gray-600', 'bg-white', 'dark:bg-dark-card', 'text-gray-900', 'dark:text-dark-text');
         });
         
         // 表单提交处理

@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 交流助手 - GLM-4.5 Flash</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body>
+    <div class="chat-container">
+        <header class="chat-header">
+            <div class="header-content">
+                <div class="header-title">
+                    <h1>AI 交流助手</h1>
+                    <span class="model-badge">GLM-4.5 Flash</span>
+                </div>
+                <div class="header-controls">
+                    <div class="toggles-container">
+                        <div class="voice-toggle">
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="voiceToggle">
+                                <span class="toggle-slider"></span>
+                            </label>
+                            <span class="toggle-label">语音朗读</span>
+                        </div>
+                        <div class="thinking-toggle">
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="thinkingToggle">
+                                <span class="toggle-slider"></span>
+                            </label>
+                            <span class="toggle-label">深度思考</span>
+                        </div>
+                    </div>
+                    <button class="settings-btn" id="settingsBtn" title="设置">⚙️</button>
+                    <button class="api-key-btn" id="apiKeyBtn" title="API Key">🔑</button>
+                </div>
+            </div>
+        </header>
+        
+        <!-- API Key弹窗 -->
+        <div class="api-key-modal" id="apiKeyModal">
+            <div class="api-key-modal-overlay" id="apiKeyOverlay"></div>
+            <div class="api-key-modal-content">
+                <div class="api-key-modal-header">
+                    <h3>配置 API Key</h3>
+                    <button class="close-btn" id="closeApiKey">✕</button>
+                </div>
+                <div class="api-key-modal-body">
+                    <div class="api-key-item">
+                        <label>智谱AI API Key</label>
+                        <input type="password" id="apiKeyInput" placeholder="请输入你的智谱AI API Key">
+                        <button class="toggle-visibility" id="toggleVisibility">👁️</button>
+                    </div>
+                    <div class="api-key-help">
+                        <p>获取 API Key：</p>
+                        <ol>
+                            <li>访问 <a href="https://open.bigmodel.cn/" target="_blank">智谱AI开放平台</a></li>
+                            <li>注册/登录账号</li>
+                            <li>进入控制台获取 API Key</li>
+                        </ol>
+                    </div>
+                </div>
+                <div class="api-key-modal-footer">
+                    <button class="modal-btn modal-btn-cancel" id="cancelApiKey">取消</button>
+                    <button class="modal-btn modal-btn-save" id="saveApiKey">保存</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 设置弹窗 -->
+        <div class="settings-modal" id="settingsModal">
+            <div class="settings-modal-overlay" id="settingsOverlay"></div>
+            <div class="settings-modal-content">
+                <div class="settings-modal-header">
+                    <h3>设置</h3>
+                    <button class="close-btn" id="closeSettings">✕</button>
+                </div>
+                <div class="settings-modal-body">
+                    <div class="settings-section">
+                        <h4>AI 参数</h4>
+                        <div class="setting-item">
+                            <label>温度</label>
+                            <input type="range" id="temperatureRange" min="0" max="2" step="0.1" value="0.7">
+                            <span class="setting-value" id="temperatureValue">0.7</span>
+                        </div>
+                        <div class="setting-item">
+                            <label>最大输出</label>
+                            <input type="number" id="maxTokensInput" min="100" max="10000" step="100" value="3000">
+                            <span class="setting-value">tokens</span>
+                        </div>
+                        <div class="setting-item">
+                            <label>可编辑输出</label>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="editableOutputToggle">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="settings-section">
+                        <h4>语音设置</h4>
+                        <div class="setting-item">
+                            <label>语速</label>
+                            <input type="range" id="rateRange" min="0.5" max="2" step="0.1" value="1">
+                            <span class="setting-value" id="rateValue">1.0</span>
+                        </div>
+                        <div class="setting-item">
+                            <label>音调</label>
+                            <input type="range" id="pitchRange" min="0.5" max="2" step="0.1" value="1">
+                            <span class="setting-value" id="pitchValue">1.0</span>
+                        </div>
+                        <div class="setting-item">
+                            <label>音量</label>
+                            <input type="range" id="volumeRange" min="0" max="1" step="0.1" value="1">
+                            <span class="setting-value" id="volumeValue">1.0</span>
+                        </div>
+                        <div class="setting-item">
+                            <label>语音选择</label>
+                            <select id="voiceSelect">
+                                <option value="">加载中...</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="settings-modal-footer">
+                    <button class="modal-btn modal-btn-cancel" id="cancelSettings">取消</button>
+                    <button class="modal-btn modal-btn-save" id="saveSettings">保存</button>
+                </div>
+            </div>
+        </div>
+        <main class="chat-messages" id="chatMessages">
+        </main>
+        <footer class="chat-footer">
+            <div class="input-container">
+                <input type="text" id="userInput" placeholder="输入你的问题或消息..." autocomplete="off">
+                <button id="sendBtn" data-original-text="发送">发送</button>
+            </div>
+        </footer>
+    </div>
+    <script src="script2.js"></script>
+</body>
+</html>

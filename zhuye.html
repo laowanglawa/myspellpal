@@ -10,6 +10,8 @@
     <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
     <!-- Marked.js for Markdown rendering -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <!-- AI Chat Styles -->
+    <link rel="stylesheet" href="ai对话/styles.css">
     
     <!-- Tailwind 配置 -->
     <script>
@@ -163,6 +165,62 @@
             .translate-x-4 {
                 transform: translateX(1rem);
             }
+            .glow-btn {
+                position: relative;
+                overflow: hidden;
+            }
+            .glow-btn::before {
+                content: '';
+                position: absolute;
+                top: -50%;
+                left: -50%;
+                width: 200%;
+                height: 200%;
+                background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 60%);
+                transform: scale(0);
+                transition: transform 0.6s ease-out;
+                pointer-events: none;
+            }
+            .glow-btn:hover::before {
+                transform: scale(1);
+            }
+            .glow-btn::after {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: -100%;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+                transition: left 0.5s ease;
+                pointer-events: none;
+            }
+            .glow-btn:hover::after {
+                left: 100%;
+            }
+            .glow-border {
+                position: relative;
+            }
+            .glow-border::before {
+                content: '';
+                position: absolute;
+                inset: -2px;
+                border-radius: inherit;
+                background: linear-gradient(45deg, #3B82F6, #10B981, #3B82F6);
+                background-size: 200% 200%;
+                animation: glow-animation 3s ease infinite;
+                opacity: 0;
+                transition: opacity 0.3s ease;
+                z-index: -1;
+            }
+            .glow-border:hover::before,
+            .glow-border.active::before {
+                opacity: 1;
+            }
+            @keyframes glow-animation {
+                0%, 100% { background-position: 0% 50%; }
+                50% { background-position: 100% 50%; }
+            }
         }
     </style>
 </head>
@@ -184,7 +242,7 @@
                 <button id="themeToggle" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
                     <i class="fa fa-moon-o text-xl"></i>
                 </button>
-                <button id="settingsBtn" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors" title="系统设置">
+                <button id="settingsBtn" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors" title="设置">
                     <i class="fa fa-cog text-xl"></i>
                 </button>
                 <!-- 用户账户区域 -->
@@ -249,8 +307,57 @@
                 </button>
             </div>
             <!-- 退出登录按钮 -->
-            <button id="logoutBtn" class="w-full btn-outline border-red-300 text-red-600 dark:text-red-400 dark:border-red-800 hover:bg-red-50 dark:hover:bg-red-900/30">
+            <button id="logoutBtn" class="glow-border w-full btn-outline border-red-300 text-red-600 dark:text-red-400 dark:border-red-800 hover:bg-red-50 dark:hover:bg-red-900/30 relative z-10">
                 <i class="fa fa-sign-out mr-2"></i> 退出登录
+            </button>
+        </div>
+    </div>
+
+    <!-- 设置模态框 -->
+    <div id="settingsModal" class="fixed inset-0 bg-black/50 z-[100] flex items-center justify-center hidden">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl w-full max-w-md p-6 transform transition-all scale-95 opacity-0" onclick="event.stopPropagation();">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-bold">页面设置</h3>
+                <button id="closeSettingsModalBtn" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 relative z-20" onclick="closeSettingsModal(); event.stopPropagation();">
+                    <i class="fa fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <!-- 文字大小设置 -->
+            <div class="mb-6">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">文字大小</label>
+                <div class="flex items-center space-x-4">
+                    <button class="glow-border text-size-btn px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors relative z-10" data-size="small">小</button>
+                    <button class="glow-border text-size-btn px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors relative z-10" data-size="medium">中</button>
+                    <button class="glow-border text-size-btn px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors relative z-10" data-size="large">大</button>
+                </div>
+            </div>
+            
+            <!-- 字体设置 -->
+            <div class="mb-6">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">字体</label>
+                <select id="fontSelect" class="w-full p-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary/50 focus:border-primary focus:outline-none">
+                    <option value="Inter">Inter</option>
+                    <option value="system-ui">系统默认</option>
+                    <option value="Arial">Arial</option>
+                    <option value="Microsoft YaHei">微软雅黑</option>
+                    <option value="SimSun">宋体</option>
+                </select>
+            </div>
+            
+            <!-- 词库选择 -->
+            <div class="mb-6">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">词库选择</label>
+                <select id="wordlistSelect" class="w-full p-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary/50 focus:border-primary focus:outline-none">
+                    <option value="beginner">初级词库</option>
+                    <option value="intermediate">中级词库</option>
+                    <option value="advanced">高级词库</option>
+                </select>
+            </div>
+            
+            <!-- 应用按钮 -->
+            <button id="applySettingsBtn" class="glow-btn w-full btn-primary">
+                应用设置
             </button>
         </div>
     </div>
@@ -274,7 +381,7 @@
                 </button>
             </div>
             
-            <button id="closeClassFeatureModal" class="w-full mt-4 btn-outline">
+            <button id="closeClassFeatureModal" class="glow-border w-full mt-4 btn-outline relative z-10">
                 关闭
             </button>
         </div>
@@ -282,98 +389,104 @@
 
     <!-- AI 对话模态框 -->
     <div id="aiChatModal" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center hidden">
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-2xl h-[600px] flex flex-col transform transition-all scale-95 opacity-0">
-            <!-- 头部 -->
-            <div class="bg-gradient-to-r from-purple-600 to-indigo-600 text-white p-4 rounded-t-xl flex justify-between items-center">
-                <div class="flex items-center space-x-2">
-                    <i class="fa fa-comments text-xl"></i>
-                    <h3 class="text-lg font-bold">AI 学习助手</h3>
-                </div>
-                <div class="flex items-center space-x-3">
-                    <label class="flex items-center space-x-2 cursor-pointer">
-                        <input type="checkbox" id="aiVoiceToggle" class="sr-only">
-                        <div class="w-10 h-6 bg-white/30 rounded-full relative transition-colors">
-                            <div class="w-4 h-4 bg-white rounded-full absolute top-1 left-1 transition-transform"></div>
+        <div class="chat-container">
+            <header class="chat-header">
+                <div class="header-content">
+                    <div class="header-title">
+                        <h1>AI 交流助手</h1>
+                        <span class="model-badge">GLM-4.5 Flash</span>
+                    </div>
+                    <div class="header-controls">
+                        <div class="toggles-container">
+                            <div class="voice-toggle">
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="voiceToggle">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                                <span class="toggle-label">语音朗读</span>
+                            </div>
+                            <div class="thinking-toggle">
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="thinkingToggle">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                                <span class="toggle-label">深度思考</span>
+                            </div>
                         </div>
-                        <span class="text-sm">语音</span>
-                    </label>
-                    <button id="aiSettingsBtn" class="p-2 hover:bg-white/20 rounded-full transition-colors" title="设置">
-                        <i class="fa fa-cog"></i>
-                    </button>
-                    <button id="closeAiChatModal" class="p-2 hover:bg-white/20 rounded-full transition-colors">
-                        <i class="fa fa-times"></i>
-                    </button>
+                        <button class="settings-btn" id="aiChatSettingsBtn" title="设置">⚙️</button>
+                        <button id="closeAiChatModal" class="text-white text-2xl ml-4 hover:opacity-80 transition-opacity">✕</button>
+                    </div>
                 </div>
-            </div>
-
-            <!-- 消息区域 -->
-            <div id="aiChatMessages" class="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50 dark:bg-gray-900">
-                <div class="flex justify-start">
-                    <div class="bg-white dark:bg-gray-800 rounded-2xl rounded-tl-none px-4 py-3 max-w-[80%] shadow-sm">
-                        <p class="text-gray-800 dark:text-gray-200">你好！我是 AI 学习助手，有什么可以帮助你的吗？</p>
+            </header>
+            
+            <!-- 设置弹窗 -->
+            <div class="settings-modal" id="aiChatSettingsModal">
+                <div class="settings-modal-overlay" id="aiChatSettingsOverlay"></div>
+                <div class="settings-modal-content">
+                    <div class="settings-modal-header">
+                        <h3>设置</h3>
+                        <button class="close-btn" id="aiChatCloseSettings">✕</button>
+                    </div>
+                    <div class="settings-modal-body">
+                        <div class="settings-section">
+                            <h4>AI 参数</h4>
+                            <div class="setting-item">
+                                <label>温度</label>
+                                <input type="range" id="aiChatTemperatureRange" min="0" max="2" step="0.1" value="0.7">
+                                <span class="setting-value" id="aiChatTemperatureValue">0.7</span>
+                            </div>
+                            <div class="setting-item">
+                                <label>最大输出</label>
+                                <input type="number" id="aiChatMaxTokensInput" min="100" max="10000" step="100" value="3000">
+                                <span class="setting-value">tokens</span>
+                            </div>
+                            <div class="setting-item">
+                                <label>可编辑输出</label>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="aiChatEditableOutputToggle">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="settings-section">
+                            <h4>语音设置</h4>
+                            <div class="setting-item">
+                                <label>语速</label>
+                                <input type="range" id="aiChatRateRange" min="0.5" max="2" step="0.1" value="1">
+                                <span class="setting-value" id="aiChatRateValue">1.0</span>
+                            </div>
+                            <div class="setting-item">
+                                <label>音调</label>
+                                <input type="range" id="aiChatPitchRange" min="0.5" max="2" step="0.1" value="1">
+                                <span class="setting-value" id="aiChatPitchValue">1.0</span>
+                            </div>
+                            <div class="setting-item">
+                                <label>音量</label>
+                                <input type="range" id="aiChatVolumeRange" min="0" max="1" step="0.1" value="1">
+                                <span class="setting-value" id="aiChatVolumeValue">1.0</span>
+                            </div>
+                            <div class="setting-item">
+                                <label>语音选择</label>
+                                <select id="aiChatVoiceSelect">
+                                    <option value="">加载中...</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="settings-modal-footer">
+                        <button class="modal-btn modal-btn-cancel" id="aiChatCancelSettings">取消</button>
+                        <button class="modal-btn modal-btn-save" id="aiChatSaveSettings">保存</button>
                     </div>
                 </div>
             </div>
-
-            <!-- 输入区域 -->
-            <div class="p-4 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 rounded-b-xl">
-                <div class="flex items-center space-x-3">
-                    <input type="text" id="aiChatInput" 
-                        class="flex-1 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 dark:bg-gray-900 dark:text-white"
-                        placeholder="输入你的问题..." autocomplete="off">
-                    <button id="aiSendBtn" 
-                        class="px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl font-medium hover:shadow-lg transition-all hover:scale-105 active:scale-95">
-                        <i class="fa fa-paper-plane mr-2"></i>发送
-                    </button>
+            <main class="chat-messages" id="chatMessages">
+            </main>
+            <footer class="chat-footer">
+                <div class="input-container">
+                    <input type="text" id="userInput" placeholder="输入你的问题或消息..." autocomplete="off">
+                    <button id="sendBtn" data-original-text="发送">发送</button>
                 </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- AI 语音设置模态框 -->
-    <div id="aiVoiceSettingsModal" class="fixed inset-0 bg-black/50 z-[60] flex items-center justify-center hidden">
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl w-full max-w-md p-6 transform transition-all scale-95 opacity-0">
-            <div class="flex justify-between items-center mb-6">
-                <h3 class="text-xl font-bold">语音设置</h3>
-                <button id="closeAiVoiceSettings" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
-                    <i class="fa fa-times text-xl"></i>
-                </button>
-            </div>
-            <div class="space-y-5">
-                <div class="flex items-center justify-between">
-                    <label class="text-sm font-medium text-gray-700 dark:text-gray-300">语速</label>
-                    <div class="flex items-center space-x-3">
-                        <input type="range" id="aiRateRange" min="0.5" max="2" step="0.1" value="1" 
-                            class="w-32 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
-                        <span id="aiRateValue" class="text-sm text-purple-600 font-medium w-8">1.0</span>
-                    </div>
-                </div>
-                <div class="flex items-center justify-between">
-                    <label class="text-sm font-medium text-gray-700 dark:text-gray-300">音调</label>
-                    <div class="flex items-center space-x-3">
-                        <input type="range" id="aiPitchRange" min="0.5" max="2" step="0.1" value="1" 
-                            class="w-32 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
-                        <span id="aiPitchValue" class="text-sm text-purple-600 font-medium w-8">1.0</span>
-                    </div>
-                </div>
-                <div class="flex items-center justify-between">
-                    <label class="text-sm font-medium text-gray-700 dark:text-gray-300">音量</label>
-                    <div class="flex items-center space-x-3">
-                        <input type="range" id="aiVolumeRange" min="0" max="1" step="0.1" value="1" 
-                            class="w-32 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
-                        <span id="aiVolumeValue" class="text-sm text-purple-600 font-medium w-8">1.0</span>
-                    </div>
-                </div>
-                <div class="flex items-center justify-between">
-                    <label class="text-sm font-medium text-gray-700 dark:text-gray-300">语音选择</label>
-                    <select id="aiVoiceSelect" class="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500">
-                        <option value="">加载中...</option>
-                    </select>
-                </div>
-            </div>
-            <button id="saveAiVoiceSettings" class="w-full mt-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl font-medium hover:shadow-lg transition-all">
-                保存设置
-            </button>
+            </footer>
         </div>
     </div>
 
@@ -457,7 +570,7 @@
                             可按难度分级学习
                         </div>
                     </div>
-                    <button id="reciteModeBtn" class="w-full py-3 bg-primary text-white rounded-lg font-medium shadow transition-all hover:shadow-lg hover:bg-primary/90">
+                    <button id="reciteModeBtn" class="glow-btn w-full py-3 bg-primary text-white rounded-lg font-medium shadow transition-all hover:shadow-lg hover:bg-primary/90">
                         开始记忆
                     </button>
                 </div>
@@ -490,7 +603,7 @@
                             提供练习统计和历史记录
                         </div>
                     </div>
-                    <button id="memorizeModeBtn" class="w-full py-3 bg-secondary text-white rounded-lg font-medium shadow transition-all hover:shadow-lg hover:bg-secondary/90">
+                    <button id="memorizeModeBtn" class="glow-btn w-full py-3 bg-secondary text-white rounded-lg font-medium shadow transition-all hover:shadow-lg hover:bg-secondary/90">
                         开始复习
                     </button>
                 </div>
@@ -501,7 +614,7 @@
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-6 mb-8">
             <div class="flex justify-between items-center mb-4">
                 <h3 class="font-bold text-lg">最近学习记录</h3>
-                <button class="text-primary hover:text-primary/80 text-sm font-medium">查看全部</button>
+                <button id="viewAllRecordsBtn" class="text-primary hover:text-primary/80 text-sm font-medium">查看全部</button>
             </div>
             <div class="overflow-x-auto">
                 <table class="min-w-full">
@@ -553,7 +666,7 @@
                         跟踪复习进度和改进情况
                     </div>
                 </div>
-                <button id="reviewErrorsBtn" class="w-full py-3 bg-red-500 text-white rounded-lg font-medium shadow transition-all hover:shadow-lg hover:bg-red-600">
+                <button id="reviewErrorsBtn" class="glow-btn w-full py-3 bg-red-500 text-white rounded-lg font-medium shadow transition-all hover:shadow-lg hover:bg-red-600">
                     开始复习错误单词
                 </button>
             </div>
@@ -583,11 +696,11 @@
     </main>
 
     <!-- 页脚 -->
-    <footer class="bg-white dark:bg-gray-800 py-6 shadow-inner mt-auto">
+    <!-- <footer class="bg-white dark:bg-gray-800 py-6 shadow-inner mt-auto">
         <div class="container mx-auto px-4 text-center text-gray-500 dark:text-gray-400 text-sm">
             <p>&copy; 2023 MySpellPal 英语单词学习平台. 让学习更高效！</p>
         </div>
-    </footer>
+    </footer> -->
 
     <!-- 词库选择模态框 -->
     <div id="wordlistSelectModal" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center hidden">
@@ -643,67 +756,9 @@
                 </div>
             </div>
             
-            <button id="confirmWordlistBtn" class="w-full btn-primary" disabled>
+            <button id="confirmWordlistBtn" class="glow-btn w-full btn-primary" disabled>
                 确认选择
             </button>
-        </div>
-    </div>
-
-    <!-- 设置模态框 -->
-    <div id="settingsModal" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center hidden">
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl w-full max-w-md p-6 transform transition-all scale-95 opacity-0">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-xl font-bold">页面设置</h3>
-                <button id="closeSettingsModalBtn" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
-                    <i class="fa fa-times text-xl"></i>
-                </button>
-            </div>
-            
-            <!-- 字体大小设置 -->
-            <div class="mb-6">
-                <label for="fontSizeSelect" class="block text-gray-700 dark:text-gray-300 mb-2">字体大小</label>
-                <select 
-                    id="fontSizeSelect" 
-                    class="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 appearance-none cursor-pointer transition-colors"
-                >
-                    <option value="normal">标准</option>
-                    <option value="small">小</option>
-                    <option value="large">大</option>
-                    <option value="xlarge">超大</option>
-                </select>
-            </div>
-            
-            <!-- 字体类型设置 -->
-            <div class="mb-6">
-                <label for="fontFamilySelect" class="block text-gray-700 dark:text-gray-300 mb-2">字体类型</label>
-                <select 
-                    id="fontFamilySelect" 
-                    class="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 appearance-none cursor-pointer transition-colors"
-                >
-                    <option value="system">系统默认</option>
-                    <option value="serif">衬线字体</option>
-                    <option value="mono">等宽字体</option>
-                </select>
-            </div>
-            
-            <!-- 词库设置 -->
-            <div class="mb-6">
-                <label for="wordlistSelect" class="block text-gray-700 dark:text-gray-300 mb-2">词库选择</label>
-                <select 
-                    id="wordlistSelect" 
-                    class="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 appearance-none cursor-pointer transition-colors"
-                >
-                    <option value="beginner">初级词库</option>
-                    <option value="intermediate">中级词库</option>
-                    <option value="advanced">高级词库</option>
-                </select>
-            </div>
-            
-            <div class="flex space-x-4">
-                <button id="applySettingsBtn" class="btn-primary flex-1">
-                    应用设置
-                </button>
-            </div>
         </div>
     </div>
 
@@ -738,7 +793,7 @@
                     </button>
                 </div>
                 
-                <button id="leaveClassBtn" class="w-full btn-outline border-red-300 text-red-600 dark:text-red-400 dark:border-red-800 hover:bg-red-50 dark:hover:bg-red-900/30">
+                <button id="leaveClassBtn" class="glow-border w-full btn-outline border-red-300 text-red-600 dark:text-red-400 dark:border-red-800 hover:bg-red-50 dark:hover:bg-red-900/30 relative z-10">
                     <i class="fa fa-sign-out mr-2"></i> 退出班级
                 </button>
             </div>
@@ -823,7 +878,7 @@
                     </button>
                 </div>
                 
-                <button id="leaveClassBtn" class="w-full btn-outline border-red-300 text-red-600 dark:text-red-400 dark:border-red-800 hover:bg-red-50 dark:hover:bg-red-900/30">
+                <button id="leaveClassBtn" class="glow-border w-full btn-outline border-red-300 text-red-600 dark:text-red-400 dark:border-red-800 hover:bg-red-50 dark:hover:bg-red-900/30 relative z-10">
                     <i class="fa fa-sign-out mr-2"></i> 退出班级
                 </button>
             </div>
@@ -842,10 +897,10 @@
                 </div>
                 
                 <div class="flex space-x-4">
-                    <button id="cancelJoinClassBtn" class="btn-outline flex-1">
+                    <button id="cancelJoinClassBtn" class="glow-border btn-outline flex-1 relative z-10">
                         取消
                     </button>
-                    <button id="joinClassBtn" class="btn-primary flex-1">
+                    <button id="joinClassBtn" class="glow-btn btn-primary flex-1">
                         加入班级
                     </button>
                 </div>
@@ -1038,13 +1093,17 @@
                             </label>
                             <input type="file" id="avatarUpload" accept="image/*" class="hidden">
                         </div>
-                        <p class="text-sm text-gray-500 dark:text-gray-400">点击相机图标更换头像</p>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mb-2">点击相机图标更换头像</p>
+                        <button id="resetAvatarBtn" class="text-sm text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300 transition-colors">
+                            <i class="fa fa-trash-o mr-1"></i>删除头像
+                        </button>
                     </div>
                     
                     <!-- 用户名设置 -->
                     <div>
                         <label for="usernameInput" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">用户名</label>
                         <input type="text" id="usernameInput" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary" placeholder="请输入用户名">
+                        <p id="usernameValidation" class="text-xs mt-1 hidden"></p>
                     </div>
                     
                     <!-- 密码设置 -->
@@ -1089,7 +1148,7 @@
                     </div>
                     
                     <!-- 保存按钮 -->
-                    <button id="saveAccountSettingsBtn" class="w-full btn-primary">保存设置</button>
+                    <button id="saveAccountSettingsBtn" class="glow-btn w-full btn-primary">保存设置</button>
                     
                     <!-- CSS样式 -->
                     <style>
@@ -1336,28 +1395,6 @@
             </div>
         </div>`;
         
-        // 显示提示消息
-        function showToast(message) {
-            // 创建toast元素
-            const toast = document.createElement('div');
-            toast.className = 'fixed bottom-8 left-1/2 transform -translate-x-1/2 bg-blue-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 transition-all duration-300 transform translate-y-10 opacity-0';
-            toast.textContent = message;
-            document.body.appendChild(toast);
-            
-            // 显示动画
-            setTimeout(() => {
-                toast.classList.remove('translate-y-10', 'opacity-0');
-            }, 10);
-            
-            // 自动关闭
-            setTimeout(() => {
-                toast.classList.add('translate-y-10', 'opacity-0');
-                setTimeout(() => {
-                    document.body.removeChild(toast);
-                }, 300);
-            }, 3000);
-        }
-
         // 初始化应用
         function initApp() {
             // 设置默认学生用户（如果不存在）
@@ -1413,7 +1450,8 @@
                 accountJoinDate: document.getElementById('accountJoinDate'),
                 accountSettingsBtn: document.getElementById('accountSettingsBtn'),
                 learningStatsBtn: document.getElementById('learningStatsBtn'),
-                wordListBtn: document.getElementById('wordListBtn')
+                wordListBtn: document.getElementById('wordListBtn'),
+                viewAllRecordsBtn: document.getElementById('viewAllRecordsBtn')
             };
             
             // 检查用户登录状态
@@ -1430,6 +1468,9 @@
             
             // 初始化页面设置
             initPageSettings();
+            
+            // 加载保存的页面设置
+            loadSettings();
             
             // 更新最近学习记录
             updateRecentActivity();
@@ -1456,12 +1497,35 @@
             if (elements.closeSettingsModalBtn) {
                 elements.closeSettingsModalBtn.addEventListener('click', closeSettingsModal);
             }
+            if (elements.viewAllRecordsBtn) {
+                elements.viewAllRecordsBtn.addEventListener('click', openLearningStats);
+            }
+            
+            // 添加模态框背景点击关闭
+            if (elements.settingsModal) {
+                elements.settingsModal.addEventListener('click', function(e) {
+                    if (e.target === elements.settingsModal) {
+                        closeSettingsModal();
+                    }
+                });
+            }
+            
             if (elements.logoutBtn) {
                 elements.logoutBtn.addEventListener('click', confirmLogout);
             }
             if (elements.applySettingsBtn) {
-                elements.applySettingsBtn.addEventListener('click', applySettings);
+                elements.applySettingsBtn.addEventListener('click', applyPageSettings);
             }
+            
+            // 文字大小按钮事件
+            document.querySelectorAll('.text-size-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.text-size-btn').forEach(b => {
+                        b.classList.remove('bg-primary', 'text-white', 'border-primary');
+                    });
+                    this.classList.add('bg-primary', 'text-white', 'border-primary');
+                });
+            });
             
             // 添加班级相关事件监听
             if (elements.myClassBtn) {
@@ -1846,107 +1910,38 @@
             }
         }
 
-        // 打开设置模态框
-        function openSettingsModal() {
-            // 加载保存的设置
-            const savedFontSize = localStorage.getItem('fontSize') || 'normal';
-            const savedFontFamily = localStorage.getItem('fontFamily') || 'system';
-            const currentUser = localStorage.getItem('currentUser') || 'guest';
-            const savedWordlist = localStorage.getItem(`wordlist_${currentUser}`) || 'beginner';
-            
-            // 设置选项的值
-            document.getElementById('fontSizeSelect').value = savedFontSize;
-            document.getElementById('fontFamilySelect').value = savedFontFamily;
-            document.getElementById('wordlistSelect').value = savedWordlist;
-            
-            // 显示模态框
-            elements.settingsModal.classList.remove('hidden');
-            const modalContent = elements.settingsModal.querySelector('div');
-            setTimeout(() => {
-                modalContent.classList.remove('scale-95', 'opacity-0');
-                modalContent.classList.add('scale-100', 'opacity-100');
-            }, 10);
-        }
-
-        // 关闭设置模态框
-        function closeSettingsModal() {
-            const modalContent = elements.settingsModal.querySelector('div');
-            modalContent.classList.remove('scale-100', 'opacity-100');
-            modalContent.classList.add('scale-95', 'opacity-0');
-            setTimeout(() => {
-                elements.settingsModal.classList.add('hidden');
-            }, 300);
-        }
-
-        // 应用设置
-        function applySettings() {
-            const fontSize = document.getElementById('fontSizeSelect').value;
-            const fontFamily = document.getElementById('fontFamilySelect').value;
-            const wordlist = document.getElementById('wordlistSelect').value;
-            const currentUser = localStorage.getItem('currentUser') || 'guest';
-            
-            // 保存设置到localStorage
-            localStorage.setItem('fontSize', fontSize);
-            localStorage.setItem('fontFamily', fontFamily);
-            
-            // 检查词库是否发生变化
-            const oldWordlist = localStorage.getItem(`wordlist_${currentUser}`);
-            if (oldWordlist !== wordlist) {
-                // 更新词库选择
-                localStorage.setItem(`wordlist_${currentUser}`, wordlist);
-                // 显示词库已更改的提示
-                showToast(`已切换到${getWordlistName(wordlist)}词库，你的学习进度将基于新词库重新计算`);
-                
-                // 更新当前词库显示
-                displayCurrentWordlist();
-            } else {
-                // 显示设置已应用的提示
-                showToast('设置已应用');
-            }
-            
-            // 应用字体大小设置
-            switch(fontSize) {
-                case 'small':
-                    document.body.classList.add('text-sm');
-                    document.body.classList.remove('text-lg', 'text-xl');
-                    break;
-                case 'large':
-                    document.body.classList.add('text-lg');
-                    document.body.classList.remove('text-sm', 'text-xl');
-                    break;
-                case 'xlarge':
-                    document.body.classList.add('text-xl');
-                    document.body.classList.remove('text-sm', 'text-lg');
-                    break;
-                default:
-                    document.body.classList.remove('text-sm', 'text-lg', 'text-xl');
-            }
-            
-            // 应用字体设置
-            switch(fontFamily) {
-                case 'serif':
-                    document.body.classList.add('font-serif');
-                    document.body.classList.remove('font-mono');
-                    break;
-                case 'mono':
-                    document.body.classList.add('font-mono');
-                    document.body.classList.remove('font-serif');
-                    break;
-                default:
-                    document.body.classList.remove('font-serif', 'font-mono');
-            }
-            
-            // 显示应用成功的提示
-            showToast('设置已应用');
-            closeSettingsModal();
-        }
-
         // 显示提示信息
-        function showToast(message) {
+        function showToast(message, type = 'info') {
             // 创建toast元素
             const toast = document.createElement('div');
-            toast.className = 'fixed top-20 right-4 bg-gray-800 text-white py-2 px-4 rounded-lg shadow-lg transform transition-all duration-300 translate-x-full opacity-0 z-50';
-            toast.textContent = message;
+            
+            // 根据类型设置样式
+            let bgColor = 'bg-gray-800';
+            let icon = '';
+            
+            switch(type) {
+                case 'success':
+                    bgColor = 'bg-green-500';
+                    icon = '<i class="fa fa-check-circle mr-2"></i>';
+                    break;
+                case 'error':
+                    bgColor = 'bg-red-500';
+                    icon = '<i class="fa fa-exclamation-circle mr-2"></i>';
+                    break;
+                case 'warning':
+                    bgColor = 'bg-yellow-500';
+                    icon = '<i class="fa fa-exclamation-triangle mr-2"></i>';
+                    break;
+                case 'loading':
+                    bgColor = 'bg-blue-500';
+                    icon = '<i class="fa fa-spinner fa-spin mr-2"></i>';
+                    break;
+                default:
+                    bgColor = 'bg-gray-800';
+            }
+            
+            toast.className = `fixed top-20 right-4 ${bgColor} text-white py-3 px-5 rounded-lg shadow-lg transform transition-all duration-300 translate-x-full opacity-0 z-50 flex items-center`;
+            toast.innerHTML = `${icon}${message}`;
             
             // 添加到页面
             document.body.appendChild(toast);
@@ -1956,13 +1951,128 @@
                 toast.classList.remove('translate-x-full', 'opacity-0');
             }, 10);
             
-            // 自动消失
-            setTimeout(() => {
-                toast.classList.add('translate-x-full', 'opacity-0');
+            // 如果不是loading类型，自动消失
+            if (type !== 'loading') {
                 setTimeout(() => {
-                    document.body.removeChild(toast);
+                    toast.classList.add('translate-x-full', 'opacity-0');
+                    setTimeout(() => {
+                        if (document.body.contains(toast)) {
+                            document.body.removeChild(toast);
+                        }
+                    }, 300);
+                }, 3000);
+            }
+            
+            return toast;
+        }
+
+        // 打开设置模态框
+        function openSettingsModal() {
+            if (!elements.settingsModal) return;
+            
+            elements.settingsModal.classList.remove('hidden');
+            const modalContent = elements.settingsModal.querySelector('div');
+            if (modalContent) {
+                setTimeout(() => {
+                    modalContent.classList.remove('scale-95', 'opacity-0');
+                    modalContent.classList.add('scale-100', 'opacity-100');
+                }, 10);
+            }
+            
+            // 加载保存的设置
+            loadSettings();
+        }
+        
+        // 关闭设置模态框并刷新页面
+        function closeSettingsModal() {
+            if (!elements.settingsModal) return;
+            
+            const modalContent = elements.settingsModal.querySelector('div');
+            if (modalContent) {
+                modalContent.classList.remove('scale-100', 'opacity-100');
+                modalContent.classList.add('scale-95', 'opacity-0');
+                
+                setTimeout(() => {
+                    elements.settingsModal.classList.add('hidden');
+                    // 关闭模态框后刷新页面
+                    window.location.reload();
                 }, 300);
-            }, 3000);
+            }
+        }
+        
+        // 加载设置
+        function loadSettings() {
+            const textSize = localStorage.getItem('textSize') || 'medium';
+            const font = localStorage.getItem('font') || 'Inter';
+            const wordlist = localStorage.getItem('wordlist') || 'beginner';
+            
+            // 设置文字大小
+            document.querySelectorAll('.text-size-btn').forEach(btn => {
+                btn.classList.remove('bg-primary', 'text-white', 'border-primary');
+                if (btn.dataset.size === textSize) {
+                    btn.classList.add('bg-primary', 'text-white', 'border-primary');
+                }
+            });
+            applyTextSize(textSize);
+            
+            // 设置字体
+            document.getElementById('fontSelect').value = font;
+            applyFont(font);
+            
+            // 设置词库
+            document.getElementById('wordlistSelect').value = wordlist;
+        }
+        
+        // 应用文字大小
+        function applyTextSize(size) {
+            const sizes = {
+                small: '14px',
+                medium: '16px',
+                large: '18px'
+            };
+            document.body.style.fontSize = sizes[size] || sizes.medium;
+        }
+        
+        // 应用字体
+        function applyFont(font) {
+            document.body.style.fontFamily = font;
+        }
+        
+        // 应用页面设置
+        function applyPageSettings() {
+            const textSize = document.querySelector('.text-size-btn.bg-primary')?.dataset.size || 'medium';
+            const font = document.getElementById('fontSelect').value;
+            const wordlist = document.getElementById('wordlistSelect').value;
+            const currentUser = localStorage.getItem('currentUser') || 'guest';
+            
+            // 保存设置
+            localStorage.setItem('textSize', textSize);
+            localStorage.setItem('font', font);
+            localStorage.setItem('wordlist', wordlist);
+            localStorage.setItem(`wordlist_${currentUser}`, wordlist);
+            
+            // 应用设置
+            applyTextSize(textSize);
+            applyFont(font);
+            
+            // 更新词库显示
+            displayCurrentWordlist();
+            
+            // 只关闭模态框，不刷新页面
+            if (elements.settingsModal) {
+                const modalContent = elements.settingsModal.querySelector('div');
+                if (modalContent) {
+                    modalContent.classList.remove('scale-100', 'opacity-100');
+                    modalContent.classList.add('scale-95', 'opacity-0');
+                    
+                    setTimeout(() => {
+                        elements.settingsModal.classList.add('hidden');
+                    }, 300);
+                }
+            }
+            
+            // 显示成功提示
+            showToast('设置已应用', 'success');
         }
 
         // 确认退出登录
@@ -2168,13 +2278,13 @@
             
             // 检查文件类型
             if (!file.type.startsWith('image/')) {
-                showToast('请上传图片文件');
+                showToast('请上传图片文件', 'error');
                 return;
             }
             
             // 检查文件大小（限制为2MB）
             if (file.size > 2 * 1024 * 1024) {
-                showToast('图片大小不能超过2MB');
+                showToast('图片大小不能超过2MB', 'error');
                 return;
             }
             
@@ -2182,9 +2292,71 @@
             reader.onload = function(e) {
                 const userAvatar = document.getElementById('userAvatar');
                 userAvatar.innerHTML = `<img src="${e.target.result}" alt="用户头像" class="w-full h-full object-cover">`;
-                showToast('头像预览成功');
+                
+                // 自动保存头像到本地存储
+                localStorage.setItem('userAvatar', e.target.result);
+                
+                // 更新页面中所有头像显示
+                updateAllAvatarDisplays(e.target.result);
+                
+                showToast('头像上传成功', 'success');
             };
             reader.readAsDataURL(file);
+        }
+        
+        // 更新页面中所有头像显示
+        function updateAllAvatarDisplays(avatarSrc) {
+            // 更新导航栏中的头像
+            const userProfileAvatar = elements.userProfileBtn?.querySelector('.w-10.h-10');
+            if (userProfileAvatar) {
+                userProfileAvatar.innerHTML = `<img src="${avatarSrc}" alt="用户头像" class="w-full h-full rounded-full object-cover">`;
+            }
+            
+            // 更新账户模态框中的头像
+            const accountModalAvatar = document.querySelector('#accountModal .w-24.h-24');
+            if (accountModalAvatar) {
+                accountModalAvatar.innerHTML = `<img src="${avatarSrc}" alt="用户头像" class="w-full h-full rounded-full object-cover">`;
+            }
+            
+            // 更新账户设置模态框中的头像
+            const accountSettingsAvatar = document.querySelector('#accountSettingsModal .w-24.h-24');
+            if (accountSettingsAvatar) {
+                accountSettingsAvatar.innerHTML = `<img src="${avatarSrc}" alt="用户头像" class="w-full h-full rounded-full object-cover">`;
+            }
+        }
+        
+        // 重置头像为默认
+        function resetAvatar() {
+            // 清除本地存储中的头像
+            localStorage.removeItem('userAvatar');
+            
+            // 重置所有头像显示为默认
+            resetAllAvatarDisplays();
+            
+            showToast('头像已重置', 'success');
+        }
+        
+        // 重置页面中所有头像为默认显示
+        function resetAllAvatarDisplays() {
+            const defaultAvatarHTML = '<i class="fa fa-user text-4xl text-gray-400 dark:text-gray-500"></i>';
+            
+            // 重置导航栏中的头像
+            const userProfileAvatar = elements.userProfileBtn?.querySelector('.w-10.h-10');
+            if (userProfileAvatar) {
+                userProfileAvatar.innerHTML = defaultAvatarHTML;
+            }
+            
+            // 重置账户模态框中的头像
+            const accountModalAvatar = document.querySelector('#accountModal .w-24.h-24');
+            if (accountModalAvatar) {
+                accountModalAvatar.innerHTML = defaultAvatarHTML;
+            }
+            
+            // 重置账户设置模态框中的头像
+            const accountSettingsAvatar = document.querySelector('#accountSettingsModal .w-24.h-24');
+            if (accountSettingsAvatar) {
+                accountSettingsAvatar.innerHTML = defaultAvatarHTML;
+            }
         }
         
         // 打开学习统计模态框
@@ -2892,6 +3064,13 @@
                     changePasswordBtn.addEventListener('click', function() {
                         showToast('修改密码功能正在开发中');
                     });
+                }
+                
+                // 绑定用户名实时验证事件
+                const usernameInput = document.getElementById('usernameInput');
+                if (usernameInput) {
+                    usernameInput.addEventListener('input', validateUsernameInput);
+                    usernameInput.addEventListener('blur', validateUsernameInput);
                 }
             }
             
@@ -3689,13 +3868,8 @@
             const newUsername = usernameInput.value.trim();
             
             // 验证用户名
-            if (!newUsername) {
-                showToast('用户名不能为空');
-                return;
-            }
-            
-            if (newUsername.length < 2 || newUsername.length > 20) {
-                showToast('用户名长度应在2-20个字符之间');
+            if (!validateUsernameInput()) {
+                showToast('请检查用户名格式', 'error');
                 return;
             }
             
@@ -3703,16 +3877,9 @@
             const currentUser = localStorage.getItem('currentUser');
             if (newUsername !== currentUser) {
                 localStorage.setItem('currentUser', newUsername);
-                // 更新页面上的用户名显示
-                if (elements.currentUsername) {
-                    elements.currentUsername.textContent = newUsername;
-                }
-                if (elements.welcomeUsername) {
-                    elements.welcomeUsername.textContent = newUsername;
-                }
-                if (elements.accountUsername) {
-                    elements.accountUsername.textContent = newUsername;
-                }
+                localStorage.setItem('username', newUsername);
+                // 更新页面上的所有用户名显示
+                updateAllUsernameDisplays(newUsername);
             }
             
             // 保存用户头像
@@ -3738,10 +3905,80 @@
             }
             
             // 显示保存成功提示
-            showToast('账户设置已保存');
+            showToast('账户设置已保存', 'success');
             
             // 关闭设置模态框
             closeAccountSettings();
+        }
+        
+        // 更新页面中所有用户名显示
+        function updateAllUsernameDisplays(username) {
+            // 更新导航栏中的用户名
+            if (elements.currentUsername) {
+                elements.currentUsername.textContent = username;
+            }
+            
+            // 更新欢迎页面的用户名
+            if (elements.welcomeUsername) {
+                elements.welcomeUsername.textContent = username;
+            }
+            
+            // 更新账户模态框中的用户名
+            if (elements.accountUsername) {
+                elements.accountUsername.textContent = username;
+            }
+            
+            // 更新账户设置模态框中的用户名输入框
+            const usernameInput = document.getElementById('usernameInput');
+            if (usernameInput) {
+                usernameInput.value = username;
+            }
+        }
+        
+        // 用户名实时验证
+        function validateUsernameInput() {
+            const usernameInput = document.getElementById('usernameInput');
+            const validationMsg = document.getElementById('usernameValidation');
+            const username = usernameInput.value.trim();
+            
+            if (!username) {
+                showValidationMessage(validationMsg, '用户名不能为空', 'error');
+                return false;
+            }
+            
+            if (username.length < 2) {
+                showValidationMessage(validationMsg, '用户名至少需要2个字符', 'error');
+                return false;
+            }
+            
+            if (username.length > 20) {
+                showValidationMessage(validationMsg, '用户名不能超过20个字符', 'error');
+                return false;
+            }
+            
+            // 检查是否包含特殊字符
+            const specialChars = /[!@#$%^&*(),.?":{}|<>]/;
+            if (specialChars.test(username)) {
+                showValidationMessage(validationMsg, '用户名不能包含特殊字符', 'error');
+                return false;
+            }
+            
+            showValidationMessage(validationMsg, '用户名格式正确', 'success');
+            return true;
+        }
+        
+        // 显示验证消息
+        function showValidationMessage(element, message, type) {
+            if (!element) return;
+            
+            element.textContent = message;
+            element.classList.remove('hidden', 'text-red-500', 'text-green-500');
+            
+            if (type === 'error') {
+                element.classList.add('text-red-500');
+            } else if (type === 'success') {
+                element.classList.add('text-green-500');
+            }
         }
         
         // 修改密码模态框HTML
@@ -3772,7 +4009,7 @@
                         <input type="password" id="confirmPassword" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary" placeholder="请再次输入新密码">
                     </div>
                     
-                    <button id="confirmChangePasswordBtn" class="w-full btn-primary mt-4">确认修改</button>
+                    <button id="confirmChangePasswordBtn" class="glow-btn w-full btn-primary mt-4">确认修改</button>
                 </div>
             </div>
         </div>`;
@@ -3865,7 +4102,7 @@
             // 保存新密码到本地存储（在实际应用中，这应该通过API发送到服务器）
             localStorage.setItem('userPassword', newPassword);
             
-            showToast('密码修改成功');
+            showToast('密码修改成功', 'success');
             closeChangePasswordModal();
         }
         
@@ -3952,7 +4189,7 @@
                             密码长度至少8位，包含字母和数字
                         </div>
                         
-                        <button id="confirmPasswordChangeBtn" class="w-full btn-primary">确认修改</button>
+                        <button id="confirmPasswordChangeBtn" class="glow-btn w-full btn-primary">确认修改</button>
                     </div>
                 </div>
             </div>`;
@@ -4033,7 +4270,7 @@
             // 保存新密码到本地存储
             localStorage.setItem('userPassword', newPassword);
             
-            showToast('密码修改成功');
+            showToast('密码修改成功', 'success');
             closePasswordModal();
         }
 
@@ -4716,6 +4953,7 @@
             const changePasswordBtn = document.getElementById('changePasswordBtn');
             const clearStudyDataBtn = document.getElementById('clearStudyDataBtn');
             const clearAllDataBtn = document.getElementById('clearAllDataBtn');
+            const resetAvatarBtn = document.getElementById('resetAvatarBtn');
             const closeLearningStatsBtn = document.getElementById('closeLearningStatsBtn');
             const closeLearningStatsModalBtn = document.getElementById('closeLearningStatsModalBtn');
             const closeWordListBtn = document.getElementById('closeWordListBtn');
@@ -4735,6 +4973,16 @@
             }
             if (clearAllDataBtn) {
                 clearAllDataBtn.addEventListener('click', clearAllData);
+            }
+            if (resetAvatarBtn) {
+                resetAvatarBtn.addEventListener('click', resetAvatar);
+            }
+            
+            // 用户名实时验证
+            const usernameInput = document.getElementById('usernameInput');
+            if (usernameInput) {
+                usernameInput.addEventListener('input', validateUsernameInput);
+                usernameInput.addEventListener('blur', validateUsernameInput);
             }
             
             // 学习统计相关按钮
@@ -4781,57 +5029,31 @@
         const aiChatBtn = document.getElementById('aiChatBtn');
         const aiChatModal = document.getElementById('aiChatModal');
         const closeAiChatModal = document.getElementById('closeAiChatModal');
-        const aiChatMessages = document.getElementById('aiChatMessages');
-        const aiChatInput = document.getElementById('aiChatInput');
-        const aiSendBtn = document.getElementById('aiSendBtn');
-        const aiVoiceToggle = document.getElementById('aiVoiceToggle');
-        const aiSettingsBtn = document.getElementById('aiSettingsBtn');
-        const aiVoiceSettingsModal = document.getElementById('aiVoiceSettingsModal');
-        const closeAiVoiceSettings = document.getElementById('closeAiVoiceSettings');
-        const saveAiVoiceSettings = document.getElementById('saveAiVoiceSettings');
-        const aiRateRange = document.getElementById('aiRateRange');
-        const aiPitchRange = document.getElementById('aiPitchRange');
-        const aiVolumeRange = document.getElementById('aiVolumeRange');
-        const aiVoiceSelect = document.getElementById('aiVoiceSelect');
-        const aiRateValue = document.getElementById('aiRateValue');
-        const aiPitchValue = document.getElementById('aiPitchValue');
-        const aiVolumeValue = document.getElementById('aiVolumeValue');
-
-        // AI API 配置
-        const AI_API_URL = 'https://text.pollinations.ai/prompt/';
-
-        // 对话历史
-        let aiConversationHistory = [];
-
-        // 语音合成
-        const aiSynthesis = window.speechSynthesis;
-        let aiVoices = [];
-
-        // 语音设置
-        let aiVoiceSettings = {
-            rate: 1.0,
-            pitch: 1.0,
-            volume: 1.0,
-            voiceURI: ''
-        };
 
         // 打开 AI 对话模态框
         aiChatBtn.addEventListener('click', function() {
             aiChatModal.classList.remove('hidden');
             setTimeout(() => {
-                aiChatModal.querySelector('div').classList.remove('scale-95', 'opacity-0');
-                aiChatModal.querySelector('div').classList.add('scale-100', 'opacity-100');
+                const chatContainer = aiChatModal.querySelector('.chat-container');
+                if (chatContainer) {
+                    chatContainer.classList.remove('scale-95', 'opacity-0');
+                    chatContainer.classList.add('scale-100', 'opacity-100');
+                }
             }, 10);
         });
 
         // 关闭 AI 对话模态框
         closeAiChatModal.addEventListener('click', function() {
-            const modalContent = aiChatModal.querySelector('div');
-            modalContent.classList.remove('scale-100', 'opacity-100');
-            modalContent.classList.add('scale-95', 'opacity-0');
-            setTimeout(() => {
+            const chatContainer = aiChatModal.querySelector('.chat-container');
+            if (chatContainer) {
+                chatContainer.classList.remove('scale-100', 'opacity-100');
+                chatContainer.classList.add('scale-95', 'opacity-0');
+                setTimeout(() => {
+                    aiChatModal.classList.add('hidden');
+                }, 300);
+            } else {
                 aiChatModal.classList.add('hidden');
-            }, 300);
+            }
         });
 
         // 点击背景关闭模态框
@@ -4840,291 +5062,8 @@
                 closeAiChatModal.click();
             }
         });
-
-        // 打开语音设置
-        aiSettingsBtn.addEventListener('click', function() {
-            aiVoiceSettingsModal.classList.remove('hidden');
-            setTimeout(() => {
-                aiVoiceSettingsModal.querySelector('div').classList.remove('scale-95', 'opacity-0');
-                aiVoiceSettingsModal.querySelector('div').classList.add('scale-100', 'opacity-100');
-            }, 10);
-        });
-
-        // 关闭语音设置
-        closeAiVoiceSettings.addEventListener('click', function() {
-            const modalContent = aiVoiceSettingsModal.querySelector('div');
-            modalContent.classList.remove('scale-100', 'opacity-100');
-            modalContent.classList.add('scale-95', 'opacity-0');
-            setTimeout(() => {
-                aiVoiceSettingsModal.classList.add('hidden');
-            }, 300);
-        });
-
-        // 点击背景关闭语音设置
-        aiVoiceSettingsModal.addEventListener('click', function(e) {
-            if (e.target === aiVoiceSettingsModal) {
-                closeAiVoiceSettings.click();
-            }
-        });
-
-        // 保存语音设置
-        saveAiVoiceSettings.addEventListener('click', function() {
-            aiVoiceSettings.rate = parseFloat(aiRateRange.value);
-            aiVoiceSettings.pitch = parseFloat(aiPitchRange.value);
-            aiVoiceSettings.volume = parseFloat(aiVolumeRange.value);
-            aiVoiceSettings.voiceURI = aiVoiceSelect.value;
-            localStorage.setItem('aiVoiceSettings', JSON.stringify(aiVoiceSettings));
-            closeAiVoiceSettings.click();
-        });
-
-        // 语音设置滑块事件
-        aiRateRange.addEventListener('input', function() {
-            aiRateValue.textContent = parseFloat(this.value).toFixed(1);
-        });
-
-        aiPitchRange.addEventListener('input', function() {
-            aiPitchValue.textContent = parseFloat(this.value).toFixed(1);
-        });
-
-        aiVolumeRange.addEventListener('input', function() {
-            aiVolumeValue.textContent = parseFloat(this.value).toFixed(1);
-        });
-
-        // 发送消息
-        async function sendAiMessage() {
-            const message = aiChatInput.value.trim();
-            if (!message) return;
-
-            // 停止当前语音
-            if (aiSynthesis) {
-                aiSynthesis.cancel();
-            }
-
-            // 添加用户消息
-            addAiMessage(message, 'user');
-            aiConversationHistory.push({ role: '用户', content: message });
-
-            // 清空输入框
-            aiChatInput.value = '';
-
-            // 显示加载状态
-            const loadingMessage = addAiMessage('正在思考...', 'bot', true);
-
-            try {
-                // 调用 AI API
-                const response = await getAiResponse(aiConversationHistory);
-
-                // 移除加载消息
-                loadingMessage.remove();
-
-                // 添加 AI 响应
-                addAiMessage(response, 'bot');
-                aiConversationHistory.push({ role: 'AI', content: response });
-
-                // 语音朗读
-                if (aiVoiceToggle.checked && aiSynthesis) {
-                    speakAiText(response);
-                }
-
-                // 限制历史长度
-                if (aiConversationHistory.length > 10) {
-                    aiConversationHistory.shift();
-                }
-            } catch (error) {
-                loadingMessage.remove();
-                addAiMessage('抱歉，出现了错误，请稍后重试。', 'bot');
-                console.error('AI API 错误:', error);
-            }
-        }
-
-        // 检测文本是否包含 Markdown 格式
-        function hasMarkdownFormat(text) {
-            const markdownPatterns = [
-                /^#{1,6}\s/m,           // 标题 #
-                /\*\*.*?\*\*/,          // 粗体 **text**
-                /\*.*?\*/,              // 斜体 *text*
-                /```[\s\S]*?```/,       // 代码块 ```
-                /^-\s/m,                // 无序列表 -
-                /^\d+\.\s/m,            // 有序列表 1.
-                /^---$/m,                // 分隔线 ---
-                /\[.*?\]\(.*?\)/,       // 链接 [text](url)
-                /`.*?`/                 // 行内代码 `code`
-            ];
-            
-            return markdownPatterns.some(pattern => pattern.test(text));
-        }
-
-        // 添加消息到聊天界面
-        function addAiMessage(text, sender, isLoading = false) {
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `flex ${sender === 'user' ? 'justify-end' : 'justify-start'}`;
-
-            const contentDiv = document.createElement('div');
-            contentDiv.className = sender === 'user' 
-                ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-2xl rounded-tr-none px-4 py-3 max-w-[80%] shadow-sm'
-                : 'bg-white dark:bg-gray-800 rounded-2xl rounded-tl-none px-4 py-3 max-w-[80%] shadow-sm';
-
-            if (isLoading) {
-                contentDiv.innerHTML = '<div class="flex items-center space-x-2"><div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div><div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.1s"></div><div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.2s"></div></div>';
-            } else {
-                const p = document.createElement('div');
-                if (sender === 'user') {
-                    p.className = 'text-white prose prose-sm max-w-none';
-                    p.textContent = text;
-                } else {
-                    p.className = 'text-gray-800 dark:text-gray-200 prose prose-sm max-w-none';
-                    if (typeof marked !== 'undefined' && hasMarkdownFormat(text)) {
-                        p.innerHTML = marked.parse(text);
-                    } else {
-                        p.textContent = text;
-                    }
-                }
-                contentDiv.appendChild(p);
-
-                // AI 消息添加朗读按钮
-                if (sender === 'bot') {
-                    const speakBtn = document.createElement('button');
-                    speakBtn.className = 'ml-2 text-gray-400 hover:text-purple-600 transition-colors';
-                    speakBtn.innerHTML = '<i class="fa fa-volume-up"></i>';
-                    speakBtn.title = '朗读';
-                    speakBtn.onclick = () => {
-                        if (aiSynthesis) {
-                            aiSynthesis.cancel();
-                            speakAiText(text);
-                        }
-                    };
-                    contentDiv.appendChild(speakBtn);
-                }
-            }
-
-            messageDiv.appendChild(contentDiv);
-            aiChatMessages.appendChild(messageDiv);
-            aiChatMessages.scrollTop = aiChatMessages.scrollHeight;
-
-            return messageDiv;
-        }
-
-        // 调用 AI API
-        async function getAiResponse(history) {
-            let contextPrompt = '';
-            history.forEach((msg, index) => {
-                contextPrompt += `${index + 1}. ${msg.role}: ${msg.content}\n`;
-            });
-            contextPrompt += '\n请基于上述对话历史，回答用户的最后一个问题。确保你的回答与对话上下文相关。';
-
-            const encodedPrompt = encodeURIComponent(contextPrompt);
-            const url = `${AI_API_URL}${encodedPrompt}`;
-
-            const response = await fetch(url, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'text/plain',
-                },
-                timeout: 30000
-            });
-
-            if (!response.ok) {
-                throw new Error(`API 响应错误: ${response.status}`);
-            }
-
-            const text = await response.text();
-            return text.trim();
-        }
-
-        // 朗读文本
-        function speakAiText(text) {
-            if (!aiSynthesis) return;
-
-            aiSynthesis.cancel();
-            const utterance = new SpeechSynthesisUtterance(text);
-            utterance.lang = 'zh-CN';
-            utterance.rate = aiVoiceSettings.rate;
-            utterance.pitch = aiVoiceSettings.pitch;
-            utterance.volume = aiVoiceSettings.volume;
-
-            if (aiVoiceSettings.voiceURI) {
-                const selectedVoice = aiVoices.find(voice => voice.voiceURI === aiVoiceSettings.voiceURI);
-                if (selectedVoice) {
-                    utterance.voice = selectedVoice;
-                }
-            }
-
-            aiSynthesis.speak(utterance);
-        }
-
-        // 加载语音列表
-        function loadAiVoices() {
-            aiVoices = aiSynthesis.getVoices();
-            aiVoiceSelect.innerHTML = '';
-
-            const zhVoices = aiVoices.filter(voice => voice.lang.includes('zh'));
-
-            if (zhVoices.length === 0) {
-                aiVoices.forEach((voice, index) => {
-                    const option = document.createElement('option');
-                    option.value = voice.voiceURI;
-                    option.textContent = `${voice.name} (${voice.lang})`;
-                    aiVoiceSelect.appendChild(option);
-                });
-            } else {
-                zhVoices.forEach((voice) => {
-                    const option = document.createElement('option');
-                    option.value = voice.voiceURI;
-                    option.textContent = `${voice.name} (${voice.lang})`;
-                    aiVoiceSelect.appendChild(option);
-                });
-            }
-
-            if (aiVoiceSettings.voiceURI) {
-                aiVoiceSelect.value = aiVoiceSettings.voiceURI;
-            }
-        }
-
-        // 发送按钮事件
-        aiSendBtn.addEventListener('click', sendAiMessage);
-
-        // 回车发送
-        aiChatInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                sendAiMessage();
-            }
-        });
-
-        // 语音开关样式
-        aiVoiceToggle.addEventListener('change', function() {
-            const slider = this.nextElementSibling;
-            const dot = slider.querySelector('div');
-            if (this.checked) {
-                slider.classList.add('bg-purple-500');
-                dot.classList.add('translate-x-4');
-            } else {
-                slider.classList.remove('bg-purple-500');
-                dot.classList.remove('translate-x-4');
-            }
-        });
-
-        // 加载保存的设置
-        const savedAiVoiceSettings = localStorage.getItem('aiVoiceSettings');
-        if (savedAiVoiceSettings) {
-            aiVoiceSettings = JSON.parse(savedAiVoiceSettings);
-            aiRateRange.value = aiVoiceSettings.rate;
-            aiRateValue.textContent = aiVoiceSettings.rate.toFixed(1);
-            aiPitchRange.value = aiVoiceSettings.pitch;
-            aiPitchValue.textContent = aiVoiceSettings.pitch.toFixed(1);
-            aiVolumeRange.value = aiVoiceSettings.volume;
-            aiVolumeValue.textContent = aiVoiceSettings.volume.toFixed(1);
-        }
-
-        // 加载语音列表
-        if (aiSynthesis) {
-            loadAiVoices();
-            aiSynthesis.onvoiceschanged = loadAiVoices;
-        }
-
-        // 初始化欢迎消息
-        const welcomeMessage = '你好！我是 AI 学习助手，有什么可以帮助你的吗？';
-        aiConversationHistory.push({ role: 'AI', content: welcomeMessage });
     </script>
+    <!-- AI Chat Script -->
+    <script src="ai对话/script2-zhuye.js"></script>
 </body>
 </html>

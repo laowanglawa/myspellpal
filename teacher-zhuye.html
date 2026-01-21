@@ -137,6 +137,62 @@
                 background-color: #FEE2E2;
                 color: #991B1B;
             }
+            .glow-btn {
+                position: relative;
+                overflow: hidden;
+            }
+            .glow-btn::before {
+                content: '';
+                position: absolute;
+                top: -50%;
+                left: -50%;
+                width: 200%;
+                height: 200%;
+                background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 60%);
+                transform: scale(0);
+                transition: transform 0.6s ease-out;
+                pointer-events: none;
+            }
+            .glow-btn:hover::before {
+                transform: scale(1);
+            }
+            .glow-btn::after {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: -100%;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+                transition: left 0.5s ease;
+                pointer-events: none;
+            }
+            .glow-btn:hover::after {
+                left: 100%;
+            }
+            .glow-border {
+                position: relative;
+            }
+            .glow-border::before {
+                content: '';
+                position: absolute;
+                inset: -2px;
+                border-radius: inherit;
+                background: linear-gradient(45deg, #1E40AF, #3B82F6, #1E40AF);
+                background-size: 200% 200%;
+                animation: glow-animation 3s ease infinite;
+                opacity: 0;
+                transition: opacity 0.3s ease;
+                z-index: -1;
+            }
+            .glow-border:hover::before,
+            .glow-border.active::before {
+                opacity: 1;
+            }
+            @keyframes glow-animation {
+                0%, 100% { background-position: 0% 50%; }
+                50% { background-position: 100% 50%; }
+            }
         }
     </style>
 </head>
@@ -495,7 +551,7 @@
                                         <i class="fa fa-search text-gray-400"></i>
                                     </div>
                                 </div>
-                                <button id="add-class-btn" class="btn-primary flex items-center justify-center">
+                                <button id="add-class-btn" class="glow-btn btn-primary flex items-center justify-center">
                                     <i class="fa fa-plus mr-2"></i> 创建班级
                                 </button>
                             </div>
@@ -545,7 +601,7 @@
                                         <i class="fa fa-search text-gray-400"></i>
                                     </div>
                                 </div>
-                                <button id="add-student-btn" class="btn-primary flex items-center justify-center">
+                                <button id="add-student-btn" class="glow-btn btn-primary flex items-center justify-center">
                                     <i class="fa fa-plus mr-2"></i> 添加学生
                                 </button>
                             </div>
@@ -600,7 +656,7 @@
                                         <i class="fa fa-search text-gray-400"></i>
                                     </div>
                                 </div>
-                                <button id="add-grade-btn" class="btn-primary flex items-center justify-center">
+                                <button id="add-grade-btn" class="glow-btn btn-primary flex items-center justify-center">
                                     <i class="fa fa-plus mr-2"></i> 添加成绩
                                 </button>
                             </div>
@@ -656,7 +712,7 @@
                                 <div>
                                     <input type="date" class="input-field">
                                 </div>
-                                <button id="record-attendance-btn" class="btn-primary flex items-center justify-center">
+                                <button id="record-attendance-btn" class="glow-btn btn-primary flex items-center justify-center">
                                     <i class="fa fa-plus mr-2"></i> 记录出勤
                                 </button>
                             </div>
@@ -853,8 +909,8 @@
                             </div>
                         </div>
                         <div class="mt-8 flex justify-end">
-                            <button class="btn-secondary mr-3">取消</button>
-                            <button class="btn-primary">保存设置</button>
+                            <button class="glow-border btn-secondary mr-3 relative z-10">取消</button>
+                            <button class="glow-btn btn-primary">保存设置</button>
                         </div>
                     </div>
                 </div>
@@ -901,7 +957,7 @@
                         <button type="button" id="cancel-add-class" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-4 rounded mr-3">
                             取消
                         </button>
-                        <button type="submit" class="btn-primary">
+                        <button type="submit" class="glow-btn btn-primary">
                             创建班级
                         </button>
                     </div>
@@ -960,8 +1016,8 @@
                         </div>
                     </div>
                     <div class="mt-6 flex justify-end">
-                        <button type="button" id="cancel-add-student" class="btn-secondary mr-3">取消</button>
-                        <button type="submit" class="btn-primary">保存</button>
+                        <button type="button" id="cancel-add-student" class="glow-border btn-secondary mr-3 relative z-10">取消</button>
+                        <button type="submit" class="glow-btn btn-primary">保存</button>
                     </div>
                 </form>
             </div>
@@ -1023,8 +1079,8 @@
                         </div>
                     </div>
                     <div class="mt-6 flex justify-end">
-                        <button type="button" id="cancel-add-grade" class="btn-secondary mr-3">取消</button>
-                        <button type="submit" class="btn-primary">保存</button>
+                        <button type="button" id="cancel-add-grade" class="glow-border btn-secondary mr-3 relative z-10">取消</button>
+                        <button type="submit" class="glow-btn btn-primary">保存</button>
                     </div>
                 </form>
             </div>
@@ -1075,8 +1131,8 @@
                         </div>
                     </div>
                     <div class="mt-6 flex justify-end">
-                        <button type="button" id="cancel-record-attendance" class="btn-secondary mr-3">取消</button>
-                        <button type="submit" class="btn-primary">保存</button>
+                        <button type="button" id="cancel-record-attendance" class="glow-border btn-secondary mr-3 relative z-10">取消</button>
+                        <button type="submit" class="glow-btn btn-primary">保存</button>
                     </div>
                 </form>
             </div>
@@ -1118,8 +1174,8 @@
                         </div>
                     </div>
                     <div class="mt-6 flex justify-end">
-                        <button type="button" id="cancel-homework" class="btn-secondary mr-3">取消</button>
-                        <button type="submit" class="btn-primary">保存</button>
+                        <button type="button" id="cancel-homework" class="glow-border btn-secondary mr-3 relative z-10">取消</button>
+                        <button type="submit" class="glow-btn btn-primary">保存</button>
                     </div>
                 </form>
             </div>
@@ -1970,7 +2026,7 @@
                                 
                                 <div class="flex justify-between items-center mb-3">
                                     <h4 class="text-md font-medium text-gray-900">班级成员</h4>
-                                    <button id="assign-homework-btn" class="btn-primary text-sm" data-class-id="${classId}">
+                                    <button id="assign-homework-btn" class="glow-btn btn-primary text-sm" data-class-id="${classId}">
                                         <i class="fa fa-plus mr-1"></i> 布置作业
                                     </button>
                                 </div>

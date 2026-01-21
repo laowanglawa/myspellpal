@@ -49,7 +49,63 @@
                 @apply border border-gray-300 bg-white text-gray-700 font-medium py-2 px-6 rounded-lg transition-all duration-300 hover:bg-gray-50 hover:shadow-md active:scale-95;
             }
             
-            /* 暗色模式下的按钮样式 */
+            .glow-btn {
+                position: relative;
+                overflow: hidden;
+            }
+            .glow-btn::before {
+                content: '';
+                position: absolute;
+                top: -50%;
+                left: -50%;
+                width: 200%;
+                height: 200%;
+                background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 60%);
+                transform: scale(0);
+                transition: transform 0.6s ease-out;
+                pointer-events: none;
+            }
+            .glow-btn:hover::before {
+                transform: scale(1);
+            }
+            .glow-btn::after {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: -100%;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+                transition: left 0.5s ease;
+                pointer-events: none;
+            }
+            .glow-btn:hover::after {
+                left: 100%;
+            }
+            .glow-border {
+                position: relative;
+            }
+            .glow-border::before {
+                content: '';
+                position: absolute;
+                inset: -2px;
+                border-radius: inherit;
+                background: linear-gradient(45deg, #3B82F6, #10B981, #3B82F6);
+                background-size: 200% 200%;
+                animation: glow-animation 3s ease infinite;
+                opacity: 0;
+                transition: opacity 0.3s ease;
+                z-index: -1;
+            }
+            .glow-border:hover::before,
+            .glow-border.active::before {
+                opacity: 1;
+            }
+            @keyframes glow-animation {
+                0%, 100% { background-position: 0% 50%; }
+                50% { background-position: 100% 50%; }
+            }
+            
             .dark .btn-outline {
                 @apply border border-gray-700 bg-gray-800 text-gray-200 hover:bg-gray-700;
             }
@@ -77,7 +133,7 @@
                 <button id="themeToggle" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
                     <i class="fa fa-moon-o text-xl"></i>
                 </button>
-                <button id="homeBtn" class="flex items-center btn-outline text-sm">
+                <button id="homeBtn" class="glow-border flex items-center btn-outline text-sm relative z-10">
                     <i class="fa fa-home mr-2"></i> 首页
                 </button>
                 <!-- 用户账户区域 -->
@@ -138,7 +194,7 @@
             </div>
             
             <!-- 退出登录按钮 -->
-            <button id="logoutBtn" class="w-full btn-outline border-red-300 text-red-600 dark:text-red-400 dark:border-red-800 hover:bg-red-50 dark:hover:bg-red-900/30">
+            <button id="logoutBtn" class="glow-border w-full btn-outline border-red-300 text-red-600 dark:text-red-400 dark:border-red-800 hover:bg-red-50 dark:hover:bg-red-900/30 relative z-10">
                 <i class="fa fa-sign-out mr-2"></i> 退出登录
             </button>
         </div>
@@ -297,13 +353,13 @@
                 <div class="flex justify-between items-center">
                     <button 
                         id="hintBtn" 
-                        class="btn-outline text-sm hidden sm:flex items-center"
+                        class="glow-border btn-outline text-sm hidden sm:flex items-center relative z-10"
                     >
                         <i class="fa fa-lightbulb-o mr-2"></i> 提示
                     </button>
                     <button 
                         id="nextBtn" 
-                        class="btn-secondary w-full sm:w-auto hidden"
+                        class="glow-btn btn-secondary w-full sm:w-auto hidden"
                     >
                         <i class="fa fa-arrow-right mr-2"></i> 下一个单词
                     </button>
@@ -370,7 +426,7 @@
                 >
                 <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">设置后将立即应用于当前练习模式</p>
                 </div>
-                <button id="confirmWordCountBtn" class="w-full btn-primary">
+                <button id="confirmWordCountBtn" class="glow-btn w-full btn-primary">
                     确认设置
                 </button>
             </div>
@@ -415,13 +471,13 @@
             
             <!-- 重新登录按钮 -->
             <div class="mb-6">
-                <button id="logoutBtn" class="w-full btn-outline border-red-300 text-red-600 dark:text-red-400 dark:border-red-800 hover:bg-red-50 dark:hover:bg-red-900/30" onclick="confirmLogout()">
+                <button id="logoutBtn" class="glow-border w-full btn-outline border-red-300 text-red-600 dark:text-red-400 dark:border-red-800 hover:bg-red-50 dark:hover:bg-red-900/30 relative z-10" onclick="confirmLogout()">
                     <i class="fa fa-sign-out mr-2"></i> 重新登录
                 </button>
             </div>
             
             <div class="flex space-x-4">
-                <button id="applySettingsBtn" class="btn-primary flex-1" onclick="applySettings()">
+                <button id="applySettingsBtn" class="glow-btn btn-primary flex-1" onclick="applySettings()">
                     应用设置
                 </button>
             </div>
@@ -1074,7 +1130,7 @@
                     </div>
                     
                     <!-- 保存按钮 -->
-                    <button id="saveAccountSettingsBtn" class="w-full btn-primary">保存设置</button>
+                    <button id="saveAccountSettingsBtn" class="glow-btn w-full btn-primary">保存设置</button>
                 </div>
             </div>
         </div>`;
@@ -1798,14 +1854,37 @@
             updateStats();
         }
 
+        // API Key 轮换机制
+        const apiKeys = [
+            'pk_jwLa2gJZZZemeOFM',
+            'pk_tsBSE8jfYTAl25EO', 
+            'pk_TQMQQhD5C4MgMDax',
+            'pk_8ZWyR6OuxozuH2hC',
+            'pk_tOxTBmdbWVaXXp2o'
+        ];
+        let currentApiKeyIndex = 0;
+
+        // 获取当前API key
+        function getCurrentApiKey() {
+            return apiKeys[currentApiKeyIndex];
+        }
+
+        // 切换到下一个API key
+        function switchToNextApiKey() {
+            currentApiKeyIndex = (currentApiKeyIndex + 1) % apiKeys.length;
+            return getCurrentApiKey();
+        }
+
         // 生成单词相关图片
         function generateWordImage(word, useSentence = false) {
             // 显示加载状态
             elements.imageLoading.classList.remove('hidden');
             elements.wordImage.src = ''; // 清空当前图片
             
-            // 定义pollinations.ai API基础URL
-            const aiImageApi = 'https://image.pollinations.ai/prompt/';
+            // 使用最新的 Pollinations Unified API Endpoint
+            const aiImageApi = 'https://gen.pollinations.ai/image/';
+            const apiKey = getCurrentApiKey();
+            const model = 'turbo';
             
             // 选择用于生成图片的提示词
             let prompt;
@@ -1818,7 +1897,9 @@
             }
             
             // 构建完整的图片URL
-            const imageUrl = `${aiImageApi}${encodeURIComponent(prompt)}`;
+            // 使用最新的 API 格式: https://gen.pollinations.ai/image/{prompt}?key={key}&model={model}
+            // 移除随机种子，使用默认种子以保持一致性
+            const imageUrl = `${aiImageApi}${encodeURIComponent(prompt)}?model=${model}&key=${apiKey}&nologo=true`;
             
             // 直接设置图片URL
             elements.wordImage.onload = function() {
@@ -1826,20 +1907,25 @@
             };
             
             elements.wordImage.onerror = function() {
-                console.error('生成图片时出错，尝试重新生成...');
-                // 出错时再次尝试使用AI生成图片，但使用不同的提示词策略
-                let retryPrompt = useSentence ? word.word : word.definition;
-                const retryImageUrl = `${aiImageApi}${encodeURIComponent(retryPrompt)}&seed=${Date.now()}`;
+                console.error('生成图片时出错，尝试使用下一个API key...');
+                
+                // 尝试使用下一个API key
+                const nextApiKey = switchToNextApiKey();
+                const retryImageUrl = `${aiImageApi}${encodeURIComponent(prompt)}?model=${model}&key=${nextApiKey}&nologo=true`;
+                
                 elements.wordImage.onload = function() {
                     elements.imageLoading.classList.add('hidden');
+                    console.log(`使用新的API key成功生成图片: ${nextApiKey}`);
                 };
+                
                 elements.wordImage.onerror = function() {
-                    // 第二次失败时使用备用图片
-                    console.error('再次生成图片失败，使用备用图片');
+                    // 如果所有API key都失败了，使用备用图片
+                    console.error('所有API key都失败，使用备用图片');
                     elements.wordImage.src = `https://picsum.photos/800/450?random=${Date.now()}`;
                     elements.imageLoading.classList.add('hidden');
                 };
-                // 重试AI生成图片
+                
+                // 尝试使用新的API key重新生成图片
                 elements.wordImage.src = retryImageUrl;
             };
             

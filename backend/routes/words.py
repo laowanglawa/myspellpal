@@ -89,8 +89,8 @@ def get_random_word():
     except Exception as e:
         return jsonify({'success': False, 'message': f'获取随机单词失败: {str(e)}'}), 500
 
-# AI图片生成API
-AI_IMAGE_API = "https://image.pollinations.ai/prompt/"
+# AI图片生成API - 更新为 Unified API
+AI_IMAGE_API = "https://gen.pollinations.ai/image/"
 
 @words_bp.route('/image', methods=['GET'])
 def get_word_image():
@@ -109,8 +109,11 @@ def get_word_image():
         # URL编码提示词
         encoded_prompt = urllib.parse.quote(prompt)
         
-        # 构建完整的API请求URL
-        image_url = f"{AI_IMAGE_API}{encoded_prompt}"
+        # 构建完整的API请求URL，包含model和key，移除seed
+        api_key = 'pk_DP5LAoZLC1L258JS'
+        model = 'flux'
+        
+        image_url = f"{AI_IMAGE_API}{encoded_prompt}?model={model}&key={api_key}"
         
         # 直接返回图片URL，不进行验证
         return jsonify({

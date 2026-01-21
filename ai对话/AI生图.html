@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI生图 - Pollinations AI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3B82F6',
+                        secondary: '#10B981',
+                        warning: '#F59E0B',
+                        danger: '#EF4444',
+                        dark: '#1E293B',
+                        light: '#F8FAFC'
+                    }
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .btn-primary {
+                @apply bg-primary text-white font-medium py-2 px-6 rounded-lg transition-all duration-300 hover:bg-primary/90 hover:shadow-md active:scale-95;
+            }
+            .btn-secondary {
+                @apply bg-secondary text-white font-medium py-2 px-6 rounded-lg transition-all duration-300 hover:bg-secondary/90 hover:shadow-md active:scale-95;
+            }
+            .input-focus {
+                @apply focus:ring-2 focus:ring-primary/50 focus:border-primary focus:outline-none;
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-gray-900 dark:to-gray-800 text-dark dark:text-white">
+    <nav class="bg-white dark:bg-gray-800 shadow-md fixed w-full top-0 z-50">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <!-- <img src="backend/img/myspellpal.png" alt="MySpellPal" class="w-14 h-14 object-contain"> -->
+                <h1 class="text-xl font-bold text-primary">Pollinations AI生图</h1>
+            </div>
+            <div class="flex items-center space-x-4">
+                <button id="themeToggle" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                    <i class="fa fa-moon-o text-xl"></i>
+                </button>
+                <!-- <button id="homeBtn" class="flex items-center btn-outline text-sm">
+                    <i class="fa fa-home mr-2"></i> 首页
+                </button> -->
+            </div>
+        </div>
+    </nav>
+
+    <main class="container mx-auto px-4 pt-24 pb-16 max-w-5xl">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+                <h2 class="text-xl font-bold mb-6 flex items-center">
+                    <i class="fa fa-magic text-primary mr-2"></i>
+                    生成设置
+                </h2>
+
+                <div class="space-y-6">
+                    <div>
+                        <label class="block text-sm font-medium mb-2">提示词 (Prompt)</label>
+                        <textarea 
+                            id="promptInput" 
+                            class="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-lg dark:bg-gray-900 input-focus h-32 resize-none"
+                            placeholder="请输入图片描述，例如：一只可爱的小猫在花园里玩耍"
+                        ></textarea>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium mb-2">模型选择</label>
+                        <select id="modelSelect" class="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-lg dark:bg-gray-900 input-focus">
+                            <option value="turbo">Turbo (快速生成)</option>
+                            <option value="flux">Flux (高质量)</option>
+                            <option value="zimage">Zimage (创意风格)</option>
+                        </select>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium mb-2">宽度</label>
+                            <input 
+                                type="number" 
+                                id="widthInput" 
+                                value="1024" 
+                                min="256" 
+                                max="2048" 
+                                step="64"
+                                class="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-lg dark:bg-gray-900 input-focus"
+                            >
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2">高度</label>
+                            <input 
+                                type="number" 
+                                id="heightInput" 
+                                value="1024" 
+                                min="256" 
+                                max="2048" 
+                                step="64"
+                                class="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-lg dark:bg-gray-900 input-focus"
+                            >
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium mb-2">随机种子 (Seed)</label>
+                        <input 
+                            type="number" 
+                            id="seedInput" 
+                            placeholder="留空则随机生成"
+                            min="0" 
+                            max="4294967295"
+                            class="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-lg dark:bg-gray-900 input-focus"
+                        >
+                        <p class="text-xs text-gray-500 mt-1">相同的种子会生成相同的图片，留空则随机生成</p>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium mb-2">快速尺寸选择</label>
+                        <div class="flex flex-wrap gap-2">
+                            <button class="size-btn px-3 py-1 border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-sm" data-w="512" data-h="512">512x512</button>
+                            <button class="size-btn px-3 py-1 border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-sm" data-w="768" data-h="768">768x768</button>
+                            <button class="size-btn px-3 py-1 border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-sm" data-w="1024" data-h="1024">1024x1024</button>
+                            <button class="size-btn px-3 py-1 border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-sm" data-w="1024" data-h="768">1024x768</button>
+                            <button class="size-btn px-3 py-1 border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-sm" data-w="768" data-h="1024">768x1024</button>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center space-x-2">
+                        <input type="checkbox" id="nologoCheckbox" checked class="w-4 h-4 text-primary rounded">
+                        <label for="nologoCheckbox" class="text-sm">移除水印</label>
+                    </div>
+
+                    <button id="generateBtn" class="w-full btn-primary py-3 text-lg">
+                        <i class="fa fa-wand-magic-sparkles mr-2"></i> 生成图片
+                    </button>
+                </div>
+            </div>
+
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+                <h2 class="text-xl font-bold mb-6 flex items-center">
+                    <i class="fa fa-image text-secondary mr-2"></i>
+                    生成结果
+                </h2>
+
+                <div class="relative">
+                    <div id="imageContainer" class="aspect-square rounded-lg overflow-hidden border-2 border-gray-200 dark:border-gray-600 bg-gray-100 dark:bg-gray-900 flex items-center justify-center">
+                        <div id="placeholder" class="text-center text-gray-400">
+                            <i class="fa fa-image text-6xl mb-4"></i>
+                            <p>生成的图片将显示在这里</p>
+                        </div>
+                        <img id="generatedImage" class="w-full h-full object-contain hidden" alt="AI生成的图片">
+                        <div id="loadingSpinner" class="absolute inset-0 flex flex-col items-center justify-center bg-white/80 dark:bg-gray-900/80 hidden">
+                            <div class="w-16 h-16 border-4 border-primary/30 border-t-primary rounded-full animate-spin"></div>
+                            <p class="mt-4 text-gray-600 dark:text-gray-300">AI正在生成图片...</p>
+                        </div>
+                    </div>
+
+                    <div id="imageActions" class="mt-4 flex flex-wrap gap-2 hidden">
+                        <button id="downloadBtn" class="flex-1 btn-secondary">
+                            <i class="fa fa-download mr-2"></i> 下载图片
+                        </button>
+                        <button id="regenerateBtn" class="flex-1 btn-primary">
+                            <i class="fa fa-refresh mr-2"></i> 重新生成
+                        </button>
+                    </div>
+                </div>
+
+                <div id="imageInfo" class="mt-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg hidden">
+                    <h3 class="font-medium mb-2">图片信息</h3>
+                    <div class="text-sm text-gray-600 dark:text-gray-300 space-y-1">
+                        <p>提示词: <span id="infoPrompt"></span></p>
+                        <p>模型: <span id="infoModel"></span></p>
+                        <p>尺寸: <span id="infoSize"></span></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-8 bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+            <h2 class="text-xl font-bold mb-4 flex items-center">
+                <i class="fa fa-history text-warning mr-2"></i>
+                生成历史
+            </h2>
+            <div id="historyContainer" class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="text-center text-gray-400 col-span-full py-8">
+                    <i class="fa fa-clock-o text-4xl mb-2"></i>
+                    <p>暂无生成历史</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const API_KEY = 'pk_DP5LAoZLC1L258JS';
+        const API_ENDPOINT = 'https://gen.pollinations.ai/image/';
+
+        const elements = {
+            promptInput: document.getElementById('promptInput'),
+            modelSelect: document.getElementById('modelSelect'),
+            widthInput: document.getElementById('widthInput'),
+            heightInput: document.getElementById('heightInput'),
+            seedInput: document.getElementById('seedInput'),
+            nologoCheckbox: document.getElementById('nologoCheckbox'),
+            generateBtn: document.getElementById('generateBtn'),
+            imageContainer: document.getElementById('imageContainer'),
+            placeholder: document.getElementById('placeholder'),
+            generatedImage: document.getElementById('generatedImage'),
+            loadingSpinner: document.getElementById('loadingSpinner'),
+            imageActions: document.getElementById('imageActions'),
+            downloadBtn: document.getElementById('downloadBtn'),
+            regenerateBtn: document.getElementById('regenerateBtn'),
+            imageInfo: document.getElementById('imageInfo'),
+            infoPrompt: document.getElementById('infoPrompt'),
+            infoModel: document.getElementById('infoModel'),
+            infoSize: document.getElementById('infoSize'),
+            historyContainer: document.getElementById('historyContainer'),
+            themeToggle: document.getElementById('themeToggle'),
+            homeBtn: document.getElementById('homeBtn')
+        };
+
+        let currentImageUrl = '';
+        let currentPrompt = '';
+        let history = [];
+
+        function generateImage() {
+            const prompt = elements.promptInput.value.trim();
+            if (!prompt) {
+                alert('请输入提示词');
+                return;
+            }
+
+            const model = elements.modelSelect.value;
+            const width = elements.widthInput.value;
+            const height = elements.heightInput.value;
+            const seed = elements.seedInput.value;
+            const nologo = elements.nologoCheckbox.checked;
+
+            elements.placeholder.classList.add('hidden');
+            elements.generatedImage.classList.add('hidden');
+            elements.loadingSpinner.classList.remove('hidden');
+            elements.imageActions.classList.add('hidden');
+            elements.imageInfo.classList.add('hidden');
+            elements.generateBtn.disabled = true;
+            elements.generateBtn.innerHTML = '<i class="fa fa-spinner fa-spin mr-2"></i> 生成中...';
+
+            let imageUrl = `${API_ENDPOINT}${encodeURIComponent(prompt)}?model=${model}&key=${API_KEY}&width=${width}&height=${height}&nologo=${nologo}`;
+            
+            if (seed) {
+                imageUrl += `&seed=${seed}`;
+            }
+
+            elements.generatedImage.onload = function() {
+                elements.loadingSpinner.classList.add('hidden');
+                elements.generatedImage.classList.remove('hidden');
+                elements.imageActions.classList.remove('hidden');
+                elements.imageInfo.classList.remove('hidden');
+                elements.generateBtn.disabled = false;
+                elements.generateBtn.innerHTML = '<i class="fa fa-wand-magic-sparkles mr-2"></i> 生成图片';
+
+                currentImageUrl = imageUrl;
+                currentPrompt = prompt;
+
+                elements.infoPrompt.textContent = prompt;
+                elements.infoModel.textContent = model;
+                elements.infoSize.textContent = `${width}x${height}`;
+
+                addToHistory(imageUrl, prompt, model, width, height, seed);
+            };
+
+            elements.generatedImage.onerror = function() {
+                elements.loadingSpinner.classList.add('hidden');
+                elements.placeholder.classList.remove('hidden');
+                elements.generateBtn.disabled = false;
+                elements.generateBtn.innerHTML = '<i class="fa fa-wand-magic-sparkles mr-2"></i> 生成图片';
+                alert('生成图片失败，请重试');
+            };
+
+            elements.generatedImage.src = imageUrl;
+        }
+
+        function addToHistory(imageUrl, prompt, model, width, height, seed) {
+            const historyItem = {
+                url: imageUrl,
+                prompt: prompt,
+                model: model,
+                width: width,
+                height: height,
+                seed: seed,
+                timestamp: Date.now()
+            };
+
+            history.unshift(historyItem);
+            if (history.length > 8) {
+                history.pop();
+            }
+
+            renderHistory();
+        }
+
+        function renderHistory() {
+            if (history.length === 0) {
+                elements.historyContainer.innerHTML = `
+                    <div class="text-center text-gray-400 col-span-full py-8">
+                        <i class="fa fa-clock-o text-4xl mb-2"></i>
+                        <p>暂无生成历史</p>
+                    </div>
+                `;
+                return;
+            }
+
+            elements.historyContainer.innerHTML = history.map((item, index) => `
+                <div class="relative group cursor-pointer" onclick="loadFromHistory(${index})">
+                    <img src="${item.url}" alt="${item.prompt}" class="w-full aspect-square object-cover rounded-lg border-2 border-gray-200 dark:border-gray-600 group-hover:border-primary transition-all">
+                    <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center">
+                        <i class="fa fa-eye text-white text-2xl"></i>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function loadFromHistory(index) {
+            const item = history[index];
+            elements.promptInput.value = item.prompt;
+            elements.modelSelect.value = item.model;
+            elements.widthInput.value = item.width;
+            elements.heightInput.value = item.height;
+            elements.seedInput.value = item.seed || '';
+
+            elements.placeholder.classList.add('hidden');
+            elements.generatedImage.src = item.url;
+            elements.generatedImage.classList.remove('hidden');
+            elements.imageActions.classList.remove('hidden');
+            elements.imageInfo.classList.remove('hidden');
+
+            currentImageUrl = item.url;
+            currentPrompt = item.prompt;
+
+            elements.infoPrompt.textContent = item.prompt;
+            elements.infoModel.textContent = item.model;
+            elements.infoSize.textContent = `${item.width}x${item.height}`;
+        }
+
+        function downloadImage() {
+            if (!currentImageUrl) return;
+
+            const link = document.createElement('a');
+            link.href = currentImageUrl;
+            link.download = `ai-image-${Date.now()}.png`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function toggleTheme() {
+            document.documentElement.classList.toggle('dark');
+            const icon = elements.themeToggle.querySelector('i');
+            if (document.documentElement.classList.contains('dark')) {
+                icon.classList.remove('fa-moon-o');
+                icon.classList.add('fa-sun-o');
+            } else {
+                icon.classList.remove('fa-sun-o');
+                icon.classList.add('fa-moon-o');
+            }
+        }
+
+        elements.generateBtn.addEventListener('click', generateImage);
+        elements.downloadBtn.addEventListener('click', downloadImage);
+        elements.regenerateBtn.addEventListener('click', generateImage);
+        elements.themeToggle.addEventListener('click', toggleTheme);
+        elements.homeBtn.addEventListener('click', () => {
+            window.location.href = 'word-memorization.html';
+        });
+
+        document.querySelectorAll('.size-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const width = this.dataset.w;
+                const height = this.dataset.h;
+                elements.widthInput.value = width;
+                elements.heightInput.value = height;
+            });
+        });
+
+        elements.promptInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && e.ctrlKey) {
+                generateImage();
+            }
+        });
+    </script>
+</body>
+</html>

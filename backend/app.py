@@ -55,8 +55,12 @@ def get_word_image():
         # URL编码提示词
         encoded_prompt = urllib.parse.quote(prompt)
         
-        # 使用pollinations.ai API生成图片
-        image_url = f"https://image.pollinations.ai/prompt/{encoded_prompt}"
+        # 使用pollinations.ai Unified API生成图片
+        api_key = 'pk_DP5LAoZLC1L258JS'
+        model = 'flux'
+        
+        # 更新为 gen.pollinations.ai/image/，移除 seed 参数
+        image_url = f"https://gen.pollinations.ai/image/{encoded_prompt}?model={model}&key={api_key}"
         
         return jsonify({'success': True, 'image_url': image_url}), 200
     
