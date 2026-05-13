@@ -202,6 +202,51 @@
 
     <!-- 主要内容 -->
     <main class="container mx-auto px-4 pt-24 pb-16 max-w-4xl">
+        <!-- 作业进度区域 -->
+        <div id="assignmentProgressSection" class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mb-8 hidden">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
+                <div class="flex items-center mb-4 md:mb-0">
+                    <div class="w-12 h-12 bg-primary/20 dark:bg-primary/30 rounded-full flex items-center justify-center mr-4">
+                        <i class="fa fa-book text-primary text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 id="assignmentTitle" class="text-lg font-bold text-gray-800 dark:text-white">当前作业</h3>
+                        <p id="assignmentDeadline" class="text-sm text-gray-500 dark:text-gray-400">截止时间：--</p>
+                    </div>
+                </div>
+                <button id="exitAssignmentBtn" class="glow-border btn-outline text-sm px-4 py-2 relative z-10">
+                    <i class="fa fa-times mr-1"></i> 退出作业
+                </button>
+            </div>
+            
+            <!-- 进度条 -->
+            <div class="mb-4">
+                <div class="flex justify-between items-center mb-2">
+                    <span class="text-sm text-gray-600 dark:text-gray-300">完成进度</span>
+                    <span id="assignmentProgressText" class="text-sm font-medium text-primary">0 / 0</span>
+                </div>
+                <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 overflow-hidden">
+                    <div id="assignmentProgressBar" class="bg-gradient-to-r from-primary to-secondary h-3 rounded-full transition-all duration-500 ease-out" style="width: 0%"></div>
+                </div>
+            </div>
+            
+            <!-- 统计信息 -->
+            <div class="grid grid-cols-3 gap-4 text-center">
+                <div class="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-3">
+                    <p class="text-2xl font-bold text-green-600 dark:text-green-400" id="assignmentCorrect">0</p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">正确</p>
+                </div>
+                <div class="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-3">
+                    <p class="text-2xl font-bold text-red-600 dark:text-red-400" id="assignmentIncorrect">0</p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">错误</p>
+                </div>
+                <div class="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-3">
+                    <p class="text-2xl font-bold text-primary" id="assignmentAccuracy">0%</p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">正确率</p>
+                </div>
+            </div>
+        </div>
+        
         <!-- 顶部统计信息 -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
             <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-6 card-hover">
@@ -925,6 +970,186 @@
             return urlParams.get('mode');
         }
         
+        // 从URL获取作业ID
+        function getAssignmentIdFromUrl() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('assignmentId');
+        }
+        
+        // 作业相关变量
+        let currentAssignment = null;
+        let assignmentProgress = null;
+        
+        // 初始化作业进度
+        function initAssignmentProgress() {
+            const assignmentId = getAssignmentIdFromUrl();
+            const currentUser = localStorage.getItem('currentUser');
+            
+            if (!assignmentId || !currentUser) {
+                return false;
+            }
+            
+            // 获取作业信息
+            const assignmentData = localStorage.getItem('currentAssignment');
+            if (!assignmentData) {
+                return false;
+            }
+            
+            currentAssignment = JSON.parse(assignmentData);
+            
+            // 确认作业ID匹配
+            if (currentAssignment.id !== assignmentId) {
+                return false;
+            }
+            
+            // 获取作业进度
+            const progressKey = `assignmentProgress_${currentUser}_${assignmentId}`;
+            const progressData = localStorage.getItem(progressKey);
+            
+            if (progressData) {
+                assignmentProgress = JSON.parse(progressData);
+            } else {
+                assignmentProgress = {
+                    completed: 0,
+                    total: currentAssignment.wordCount || 10,
+                    correct: 0,
+                    incorrect: 0,
+                    startTime: new Date().toISOString()
+                };
+                localStorage.setItem(progressKey, JSON.stringify(assignmentProgress));
+            }
+            
+            // 显示作业进度区域
+            const progressSection = document.getElementById('assignmentProgressSection');
+            if (progressSection) {
+                progressSection.classList.remove('hidden');
+            }
+            
+            // 更新UI
+            updateAssignmentProgressUI();
+            
+            // 设置作业标题和截止时间
+            const titleEl = document.getElementById('assignmentTitle');
+            const deadlineEl = document.getElementById('assignmentDeadline');
+            
+            if (titleEl && currentAssignment.name) {
+                titleEl.textContent = currentAssignment.name;
+            }
+            
+            if (deadlineEl && currentAssignment.deadline) {
+                const deadline = new Date(currentAssignment.deadline);
+                deadlineEl.textContent = `截止时间：${deadline.toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })}`;
+            }
+            
+            // 设置单词数量为作业要求的数量
+            if (currentAssignment.wordCount) {
+                wordCountLimit = currentAssignment.wordCount;
+                localStorage.setItem('wordCountLimit', wordCountLimit);
+            }
+            
+            // 设置词库级别
+            if (currentAssignment.wordLevel) {
+                localStorage.setItem(`wordlist_${currentUser}`, currentAssignment.wordLevel);
+            }
+            
+            return true;
+        }
+        
+        // 更新作业进度UI
+        function updateAssignmentProgressUI() {
+            if (!assignmentProgress) return;
+            
+            const progressText = document.getElementById('assignmentProgressText');
+            const progressBar = document.getElementById('assignmentProgressBar');
+            const correctEl = document.getElementById('assignmentCorrect');
+            const incorrectEl = document.getElementById('assignmentIncorrect');
+            const accuracyEl = document.getElementById('assignmentAccuracy');
+            
+            const total = assignmentProgress.total || 1;
+            const completed = assignmentProgress.completed || 0;
+            const correct = assignmentProgress.correct || 0;
+            const incorrect = assignmentProgress.incorrect || 0;
+            const percentage = Math.round((completed / total) * 100);
+            const accuracy = completed > 0 ? Math.round((correct / completed) * 100) : 0;
+            
+            if (progressText) progressText.textContent = `${completed} / ${total}`;
+            if (progressBar) progressBar.style.width = `${percentage}%`;
+            if (correctEl) correctEl.textContent = correct;
+            if (incorrectEl) incorrectEl.textContent = incorrect;
+            if (accuracyEl) accuracyEl.textContent = `${accuracy}%`;
+        }
+        
+        // 保存作业进度
+        function saveAssignmentProgress(isCorrect) {
+            if (!currentAssignment || !assignmentProgress) return;
+            
+            const currentUser = localStorage.getItem('currentUser');
+            const progressKey = `assignmentProgress_${currentUser}_${currentAssignment.id}`;
+            
+            assignmentProgress.completed += 1;
+            if (isCorrect) {
+                assignmentProgress.correct += 1;
+            } else {
+                assignmentProgress.incorrect += 1;
+            }
+            
+            localStorage.setItem(progressKey, JSON.stringify(assignmentProgress));
+            updateAssignmentProgressUI();
+            
+            // 检查是否完成作业
+            if (assignmentProgress.completed >= assignmentProgress.total) {
+                completeAssignment();
+            }
+        }
+        
+        // 完成作业
+        function completeAssignment() {
+            if (!currentAssignment) return;
+            
+            const currentUser = localStorage.getItem('currentUser');
+            
+            // 更新作业状态为已完成
+            const homeworkStatusKey = `homeworkStatus_${currentUser}`;
+            const homeworkStatus = JSON.parse(localStorage.getItem(homeworkStatusKey) || '{}');
+            homeworkStatus[currentAssignment.id] = 'completed';
+            localStorage.setItem(homeworkStatusKey, JSON.stringify(homeworkStatus));
+            
+            // 更新教师端的作业完成情况
+            const statusKey = `homeworkStatus_${currentAssignment.id}`;
+            const statusList = JSON.parse(localStorage.getItem(statusKey) || '[]');
+            
+            let studentStatus = statusList.find(s => s.studentId === currentUser);
+            if (!studentStatus) {
+                studentStatus = {
+                    studentId: currentUser,
+                    studentName: currentUser,
+                    status: '已提交',
+                    submitTime: new Date().toISOString(),
+                    score: `${assignmentProgress.correct}/${assignmentProgress.total}`
+                };
+                statusList.push(studentStatus);
+            } else {
+                studentStatus.status = '已提交';
+                studentStatus.submitTime = new Date().toISOString();
+                studentStatus.score = `${assignmentProgress.correct}/${assignmentProgress.total}`;
+            }
+            
+            localStorage.setItem(statusKey, JSON.stringify(statusList));
+            
+            // 清除当前作业
+            localStorage.removeItem('currentAssignment');
+            
+            // 显示完成提示
+            showToast('恭喜！作业已完成！', 'success');
+        }
+        
+        // 退出作业
+        function exitAssignment() {
+            if (confirm('确定要退出作业吗？当前进度已保存。')) {
+                window.location.href = 'zhuye.html';
+            }
+        }
+        
         // 检查用户登录状态
         function checkLoginStatus() {
             const currentUser = localStorage.getItem('currentUser');
@@ -944,6 +1169,9 @@
         function initApp() {
             // 检查用户登录状态
             checkLoginStatus();
+            
+            // 初始化作业进度（如果有作业ID）
+            initAssignmentProgress();
             
             // 设置初始统计数据
             elements.totalWords.textContent = wordList.length;
@@ -967,6 +1195,12 @@
             
             // 初始化练习
             initPractice();
+            
+            // 添加退出作业按钮事件
+            const exitBtn = document.getElementById('exitAssignmentBtn');
+            if (exitBtn) {
+                exitBtn.addEventListener('click', exitAssignment);
+            }
             
             // 添加事件监听
             elements.checkBtn.addEventListener('click', checkAnswer);
@@ -1856,11 +2090,14 @@
 
         // API Key 轮换机制
         const apiKeys = [
-            'pk_jwLa2gJZZZemeOFM',
-            'pk_tsBSE8jfYTAl25EO', 
-            'pk_TQMQQhD5C4MgMDax',
-            'pk_8ZWyR6OuxozuH2hC',
-            'pk_tOxTBmdbWVaXXp2o'
+            'sk-oyplizxjtasrmnhtbmpgojrmtphmsnbwlqtwwuchvxzvaozg',
+            'sk-sbqczwtinydigdjokxnqbyvdhsklyudnjayaceetvgisdeln',
+            'sk-dyryysesjvyjqgzmjiojebxuuawwquhpssollfxcedddgesp',
+            'sk-mmkeldxldcjmxqjvoyvadhmiqkmyfqdxwleiyuhvqvzohujo',
+            'sk-qxcmrvtktvlxqiuotnrhhnrkfblzxqgpmixgqrxbaedlxoyx',
+            'sk-artagmeblzftvqjgyfcgibucjhdbaaulhyxvermlxwgqzsmp',
+            'sk-yzzlboojmixoxwzcmjidllvquxboeioajmgbqxltmsnaknga',
+            'sk-libittighwffaviqiwxmfpqupzrkjarlyiydznvwtvrwvtti'
         ];
         let currentApiKeyIndex = 0;
 
@@ -1875,61 +2112,78 @@
             return getCurrentApiKey();
         }
 
+        let currentImageAbortController = null;
+
         // 生成单词相关图片
         function generateWordImage(word, useSentence = false) {
-            // 显示加载状态
+            if (currentImageAbortController) {
+                currentImageAbortController.abort();
+            }
+            currentImageAbortController = new AbortController();
+            
             elements.imageLoading.classList.remove('hidden');
-            elements.wordImage.src = ''; // 清空当前图片
+            elements.wordImage.src = '';
             
-            // 使用最新的 Pollinations Unified API Endpoint
-            const aiImageApi = 'https://gen.pollinations.ai/image/';
-            const apiKey = getCurrentApiKey();
-            const model = 'turbo';
+            const aiImageApi = 'https://api.siliconflow.cn/v1/images/generations';
+            const model = 'Kwai-Kolors/Kolors';
+            const signal = currentImageAbortController.signal;
             
-            // 选择用于生成图片的提示词
             let prompt;
             if (useSentence && word.example) {
-                // 如果是重新生成图片且有例句，则使用英文例句作为提示词
                 prompt = word.example.replace('____',word.word);
             } else {
-                // 默认使用单词本身作为提示词
                 prompt = word.word;
             }
             
-            // 构建完整的图片URL
-            // 使用最新的 API 格式: https://gen.pollinations.ai/image/{prompt}?key={key}&model={model}
-            // 移除随机种子，使用默认种子以保持一致性
-            const imageUrl = `${aiImageApi}${encodeURIComponent(prompt)}?model=${model}&key=${apiKey}&nologo=true`;
+            function tryGenerateImage() {
+                const apiKey = getCurrentApiKey();
+                
+                fetch(aiImageApi, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + apiKey
+                    },
+                    body: JSON.stringify({
+                        model: model,
+                        prompt: prompt,
+                        image_size: '1024x1024'
+                    }),
+                    signal: signal
+                })
+                .then(function(response) {
+                    if (!response.ok) {
+                        throw new Error('API请求失败: ' + response.status);
+                    }
+                    return response.json();
+                })
+                .then(function(data) {
+                    if (data.images && data.images.length > 0 && data.images[0].url) {
+                        elements.wordImage.onload = function() {
+                            elements.imageLoading.classList.add('hidden');
+                        };
+                        elements.wordImage.onerror = function() {
+                            console.error('图片加载失败，切换API key重试');
+                            switchToNextApiKey();
+                            tryGenerateImage();
+                        };
+                        elements.wordImage.src = data.images[0].url;
+                    } else {
+                        throw new Error('API返回数据中没有图片URL');
+                    }
+                })
+                .catch(function(error) {
+                    if (error.name === 'AbortError') {
+                        console.log('图片生成请求已取消');
+                        return;
+                    }
+                    console.error('生成图片时出错:', error.message, '切换API key重试');
+                    switchToNextApiKey();
+                    tryGenerateImage();
+                });
+            }
             
-            // 直接设置图片URL
-            elements.wordImage.onload = function() {
-                elements.imageLoading.classList.add('hidden');
-            };
-            
-            elements.wordImage.onerror = function() {
-                console.error('生成图片时出错，尝试使用下一个API key...');
-                
-                // 尝试使用下一个API key
-                const nextApiKey = switchToNextApiKey();
-                const retryImageUrl = `${aiImageApi}${encodeURIComponent(prompt)}?model=${model}&key=${nextApiKey}&nologo=true`;
-                
-                elements.wordImage.onload = function() {
-                    elements.imageLoading.classList.add('hidden');
-                    console.log(`使用新的API key成功生成图片: ${nextApiKey}`);
-                };
-                
-                elements.wordImage.onerror = function() {
-                    // 如果所有API key都失败了，使用备用图片
-                    console.error('所有API key都失败，使用备用图片');
-                    elements.wordImage.src = `https://picsum.photos/800/450?random=${Date.now()}`;
-                    elements.imageLoading.classList.add('hidden');
-                };
-                
-                // 尝试使用新的API key重新生成图片
-                elements.wordImage.src = retryImageUrl;
-            };
-            
-            elements.wordImage.src = imageUrl;
+            tryGenerateImage();
         }
         
         // 显示当前单词
@@ -1973,6 +2227,12 @@
             const isCorrect = userAnswer === currentWord.word.toLowerCase();
             
             appState.totalAttempted++;
+            
+            // 保存作业进度
+            if (currentAssignment) {
+                saveAssignmentProgress(isCorrect);
+            }
+            
             if (isCorrect) {
                 appState.correctCount++;
                 showCorrectResult();

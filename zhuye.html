@@ -236,6 +236,12 @@
                 <button id="myClassBtn" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors" title="我的班级">
                     <i class="fa fa-users text-xl"></i>
                 </button>
+                <button id="translateBtn" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors" title="翻译">
+                    <i class="fa fa-language text-xl"></i>
+                </button>
+                <button id="voicePracticeBtn" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors" title="语音朗读">
+                    <i class="fa fa-microphone text-xl"></i>
+                </button>
                 <button id="aiChatBtn" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors" title="AI 助手">
                     <i class="fa fa-comments text-xl"></i>
                 </button>
@@ -386,6 +392,95 @@
             </button>
         </div>
     </div> -->
+
+    <!-- 翻译模态框 -->
+    <div id="translateModal" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center hidden">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl w-full max-w-2xl max-h-[85vh] overflow-hidden transform transition-all scale-95 opacity-0 mx-4">
+            <div class="flex justify-between items-center p-4 border-b border-gray-200 dark:border-gray-700">
+                <h3 class="text-xl font-bold text-primary flex items-center gap-2">
+                    <i class="fa fa-language"></i> 中英翻译
+                </h3>
+                <button id="closeTranslateModal" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 text-2xl">
+                    <i class="fa fa-times"></i>
+                </button>
+            </div>
+            <div class="p-6">
+                <div class="flex items-center justify-center gap-4 mb-6">
+                    <span id="sourceLangLabel" class="text-sm font-medium text-gray-600 dark:text-gray-300">中文</span>
+                    <button id="swapLangBtn" class="p-2 rounded-full bg-primary/10 hover:bg-primary/20 text-primary transition-colors" title="交换语言">
+                        <i class="fa fa-exchange"></i>
+                    </button>
+                    <span id="targetLangLabel" class="text-sm font-medium text-gray-600 dark:text-gray-300">英文</span>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <textarea id="translateInput" class="w-full h-40 p-4 rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white resize-none focus:ring-2 focus:ring-primary/50 focus:border-primary focus:outline-none" placeholder="输入要翻译的文本..."></textarea>
+                        <div class="flex justify-between items-center mt-2">
+                            <div class="flex items-center gap-2">
+                                <button id="speakInputBtn" class="text-xs text-primary hover:text-primary/80 transition-colors">
+                                    <i class="fa fa-volume-up mr-1"></i>朗读
+                                </button>
+                                <select id="translateVoiceSelect" class="text-xs border border-gray-300 dark:border-gray-600 rounded px-1 py-0.5 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 max-w-[140px] outline-none focus:border-primary">
+                                    <option value="">加载中...</option>
+                                </select>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <span id="inputCharCount" class="text-xs text-gray-400">0 字</span>
+                                <button id="clearInputBtn" class="text-xs text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
+                                    <i class="fa fa-trash-o mr-1"></i>清空
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <div id="translateOutput" class="w-full h-40 p-4 rounded-lg border border-gray-200 dark:border-gray-600 bg-blue-50 dark:bg-gray-900 text-gray-900 dark:text-white overflow-y-auto">
+                            <span class="text-gray-400 dark:text-gray-500">翻译结果将显示在这里</span>
+                        </div>
+                        <div class="flex justify-between items-center mt-2">
+                            <button id="speakOutputBtn" class="text-xs text-primary hover:text-primary/80 transition-colors">
+                                <i class="fa fa-volume-up mr-1"></i>朗读
+                            </button>
+                            <div class="flex items-center gap-3">
+                                <span id="outputCharCount" class="text-xs text-gray-400"></span>
+                                <button id="copyOutputBtn" class="text-xs text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
+                                    <i class="fa fa-copy mr-1"></i>复制
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button id="doTranslateBtn" class="w-full mt-4 py-3 bg-primary text-white rounded-lg font-medium shadow transition-all hover:shadow-lg hover:bg-primary/90 flex items-center justify-center gap-2">
+                    <i class="fa fa-language"></i> 翻译
+                </button>
+                <div id="translateHistory" class="mt-6">
+                    <div class="flex justify-between items-center mb-3">
+                        <h4 class="text-sm font-medium text-gray-500 dark:text-gray-400">翻译历史</h4>
+                        <button id="clearHistoryBtn" class="text-xs text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
+                            <i class="fa fa-trash-o mr-1"></i>清空历史
+                        </button>
+                    </div>
+                    <div id="translateHistoryList" class="space-y-2 max-h-48 overflow-y-auto">
+                        <p class="text-center text-gray-400 dark:text-gray-500 text-sm py-4">暂无翻译历史</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 语音朗读模态框 -->
+    <div id="voicePracticeModal" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center hidden">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl w-full max-w-4xl max-h-[90vh] overflow-hidden transform transition-all scale-95 opacity-0">
+            <div class="flex justify-between items-center p-4 border-b border-gray-200 dark:border-gray-700">
+                <h3 class="text-xl font-bold text-primary">🎤 语音朗读练习</h3>
+                <button id="closeVoicePracticeModal" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 text-2xl">
+                    <i class="fa fa-times"></i>
+                </button>
+            </div>
+            <div class="h-[calc(90vh-60px)] overflow-auto">
+                <iframe id="voicePracticeIframe" src="" class="w-full h-full border-0"></iframe>
+            </div>
+        </div>
+    </div>
 
     <!-- AI 对话模态框 -->
     <div id="aiChatModal" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center hidden">
@@ -3416,6 +3511,10 @@
                     return;
                 }
                 
+                // 获取当前用户的作业完成状态
+                const currentUser = localStorage.getItem('currentUser');
+                const homeworkStatus = JSON.parse(localStorage.getItem(`homeworkStatus_${currentUser}`) || '{}');
+                
                 // 创建作业列表
                 const assignmentListUl = document.createElement('ul');
                 assignmentListUl.className = 'space-y-3';
@@ -3423,10 +3522,19 @@
                 assignments.forEach(assignment => {
                     const assignmentLi = document.createElement('li');
                     
-                    // 判断作业状态
+                    // 兼容教师端数据格式：title -> name, deadline -> dueDate, content -> description
+                    const assignmentName = assignment.name || assignment.title || '未命名作业';
+                    const assignmentDescText = assignment.description || assignment.content || '';
+                    const dueDateStr = assignment.dueDate || assignment.deadline;
+                    const dueDate = dueDateStr ? new Date(dueDateStr) : null;
+                    
+                    // 检查作业是否已完成
+                    const isCompleted = homeworkStatus[assignment.id] === 'completed';
+                    const assignmentStatus = isCompleted ? 'completed' : 'pending';
+                    
+                    // 判断作业是否过期
                     const now = new Date();
-                    const dueDate = new Date(assignment.dueDate);
-                    const isExpired = assignment.status === 'pending' && dueDate < now;
+                    const isExpired = !isCompleted && dueDate && dueDate < now;
                     
                     // 设置列表项样式
                     assignmentLi.className = `p-4 rounded-lg ${isExpired ? 'bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800' : 'bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600'}`;
@@ -3434,27 +3542,31 @@
                     // 作业标题
                     const assignmentTitle = document.createElement('div');
                     assignmentTitle.className = 'font-medium text-gray-800 dark:text-gray-200 mb-1';
-                    assignmentTitle.textContent = assignment.name;
+                    assignmentTitle.textContent = assignmentName;
                     
                     // 作业描述
                     const assignmentDesc = document.createElement('div');
                     assignmentDesc.className = 'text-sm text-gray-600 dark:text-gray-400 mb-2';
-                    assignmentDesc.textContent = assignment.description;
+                    assignmentDesc.textContent = assignmentDescText;
                     
                     // 单词信息
                     const wordInfo = document.createElement('div');
                     wordInfo.className = 'flex items-center text-sm text-gray-500 dark:text-gray-300 mb-2';
                     
                     const wordCountSpan = document.createElement('span');
-                    wordCountSpan.textContent = `${assignment.wordCount}个单词`;
+                    wordCountSpan.textContent = assignment.wordCount ? `${assignment.wordCount}个单词` : '';
                     wordCountSpan.className = 'mr-3';
                     
                     const wordLevelSpan = document.createElement('span');
-                    wordLevelSpan.textContent = getLevelName(assignment.wordLevel);
-                    wordLevelSpan.className = `px-2 py-0.5 rounded-full text-xs ${assignment.wordLevel === 'beginner' ? 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300' : assignment.wordLevel === 'intermediate' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300' : 'bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300'}`;
+                    if (assignment.wordLevel) {
+                        wordLevelSpan.textContent = getLevelName(assignment.wordLevel);
+                        wordLevelSpan.className = `px-2 py-0.5 rounded-full text-xs ${assignment.wordLevel === 'beginner' ? 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300' : assignment.wordLevel === 'intermediate' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300' : 'bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300'}`;
+                    }
                     
                     wordInfo.appendChild(wordCountSpan);
-                    wordInfo.appendChild(wordLevelSpan);
+                    if (assignment.wordLevel) {
+                        wordInfo.appendChild(wordLevelSpan);
+                    }
                     
                     // 截止日期
                     const dueDateDiv = document.createElement('div');
@@ -3465,14 +3577,18 @@
                     
                     const dueDateText = document.createElement('span');
                     dueDateText.className = `${isExpired ? 'text-red-600 dark:text-red-400' : 'text-gray-500 dark:text-gray-400'}`;
-                    dueDateText.textContent = `截止日期: ${dueDate.toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' })}`;
+                    if (dueDate) {
+                        dueDateText.textContent = `截止日期: ${dueDate.toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })}`;
+                    } else {
+                        dueDateText.textContent = '无截止日期';
+                    }
                     
                     dueDateDiv.appendChild(dueDateIcon);
                     dueDateDiv.appendChild(dueDateText);
                     
                     // 状态标签
                     const statusLabel = document.createElement('span');
-                    if (assignment.status === 'completed') {
+                    if (isCompleted) {
                         statusLabel.className = 'inline-block bg-green-100 dark:bg-green-900/50 text-green-800 dark:text-green-300 text-xs px-3 py-1 rounded-full mr-2';
                         statusLabel.textContent = '已完成';
                     } else if (isExpired) {
@@ -3485,9 +3601,9 @@
                     
                     // 操作按钮
                     const actionBtn = document.createElement('button');
-                    actionBtn.className = `px-3 py-1 text-xs rounded-full font-medium ${assignment.status === 'completed' ? 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 cursor-not-allowed' : 'bg-primary hover:bg-primary/90 text-white'}`;
-                    actionBtn.textContent = assignment.status === 'completed' ? '已完成' : '开始完成';
-                    actionBtn.disabled = assignment.status === 'completed';
+                    actionBtn.className = `px-3 py-1 text-xs rounded-full font-medium ${isCompleted ? 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 cursor-not-allowed' : 'bg-primary hover:bg-primary/90 text-white'}`;
+                    actionBtn.textContent = isCompleted ? '已完成' : '开始完成';
+                    actionBtn.disabled = isCompleted;
                     
                     if (!actionBtn.disabled) {
                         actionBtn.addEventListener('click', () => {
@@ -3517,11 +3633,41 @@
             
             // 完成作业
             function completeAssignment(assignment) {
-                // 这里可以实现作业完成的逻辑，例如跳转到朗读页面
-                showToast('开始完成作业', 'success');
+                const currentUser = localStorage.getItem('currentUser');
+                if (!currentUser) {
+                    showToast('请先登录', 'error');
+                    return;
+                }
+                
+                // 保存当前作业信息到localStorage
+                const currentAssignment = {
+                    id: assignment.id,
+                    name: assignment.name || assignment.title,
+                    wordCount: assignment.wordCount || 10,
+                    wordLevel: assignment.wordLevel || 'beginner',
+                    deadline: assignment.deadline || assignment.dueDate
+                };
+                localStorage.setItem('currentAssignment', JSON.stringify(currentAssignment));
+                
+                // 初始化作业进度
+                const assignmentProgressKey = `assignmentProgress_${currentUser}_${assignment.id}`;
+                const existingProgress = localStorage.getItem(assignmentProgressKey);
+                if (!existingProgress) {
+                    const progress = {
+                        completed: 0,
+                        total: currentAssignment.wordCount,
+                        correct: 0,
+                        incorrect: 0,
+                        startTime: new Date().toISOString()
+                    };
+                    localStorage.setItem(assignmentProgressKey, JSON.stringify(progress));
+                }
+                
+                // 关闭作业列表弹窗
                 closeAssignmentsModal();
-                // 实际项目中可以跳转到对应的朗读页面，并传递作业参数
-                // window.location.href = `read.html?assignmentId=${assignment.id}`;
+                
+                // 跳转到单词背诵页面
+                window.location.href = `word-memorization.html?assignmentId=${assignment.id}&mode=recite`;
             }
         
         // 关闭班级功能弹窗
@@ -3732,6 +3878,17 @@
             
             // 显示成功通知
             showToast(`成功加入班级：${classes[classIndex].name}`, 'success');
+            
+            // 关闭加入班级弹窗
+            const myClassModal = document.getElementById('myClassModal');
+            if (myClassModal) {
+                const myClassModalContent = myClassModal.querySelector('div');
+                myClassModalContent.classList.remove('scale-100', 'opacity-100');
+                myClassModalContent.classList.add('scale-95', 'opacity-0');
+                setTimeout(() => {
+                    myClassModal.classList.add('hidden');
+                }, 300);
+            }
             
             // 显示班级功能弹窗
             const classFeatureModal = document.getElementById('classFeatureModal');
@@ -5024,6 +5181,284 @@
 
         // 页面加载完成后初始化应用
         document.addEventListener('DOMContentLoaded', initApp);
+
+        // 翻译功能
+        const translateBtn = document.getElementById('translateBtn');
+        const translateModal = document.getElementById('translateModal');
+        const closeTranslateModal = document.getElementById('closeTranslateModal');
+        const swapLangBtn = document.getElementById('swapLangBtn');
+        const translateInput = document.getElementById('translateInput');
+        const translateOutput = document.getElementById('translateOutput');
+        const doTranslateBtn = document.getElementById('doTranslateBtn');
+        const clearInputBtn = document.getElementById('clearInputBtn');
+        const copyOutputBtn = document.getElementById('copyOutputBtn');
+        const inputCharCount = document.getElementById('inputCharCount');
+        const outputCharCount = document.getElementById('outputCharCount');
+        const sourceLangLabel = document.getElementById('sourceLangLabel');
+        const targetLangLabel = document.getElementById('targetLangLabel');
+        const clearHistoryBtn = document.getElementById('clearHistoryBtn');
+        const translateHistoryList = document.getElementById('translateHistoryList');
+        const speakInputBtn = document.getElementById('speakInputBtn');
+        const speakOutputBtn = document.getElementById('speakOutputBtn');
+
+        let translateDirection = 'zh2en';
+        let translateHistoryData = JSON.parse(localStorage.getItem('translateHistory') || '[]');
+        let isTranslating = false;
+        var translateSynth = window.speechSynthesis;
+
+        function loadTranslateVoices() {
+            var voices = translateSynth.getVoices();
+            var voiceSelect = document.getElementById('translateVoiceSelect');
+            if (!voiceSelect) return;
+            voiceSelect.innerHTML = '';
+            voices.forEach(function(voice) {
+                var option = document.createElement('option');
+                option.value = voice.name;
+                option.textContent = voice.name + ' (' + voice.lang + ')';
+                voiceSelect.appendChild(option);
+            });
+        }
+
+        translateSynth.onvoiceschanged = loadTranslateVoices;
+
+        function speakTranslateText(text, lang) {
+            if (!text) return;
+            
+            translateSynth.cancel();
+            
+            var utterance = new SpeechSynthesisUtterance(text);
+            var selectedVoice = translateSynth.getVoices().find(function(v) { return v.name === document.getElementById('translateVoiceSelect').value; });
+            if (selectedVoice) utterance.voice = selectedVoice;
+            utterance.lang = lang;
+            utterance.rate = 0.9;
+            utterance.pitch = 1;
+            utterance.volume = 1;
+            
+            translateSynth.speak(utterance);
+        }
+
+        speakInputBtn.addEventListener('click', function() {
+            var text = translateInput.value.trim();
+            if (!text) return;
+            var lang = translateDirection === 'zh2en' ? 'zh-CN' : 'en-US';
+            speakTranslateText(text, lang);
+        });
+
+        speakOutputBtn.addEventListener('click', function() {
+            var text = translateOutput.innerText.trim();
+            if (!text || text === '翻译结果将显示在这里') return;
+            var lang = translateDirection === 'zh2en' ? 'en-US' : 'zh-CN';
+            speakTranslateText(text, lang);
+        });
+
+        const TRANSLATE_API_URL = 'https://open.bigmodel.cn/api/paas/v4/chat/completions';
+        const TRANSLATE_MODEL = 'glm-4.5-flash';
+        const TRANSLATE_API_KEY = 'aaf20d23b2f842ebb9a75252d0a1dbda.N4ten0XTQKkNQ0K4';
+
+        function renderTranslateHistory() {
+            if (translateHistoryData.length === 0) {
+                translateHistoryList.innerHTML = '<p class="text-center text-gray-400 dark:text-gray-500 text-sm py-4">暂无翻译历史</p>';
+                return;
+            }
+            translateHistoryList.innerHTML = translateHistoryData.slice(0, 10).map(function(item) {
+                return '<div class="p-3 rounded-lg bg-gray-50 dark:bg-gray-700/50 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors" onclick="useTranslateHistory(\'' + item.source.replace(/'/g, "\\'") + '\',\'' + item.target.replace(/'/g, "\\'") + '\')">' +
+                    '<div class="text-sm text-gray-700 dark:text-gray-300 truncate">' + item.source + '</div>' +
+                    '<div class="text-xs text-primary mt-1 truncate">' + item.target + '</div>' +
+                    '<div class="text-xs text-gray-400 mt-1">' + item.direction + '</div>' +
+                '</div>';
+            }).join('');
+        }
+
+        window.useTranslateHistory = function(source, target) {
+            translateInput.value = source;
+            translateOutput.innerHTML = '<span class="text-gray-900 dark:text-white">' + target + '</span>';
+            inputCharCount.textContent = source.length + ' 字';
+            outputCharCount.textContent = target.length + ' 字';
+        };
+
+        translateBtn.addEventListener('click', function() {
+            translateModal.classList.remove('hidden');
+            setTimeout(function() {
+                var modalContent = translateModal.querySelector('div');
+                if (modalContent) {
+                    modalContent.classList.remove('scale-95', 'opacity-0');
+                    modalContent.classList.add('scale-100', 'opacity-100');
+                }
+            }, 10);
+            renderTranslateHistory();
+        });
+
+        closeTranslateModal.addEventListener('click', function() {
+            var modalContent = translateModal.querySelector('div');
+            if (modalContent) {
+                modalContent.classList.remove('scale-100', 'opacity-100');
+                modalContent.classList.add('scale-95', 'opacity-0');
+                setTimeout(function() {
+                    translateModal.classList.add('hidden');
+                }, 300);
+            }
+        });
+
+        translateModal.addEventListener('click', function(e) {
+            if (e.target === translateModal) {
+                closeTranslateModal.click();
+            }
+        });
+
+        swapLangBtn.addEventListener('click', function() {
+            if (translateDirection === 'zh2en') {
+                translateDirection = 'en2zh';
+                sourceLangLabel.textContent = '英文';
+                targetLangLabel.textContent = '中文';
+            } else {
+                translateDirection = 'zh2en';
+                sourceLangLabel.textContent = '中文';
+                targetLangLabel.textContent = '英文';
+            }
+            var currentInput = translateInput.value;
+            var currentOutput = translateOutput.innerText;
+            if (currentOutput && currentOutput !== '翻译结果将显示在这里') {
+                translateInput.value = currentOutput;
+                translateOutput.innerHTML = '<span class="text-gray-900 dark:text-white">' + currentInput + '</span>';
+                inputCharCount.textContent = currentOutput.length + ' 字';
+                outputCharCount.textContent = currentInput.length + ' 字';
+            }
+        });
+
+        translateInput.addEventListener('input', function() {
+            inputCharCount.textContent = translateInput.value.length + ' 字';
+        });
+
+        clearInputBtn.addEventListener('click', function() {
+            translateInput.value = '';
+            translateOutput.innerHTML = '<span class="text-gray-400 dark:text-gray-500">翻译结果将显示在这里</span>';
+            inputCharCount.textContent = '0 字';
+            outputCharCount.textContent = '';
+        });
+
+        copyOutputBtn.addEventListener('click', function() {
+            var text = translateOutput.innerText;
+            if (text && text !== '翻译结果将显示在这里') {
+                navigator.clipboard.writeText(text).then(function() {
+                    copyOutputBtn.innerHTML = '<i class="fa fa-check mr-1"></i>已复制';
+                    setTimeout(function() {
+                        copyOutputBtn.innerHTML = '<i class="fa fa-copy mr-1"></i>复制';
+                    }, 2000);
+                });
+            }
+        });
+
+        clearHistoryBtn.addEventListener('click', function() {
+            translateHistoryData = [];
+            localStorage.setItem('translateHistory', '[]');
+            renderTranslateHistory();
+        });
+
+        doTranslateBtn.addEventListener('click', async function() {
+            var text = translateInput.value.trim();
+            if (!text) return;
+            if (isTranslating) return;
+
+            isTranslating = true;
+            doTranslateBtn.disabled = true;
+            doTranslateBtn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> 翻译中...';
+            translateOutput.innerHTML = '<span class="text-gray-400 dark:text-gray-500">正在翻译...</span>';
+
+            var systemPrompt = translateDirection === 'zh2en'
+                ? '你是一个专业的中英翻译器。请将用户输入的中文翻译成英文。只返回翻译结果，不要添加任何解释或额外内容。保持原文的语气和风格。'
+                : '你是一个专业的英中翻译器。请将用户输入的英文翻译成中文。只返回翻译结果，不要添加任何解释或额外内容。保持原文的语气和风格。';
+
+            try {
+                var response = await fetch(TRANSLATE_API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + TRANSLATE_API_KEY
+                    },
+                    body: JSON.stringify({
+                        model: TRANSLATE_MODEL,
+                        messages: [
+                            { role: 'system', content: systemPrompt },
+                            { role: 'user', content: text }
+                        ],
+                        temperature: 0.3,
+                        max_tokens: 1000
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error('翻译请求失败: ' + response.status);
+                }
+
+                var data = await response.json();
+                var result = data.choices && data.choices[0] && data.choices[0].message
+                    ? data.choices[0].message.content.trim()
+                    : '翻译失败，请重试';
+
+                translateOutput.innerHTML = '<span class="text-gray-900 dark:text-white">' + result + '</span>';
+                outputCharCount.textContent = result.length + ' 字';
+
+                translateHistoryData.unshift({
+                    source: text,
+                    target: result,
+                    direction: translateDirection === 'zh2en' ? '中→英' : '英→中',
+                    time: new Date().toLocaleTimeString()
+                });
+                if (translateHistoryData.length > 20) translateHistoryData.pop();
+                localStorage.setItem('translateHistory', JSON.stringify(translateHistoryData));
+                renderTranslateHistory();
+
+            } catch (error) {
+                translateOutput.innerHTML = '<span class="text-red-500">翻译失败: ' + error.message + '</span>';
+            } finally {
+                isTranslating = false;
+                doTranslateBtn.disabled = false;
+                doTranslateBtn.innerHTML = '<i class="fa fa-language"></i> 翻译';
+            }
+        });
+
+        translateInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                doTranslateBtn.click();
+            }
+        });
+
+        // 语音朗读模态框功能
+        const voicePracticeBtn = document.getElementById('voicePracticeBtn');
+        const voicePracticeModal = document.getElementById('voicePracticeModal');
+        const closeVoicePracticeModal = document.getElementById('closeVoicePracticeModal');
+        const voicePracticeIframe = document.getElementById('voicePracticeIframe');
+
+        voicePracticeBtn.addEventListener('click', function() {
+            voicePracticeModal.classList.remove('hidden');
+            voicePracticeIframe.src = '功能/语音识别第二稿/public/aivoice.html';
+            setTimeout(() => {
+                const modalContent = voicePracticeModal.querySelector('div');
+                if (modalContent) {
+                    modalContent.classList.remove('scale-95', 'opacity-0');
+                    modalContent.classList.add('scale-100', 'opacity-100');
+                }
+            }, 10);
+        });
+
+        closeVoicePracticeModal.addEventListener('click', function() {
+            const modalContent = voicePracticeModal.querySelector('div');
+            if (modalContent) {
+                modalContent.classList.remove('scale-100', 'opacity-100');
+                modalContent.classList.add('scale-95', 'opacity-0');
+                setTimeout(() => {
+                    voicePracticeModal.classList.add('hidden');
+                    voicePracticeIframe.src = '';
+                }, 300);
+            }
+        });
+
+        voicePracticeModal.addEventListener('click', function(e) {
+            if (e.target === voicePracticeModal) {
+                closeVoicePracticeModal.click();
+            }
+        });
 
         // AI 对话功能
         const aiChatBtn = document.getElementById('aiChatBtn');

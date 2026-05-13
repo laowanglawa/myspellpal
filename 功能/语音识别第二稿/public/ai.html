@@ -1,0 +1,1789 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 交流助手</title>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .chat-container {
+            width: 100%;
+            max-width: 960px;
+            height: 90vh;
+            max-height: 960px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            backdrop-filter: blur(10px);
+        }
+
+        .chat-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 20px 20px 0 0;
+            text-align: center;
+            position: relative;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 10px;
+        }
+
+        .header-title {
+            flex: 1;
+        }
+
+        .chat-header h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .chat-header p {
+            font-size: 14px;
+            opacity: 0.9;
+            font-weight: 400;
+        }
+
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .toggles-container {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .voice-toggle {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .thinking-toggle {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 26px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            width: 59px;
+            top: 0;
+            left: -6px;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: 0.4s;
+            border-radius: 34px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: 0.4s;
+            border-radius: 50%;
+        }
+
+        .toggle-switch input:checked + .toggle-slider {
+            background-color: #4CAF50;
+        }
+
+        .toggle-switch input:checked + .toggle-slider:before {
+            transform: translateX(33px);
+        }
+
+        .toggle-label {
+            font-size: 14px;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .bot-message .message-content > div {
+            line-height: 1.6;
+        }
+
+        .bot-message .message-content h1,
+        .bot-message .message-content h2,
+        .bot-message .message-content h3,
+        .bot-message .message-content h4,
+        .bot-message .message-content h5,
+        .bot-message .message-content h6 {
+            margin-top: 16px;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .bot-message .message-content h1 {
+            font-size: 1.5em;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 8px;
+        }
+
+        .bot-message .message-content h2 {
+            font-size: 1.3em;
+            border-bottom: 1px solid #e0e0e0;
+            padding-bottom: 6px;
+        }
+
+        .bot-message .message-content h3 {
+            font-size: 1.1em;
+        }
+
+        .bot-message .message-content p {
+            margin: 8px 0;
+        }
+
+        .bot-message .message-content ul,
+        .bot-message .message-content ol {
+            margin: 8px 0;
+            padding-left: 20px;
+        }
+
+        .bot-message .message-content ul {
+            list-style-type: disc;
+        }
+
+        .bot-message .message-content ol {
+            list-style-type: decimal;
+        }
+
+        .bot-message .message-content li {
+            margin: 4px 0;
+        }
+
+        .bot-message .message-content code {
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+
+        .bot-message .message-content pre {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 12px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 12px 0;
+        }
+
+        .bot-message .message-content pre code {
+            background: none;
+            color: inherit;
+            padding: 0;
+            border-radius: 0;
+        }
+
+        .bot-message .message-content blockquote {
+            border-left: 4px solid #667eea;
+            padding-left: 12px;
+            margin: 12px 0;
+            color: #666;
+            font-style: italic;
+        }
+
+        .bot-message .message-content a {
+            color: #667eea;
+            text-decoration: none;
+            border-bottom: 1px solid transparent;
+            transition: border-color 0.2s;
+        }
+
+        .bot-message .message-content a:hover {
+            border-bottom-color: #667eea;
+        }
+
+        .bot-message .message-content table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 12px 0;
+        }
+
+        .bot-message .message-content th,
+        .bot-message .message-content td {
+            border: 1px solid #e0e0e0;
+            padding: 8px 12px;
+            text-align: left;
+        }
+
+        .bot-message .message-content th {
+            background: rgba(102, 126, 234, 0.1);
+            font-weight: 600;
+        }
+
+        .bot-message .message-content tr:nth-child(even) {
+            background: rgba(0, 0, 0, 0.02);
+        }
+
+        .bot-message .message-content hr {
+            border: none;
+            border-top: 1px solid #e0e0e0;
+            margin: 16px 0;
+        }
+
+        .bot-message .message-content img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin: 8px 0;
+        }
+
+        .bot-message .message-content strong {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .bot-message .message-content em {
+            font-style: italic;
+            color: #555;
+        }
+
+        .model-badge {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+            margin-top: 5px;
+        }
+
+        .settings-section {
+            margin-bottom: 24px;
+        }
+
+        .settings-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .settings-section h4 {
+            font-size: 14px;
+            font-weight: 600;
+            color: #667eea;
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #667eea;
+        }
+
+        .setting-item input[type="number"] {
+            flex: 1;
+            padding: 8px 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.3s;
+            max-width: 100px;
+        }
+
+        .setting-item input[type="number"]:focus {
+            border-color: #667eea;
+        }
+
+        .settings-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            font-size: 24px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .settings-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: rotate(90deg);
+        }
+
+        .settings-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1000;
+        }
+
+        .settings-modal.show {
+            display: block;
+        }
+
+        .settings-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+        }
+
+        .settings-modal-content {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.9);
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            width: 90%;
+            max-width: 450px;
+            max-height: 80vh;
+            overflow: hidden;
+            opacity: 0;
+            transition: all 0.3s ease-out;
+        }
+
+        .settings-modal.show .settings-modal-content {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .settings-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 24px;
+            border-bottom: 1px solid #e0e0e0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .settings-modal-header h3 {
+            font-size: 18px;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .settings-modal-body {
+            padding: 24px;
+            max-height: calc(80vh - 140px);
+            overflow-y: auto;
+        }
+
+        .settings-modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            padding: 16px 24px;
+            border-top: 1px solid #e0e0e0;
+            background: #f8f9fa;
+        }
+
+        .modal-btn {
+            padding: 10px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .modal-btn-cancel {
+            background: #f0f0f0;
+            color: #666;
+        }
+
+        .modal-btn-cancel:hover {
+            background: #e0e0e0;
+            color: #333;
+        }
+
+        .modal-btn-save {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .modal-btn-save:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .modal-btn:active {
+            transform: translateY(0);
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+
+        .close-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .setting-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .setting-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .setting-item label {
+            font-size: 14px;
+            color: #333;
+            font-weight: 500;
+            min-width: 60px;
+        }
+
+        .setting-item input[type="range"] {
+            flex: 1;
+            margin: 0 10px;
+            height: 6px;
+            -webkit-appearance: none;
+            background: #e0e0e0;
+            border-radius: 3px;
+            outline: none;
+        }
+
+        .setting-item input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .setting-item input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+
+        .setting-value {
+            min-width: 40px;
+            text-align: right;
+            font-size: 14px;
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .setting-item select {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #333;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .setting-item select:focus {
+            border-color: #667eea;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .chat-messages::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .chat-messages::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb {
+            background: #667eea;
+            border-radius: 4px;
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb:hover {
+            background: #5a6fd8;
+        }
+
+        .message {
+            display: flex;
+            max-width: 85%;
+            flex-direction: column;
+        }
+
+        .user-message {
+            align-self: flex-end;
+        }
+
+        .bot-message {
+            align-self: flex-start;
+        }
+
+        .message-content {
+            padding: 12px 18px;
+            border-radius: 18px;
+            line-height: 1.5;
+            font-size: 15px;
+            position: relative;
+            word-wrap: break-word;
+        }
+
+        .user-message .message-content {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .bot-message .message-content {
+            background: #f1f3f4;
+            color: #333;
+            border-bottom-left-radius: 4px;
+        }
+
+        .speak-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            padding: 4px 8px;
+            margin-left: 10px;
+            opacity: 0.6;
+            transition: opacity 0.2s;
+            display: inline-block;
+            vertical-align: middle;
+        }
+
+        .speak-btn:hover {
+            opacity: 1;
+            transform: scale(1.1);
+        }
+
+        .speak-btn:active {
+            transform: scale(0.95);
+        }
+
+        .chat-footer {
+            padding: 20px;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .input-container {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+        }
+
+        #userInput {
+            flex: 1;
+            padding: 15px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 25px;
+            font-size: 15px;
+            outline: none;
+            transition: all 0.3s ease;
+            resize: none;
+            max-height: 120px;
+            overflow-y: auto;
+        }
+
+        #userInput:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        #sendBtn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 25px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 80px;
+        }
+
+        #sendBtn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        #sendBtn:active {
+            transform: translateY(0);
+        }
+
+        #sendBtn.stop-mode {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a5a 100%);
+        }
+
+        #sendBtn.stop-mode:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.3);
+        }
+
+        .loading {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .loading::after {
+            content: '';
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .chat-container {
+                height: 90vh;
+                max-height: none;
+                border-radius: 15px;
+            }
+            
+            .chat-header h1 {
+                font-size: 20px;
+            }
+            
+            .message {
+                max-width: 95%;
+            }
+            
+            .message-content {
+                font-size: 15px;
+                padding: 10px 15px;
+            }
+            
+            #userInput {
+                font-size: 14px;
+                padding: 12px 18px;
+            }
+            
+            #sendBtn {
+                padding: 12px 20px;
+                font-size: 14px;
+            }
+        }
+
+        .message-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 4px;
+            font-size: 0.8rem;
+            color: #666;
+            padding: 0 4px;
+        }
+
+        .role-label {
+            font-weight: bold;
+            margin-right: 8px;
+            opacity: 0.8;
+        }
+
+        .pagination {
+            display: inline-flex;
+            align-items: center;
+            gap: 2px;
+            font-size: 0.75rem;
+            color: #888;
+            user-select: none;
+            background: rgba(0,0,0,0.05);
+            padding: 0 4px;
+            border-radius: 4px;
+            margin-right: 8px;
+        }
+
+        .pagination button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: inherit;
+            padding: 2px 6px;
+            font-weight: bold;
+            font-size: 1rem;
+            line-height: 1;
+            display: flex;
+            align-items: center;
+        }
+
+        .pagination button:hover {
+            color: #333;
+            background-color: rgba(0,0,0,0.1);
+            border-radius: 3px;
+        }
+
+        .pagination button:disabled {
+            opacity: 0.2;
+            cursor: default;
+        }
+
+        .pagination span {
+            margin: 0 4px;
+            font-family: monospace;
+        }
+
+        .user-message .message-header {
+            flex-direction: row-reverse;
+            color: rgba(255,255,255,0.9);
+        }
+
+        .user-message .pagination {
+            background: rgba(255,255,255,0.2);
+            color: white;
+        }
+
+        .user-message .pagination button:hover {
+            background: rgba(255,255,255,0.3);
+            color: white;
+        }
+
+        .edit-btn, .regen-btn {
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.2s, background-color 0.2s;
+            font-size: 0.8rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-left: 8px;
+            background-color: #f0f0f0;
+            color: #333;
+        }
+
+        .message:hover .edit-btn,
+        .message:hover .regen-btn {
+            opacity: 1;
+        }
+
+        .edit-btn:hover, .regen-btn:hover {
+            background-color: #e0e0e0;
+            color: #000;
+        }
+
+        .user-message .edit-btn:hover {
+            background-color: rgba(255,255,255,0.2);
+        }
+
+        .message.editing {
+            width: 90%; 
+            max-width: 90%;
+        }
+
+        .edit-area {
+            width: 100%;
+            margin-top: 8px;
+        }
+
+        .edit-area textarea {
+            width: 100%;
+            min-height: 100px;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            font-family: inherit;
+            font-size: 1rem;
+            line-height: 1.5;
+            resize: vertical;
+            box-sizing: border-box;
+            background-color: #fff;
+            color: #333;
+            display: block;
+        }
+
+        .edit-area textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .edit-actions {
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+            margin-top: 8px;
+        }
+
+        .edit-actions button {
+            padding: 6px 12px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            border-radius: 4px;
+            border: none;
+            font-weight: 500;
+        }
+
+        .btn-save {
+            background-color: #2ecc71;
+            color: white;
+        }
+
+        .btn-regen {
+            background-color: #3498db;
+            color: white;
+        }
+
+        .btn-cancel {
+            background-color: #95a5a6;
+            color: white;
+        }
+
+        .token-stats {
+            font-size: 0.75rem;
+            color: #888;
+            margin-top: 4px;
+            text-align: right;
+            padding-right: 8px;
+        }
+        .user-message .token-stats {
+            color: rgba(255,255,255,0.7);
+        }
+
+        .thinking-box {
+            background-color: #f1f5ff;
+            border-left: 3px solid #697dd6;
+            padding: 10px 12px;
+            margin-bottom: 6px;
+            font-size: 0.92em;
+            color: #555;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .thinking-header {
+            font-weight: 600;
+            font-style: normal;
+            margin-bottom: 4px;
+            font-size: 1em;
+            text-transform: none;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
+            color: #667eea;
+        }
+
+        .thinking-arrow {
+            margin-right: 8px;
+            font-size: 0.8em;
+            transition: transform 0.3s ease;
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            line-height: 16px;
+            text-align: center;
+        }
+
+        .thinking-arrow.collapsed {
+            transform: rotate(-90deg);
+        }
+
+        .thinking-content {
+            transition: max-height 0.3s ease-out, opacity 0.3s ease-out;
+            overflow: hidden;
+            max-height: none;
+            opacity: 1;
+        }
+
+        .thinking-content.collapsed {
+            max-height: 0;
+            opacity: 0;
+        }
+
+        .thinking-content p {
+            margin: 6px 0;
+            line-height: 1.5;
+        }
+
+        .thinking-content code {
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <header class="chat-header">
+            <div class="header-content">
+                <div class="header-title">
+                    <h1>AI 交流助手</h1>
+                    <span class="model-badge">GLM-4.5 Flash</span>
+                </div>
+                <div class="header-controls">
+                    <div class="toggles-container">
+                        <div class="voice-toggle">
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="voiceToggle">
+                                <span class="toggle-slider"></span>
+                            </label>
+                            <span class="toggle-label">语音朗读</span>
+                        </div>
+                        <div class="thinking-toggle">
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="thinkingToggle">
+                                <span class="toggle-slider"></span>
+                            </label>
+                            <span class="toggle-label">深度思考</span>
+                        </div>
+                    </div>
+                    <button class="settings-btn" id="aiChatSettingsBtn" title="设置">⚙️</button>
+                </div>
+            </div>
+        </header>
+        
+        <div class="settings-modal" id="aiChatSettingsModal">
+            <div class="settings-modal-overlay" id="aiChatSettingsOverlay"></div>
+            <div class="settings-modal-content">
+                <div class="settings-modal-header">
+                    <h3>设置</h3>
+                    <button class="close-btn" id="aiChatCloseSettings">✕</button>
+                </div>
+                <div class="settings-modal-body">
+                    <div class="settings-section">
+                        <h4>AI 参数</h4>
+                        <div class="setting-item">
+                            <label>温度</label>
+                            <input type="range" id="aiChatTemperatureRange" min="0" max="2" step="0.1" value="0.7">
+                            <span class="setting-value" id="aiChatTemperatureValue">0.7</span>
+                        </div>
+                        <div class="setting-item">
+                            <label>最大输出</label>
+                            <input type="number" id="aiChatMaxTokensInput" min="100" max="10000" step="100" value="3000">
+                            <span class="setting-value">tokens</span>
+                        </div>
+                        <div class="setting-item">
+                            <label>可编辑输出</label>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="aiChatEditableOutputToggle">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="settings-section">
+                        <h4>语音设置</h4>
+                        <div class="setting-item">
+                            <label>语速</label>
+                            <input type="range" id="aiChatRateRange" min="0.5" max="2" step="0.1" value="1">
+                            <span class="setting-value" id="aiChatRateValue">1.0</span>
+                        </div>
+                        <div class="setting-item">
+                            <label>音调</label>
+                            <input type="range" id="aiChatPitchRange" min="0.5" max="2" step="0.1" value="1">
+                            <span class="setting-value" id="aiChatPitchValue">1.0</span>
+                        </div>
+                        <div class="setting-item">
+                            <label>音量</label>
+                            <input type="range" id="aiChatVolumeRange" min="0" max="1" step="0.1" value="1">
+                            <span class="setting-value" id="aiChatVolumeValue">1.0</span>
+                        </div>
+                        <div class="setting-item">
+                            <label>语音选择</label>
+                            <select id="aiChatVoiceSelect">
+                                <option value="">加载中...</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="settings-modal-footer">
+                    <button class="modal-btn modal-btn-cancel" id="aiChatCancelSettings">取消</button>
+                    <button class="modal-btn modal-btn-save" id="aiChatSaveSettings">保存</button>
+                </div>
+            </div>
+        </div>
+        <main class="chat-messages" id="chatMessages">
+        </main>
+        <footer class="chat-footer">
+            <div class="input-container">
+                <input type="text" id="userInput" placeholder="输入你的问题或消息..." autocomplete="off">
+                <button id="sendBtn" data-original-text="发送">发送</button>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        const chatMessages = document.getElementById('chatMessages');
+        const userInput = document.getElementById('userInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const voiceToggle = document.getElementById('voiceToggle');
+        const settingsBtn = document.getElementById('aiChatSettingsBtn');
+        const settingsModal = document.getElementById('aiChatSettingsModal');
+        const settingsOverlay = document.getElementById('aiChatSettingsOverlay');
+        const closeSettings = document.getElementById('aiChatCloseSettings');
+        const cancelSettings = document.getElementById('aiChatCancelSettings');
+        const saveSettingsBtn = document.getElementById('aiChatSaveSettings');
+
+        const rateRange = document.getElementById('aiChatRateRange');
+        const pitchRange = document.getElementById('aiChatPitchRange');
+        const volumeRange = document.getElementById('aiChatVolumeRange');
+        const rateValue = document.getElementById('aiChatRateValue');
+        const pitchValue = document.getElementById('aiChatPitchValue');
+        const volumeValue = document.getElementById('aiChatVolumeValue');
+        const voiceSelect = document.getElementById('aiChatVoiceSelect');
+
+        const temperatureRange = document.getElementById('aiChatTemperatureRange');
+        const temperatureValue = document.getElementById('aiChatTemperatureValue');
+        const maxTokensInput = document.getElementById('aiChatMaxTokensInput');
+        const editableOutputToggle = document.getElementById('aiChatEditableOutputToggle');
+        const thinkingToggle = document.getElementById('thinkingToggle');
+
+        const API_BASE_URL = 'https://open.bigmodel.cn/api/paas/v4/chat/completions';
+        const MODEL_NAME = 'glm-4.5-flash';
+        const API_KEY = 'aaf20d23b2f842ebb9a75252d0a1dbda.N4ten0XTQKkNQ0K4';
+
+        let nodes = {};
+        const ROOT_ID = 'root';
+
+        let isGenerating = false;
+        let abortController = null;
+
+        const synthesis = window.speechSynthesis;
+        let currentUtterance = null;
+        let voices = [];
+
+        let voiceSettings = {
+            rate: 1.0,
+            pitch: 1.0,
+            volume: 1.0,
+            voiceURI: ''
+        };
+
+        let aiSettings = {
+            temperature: 0.7,
+            maxTokens: 3000,
+            editableOutput: false,
+            thinkingEnabled: false
+        };
+
+        let tempSettings = {
+            rate: 1.0,
+            pitch: 1.0,
+            volume: 1.0,
+            voiceURI: '',
+            temperature: 0.7,
+            maxTokens: 3000,
+            editableOutput: false,
+            thinkingEnabled: false
+        };
+
+        function initTree() {
+            nodes = {};
+            nodes[ROOT_ID] = {
+                id: ROOT_ID,
+                role: 'system',
+                content: '',
+                parentId: null,
+                childrenIds: [],
+                selectedChildId: null
+            };
+        }
+
+        function init() {
+            initTree();
+            
+            sendBtn.addEventListener('click', handleSendOrStop);
+            userInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    handleSendOrStop();
+                }
+            });
+            
+            settingsBtn.addEventListener('click', openSettings);
+            closeSettings.addEventListener('click', closeSettingsModal);
+            settingsOverlay.addEventListener('click', closeSettingsModal);
+            cancelSettings.addEventListener('click', closeSettingsModal);
+            saveSettingsBtn.addEventListener('click', saveAndCloseSettings);
+            
+            temperatureRange.addEventListener('input', (e) => {
+                tempSettings.temperature = parseFloat(e.target.value);
+                temperatureValue.textContent = tempSettings.temperature.toFixed(1);
+            });
+            
+            maxTokensInput.addEventListener('input', (e) => {
+                tempSettings.maxTokens = parseInt(e.target.value);
+            });
+            
+            editableOutputToggle.addEventListener('change', (e) => {
+                tempSettings.editableOutput = e.target.checked;
+            });
+            
+            thinkingToggle.addEventListener('change', (e) => {
+                aiSettings.thinkingEnabled = e.target.checked;
+                localStorage.setItem('thinkingEnabled', e.target.checked);
+                renderConversation();
+            });
+            
+            rateRange.addEventListener('input', (e) => {
+                tempSettings.rate = parseFloat(e.target.value);
+                rateValue.textContent = tempSettings.rate.toFixed(1);
+            });
+            
+            pitchRange.addEventListener('input', (e) => {
+                tempSettings.pitch = parseFloat(e.target.value);
+                pitchValue.textContent = tempSettings.pitch.toFixed(1);
+            });
+            
+            volumeRange.addEventListener('input', (e) => {
+                tempSettings.volume = parseFloat(e.target.value);
+                volumeValue.textContent = tempSettings.volume.toFixed(1);
+            });
+            
+            voiceSelect.addEventListener('change', (e) => {
+                tempSettings.voiceURI = e.target.value;
+            });
+            
+            loadSettings();
+            
+            if (!synthesis) {
+                console.warn('浏览器不支持语音合成功能');
+                voiceToggle.disabled = true;
+                voiceToggle.parentElement.style.opacity = '0.5';
+            } else {
+                loadVoices();
+                synthesis.onvoiceschanged = loadVoices;
+            }
+        }
+
+        function createNode(role, content, parentId) {
+            const id = 'msg_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            const node = {
+                id: id,
+                role: role,
+                content: content,
+                reasoning: null,
+                parentId: parentId,
+                childrenIds: [],
+                selectedChildId: null,
+                usage: null
+            };
+            nodes[id] = node;
+            
+            if (nodes[parentId]) {
+                nodes[parentId].childrenIds.push(id);
+                nodes[parentId].selectedChildId = id;
+            }
+            
+            return node;
+        }
+
+        function getLastNode() {
+            let curr = nodes[ROOT_ID];
+            while (curr.selectedChildId && nodes[curr.selectedChildId]) {
+                curr = nodes[curr.selectedChildId];
+            }
+            return curr;
+        }
+
+        function getMessageHistory() {
+            const history = [];
+            let currId = nodes[ROOT_ID].selectedChildId;
+            while (currId && nodes[currId]) {
+                const n = nodes[currId];
+                if (n.content || n.role === 'assistant') {
+                     history.push({ role: n.role, content: n.content });
+                }
+                currId = n.selectedChildId;
+            }
+            return history;
+        }
+
+        function renderConversation() {
+            chatMessages.innerHTML = '';
+            
+            let currentId = nodes[ROOT_ID].selectedChildId;
+            while (currentId && nodes[currentId]) {
+                const node = nodes[currentId];
+                drawMessage(node);
+                currentId = node.selectedChildId;
+            }
+            
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function drawMessage(node) {
+            const msgDiv = document.createElement('div');
+            msgDiv.className = `message ${node.role}-message`;
+            if (node.role === 'assistant') msgDiv.classList.add('bot-message');
+            msgDiv.id = `dom-${node.id}`;
+
+            const headerDiv = document.createElement('div');
+            headerDiv.className = 'message-header';
+
+            const roleLabel = document.createElement('div');
+            roleLabel.className = 'role-label';
+            roleLabel.textContent = node.role === 'user' ? 'You' : 'AI Assistant';
+            headerDiv.appendChild(roleLabel);
+
+            const parent = nodes[node.parentId];
+            if (parent && parent.childrenIds.length > 1) {
+                const currentIndex = parent.childrenIds.indexOf(node.id);
+                const total = parent.childrenIds.length;
+                
+                const paginationDiv = document.createElement('div');
+                paginationDiv.className = 'pagination';
+                
+                const prevBtn = document.createElement('button');
+                prevBtn.innerHTML = '&lt;';
+                prevBtn.disabled = currentIndex === 0;
+                prevBtn.onclick = () => switchBranch(node.parentId, currentIndex - 1);
+                
+                const countSpan = document.createElement('span');
+                countSpan.textContent = `${currentIndex + 1}/${total}`;
+                
+                const nextBtn = document.createElement('button');
+                nextBtn.innerHTML = '&gt;';
+                nextBtn.disabled = currentIndex === total - 1;
+                nextBtn.onclick = () => switchBranch(node.parentId, currentIndex + 1);
+                
+                paginationDiv.appendChild(prevBtn);
+                paginationDiv.appendChild(countSpan);
+                paginationDiv.appendChild(nextBtn);
+                
+                headerDiv.appendChild(paginationDiv);
+            }
+
+            if (aiSettings.editableOutput) {
+                const editBtn = document.createElement('span');
+                editBtn.className = 'edit-btn';
+                editBtn.textContent = '✏️ 编辑';
+                editBtn.onclick = () => enterEditMode(msgDiv, node);
+                headerDiv.appendChild(editBtn);
+            }
+
+            if (node.role === 'assistant') {
+                const regenBtn = document.createElement('span');
+                regenBtn.className = 'regen-btn';
+                regenBtn.textContent = '🔄 重新生成';
+                regenBtn.onclick = () => regenerateResponse(node);
+                headerDiv.appendChild(regenBtn);
+            }
+
+            msgDiv.appendChild(headerDiv);
+
+            const thinkingDiv = document.createElement('div');
+            thinkingDiv.className = 'thinking-box';
+            thinkingDiv.innerHTML = `
+                <div class="thinking-header">
+                    <span class="thinking-arrow">▼</span>
+                    <span>深度思考</span>
+                </div>
+                <div class="thinking-content"></div>
+            `;
+            
+            const thinkingHeader = thinkingDiv.querySelector('.thinking-header');
+            const thinkingArrow = thinkingDiv.querySelector('.thinking-arrow');
+            const thinkingContent = thinkingDiv.querySelector('.thinking-content');
+            
+            thinkingHeader.addEventListener('click', () => {
+                thinkingArrow.classList.toggle('collapsed');
+                thinkingContent.classList.toggle('collapsed');
+            });
+            
+            msgDiv.appendChild(thinkingDiv);
+
+            if (node.reasoning) {
+                thinkingDiv.style.display = 'block';
+                thinkingContent.innerHTML = marked.parse(node.reasoning || '');
+            } else {
+                thinkingDiv.style.display = 'none';
+            }
+
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'message-content';
+            
+            const p = document.createElement('div');
+            if (node.role === 'assistant') {
+                p.innerHTML = marked.parse(node.content || '');
+            } else {
+                p.textContent = node.content;
+            }
+            contentDiv.appendChild(p);
+            
+            if (node.role === 'assistant') {
+                const speakBtn = document.createElement('button');
+                speakBtn.className = 'speak-btn';
+                speakBtn.innerHTML = '🔊';
+                speakBtn.title = '朗读此消息';
+                speakBtn.style.marginLeft = '8px';
+                speakBtn.style.cursor = 'pointer';
+                speakBtn.style.background = 'none';
+                speakBtn.style.border = 'none';
+                speakBtn.style.fontSize = '1.2em';
+                speakBtn.onclick = () => {
+                    if (synthesis) {
+                        synthesis.cancel();
+                        speakText(node.content);
+                    }
+                };
+                contentDiv.appendChild(speakBtn);
+            }
+
+            msgDiv.appendChild(contentDiv);
+            
+            chatMessages.appendChild(msgDiv);
+        }
+
+        function switchBranch(parentId, index) {
+            const parent = nodes[parentId];
+            if (!parent || index < 0 || index >= parent.childrenIds.length) return;
+            
+            parent.selectedChildId = parent.childrenIds[index];
+            renderConversation();
+        }
+
+        function enterEditMode(msgDiv, node) {
+            if (msgDiv.querySelector('.edit-area')) return;
+
+            msgDiv.classList.add('editing');
+            const contentDiv = msgDiv.querySelector('.message-content');
+            const thinkingDiv = msgDiv.querySelector('.thinking-box');
+            
+            contentDiv.style.display = 'none';
+            if (thinkingDiv) thinkingDiv.style.display = 'none';
+
+            const editArea = document.createElement('div');
+            editArea.className = 'edit-area';
+            
+            const textarea = document.createElement('textarea');
+            textarea.value = node.content;
+            
+            const actionDiv = document.createElement('div');
+            actionDiv.className = 'edit-actions';
+            
+            const saveBtn = document.createElement('button');
+            saveBtn.className = 'btn-save';
+            saveBtn.textContent = '保存修改';
+            saveBtn.onclick = () => saveEdit(node, textarea.value, 'save');
+            
+            const cancelBtn = document.createElement('button');
+            cancelBtn.className = 'btn-cancel';
+            cancelBtn.textContent = '取消';
+            cancelBtn.onclick = () => {
+                editArea.remove();
+                msgDiv.classList.remove('editing');
+                contentDiv.style.display = 'block';
+                if (node.reasoning && thinkingDiv) thinkingDiv.style.display = 'block';
+            };
+
+            actionDiv.appendChild(cancelBtn);
+            actionDiv.appendChild(saveBtn);
+
+            if (node.role === 'user') {
+                const regenBtn = document.createElement('button');
+                regenBtn.className = 'btn-regen';
+                regenBtn.textContent = '保存并重新生成';
+                regenBtn.onclick = () => saveEdit(node, textarea.value, 'regen');
+                actionDiv.appendChild(regenBtn);
+            }
+
+            editArea.appendChild(textarea);
+            editArea.appendChild(actionDiv);
+            msgDiv.appendChild(editArea);
+        }
+
+        async function saveEdit(node, newText, mode) {
+            if (mode === 'save') {
+                node.content = newText;
+                renderConversation();
+            } else if (mode === 'regen') {
+                if (isGenerating) {
+                    alert('请等待当前对话生成完毕后再尝试。');
+                    return;
+                }
+                createNode(node.role, newText, node.parentId);
+                renderConversation();
+                await performGeneration();
+            }
+        }
+
+        async function regenerateResponse(node) {
+            if (isGenerating) {
+                alert('请等待当前对话生成完毕后再尝试。');
+                return;
+            }
+            
+            const parentId = node.parentId;
+            if (!parentId || !nodes[parentId]) return;
+            
+            await performGeneration(parentId);
+        }
+
+        function openSettings() {
+            tempSettings = { ...voiceSettings, ...aiSettings };
+            
+            temperatureRange.value = tempSettings.temperature;
+            temperatureValue.textContent = tempSettings.temperature.toFixed(1);
+            
+            maxTokensInput.value = tempSettings.maxTokens;
+            
+            editableOutputToggle.checked = tempSettings.editableOutput;
+            
+            rateRange.value = tempSettings.rate;
+            rateValue.textContent = tempSettings.rate.toFixed(1);
+            
+            pitchRange.value = tempSettings.pitch;
+            pitchValue.textContent = tempSettings.pitch.toFixed(1);
+            
+            volumeRange.value = tempSettings.volume;
+            volumeValue.textContent = tempSettings.volume.toFixed(1);
+            
+            voiceSelect.value = tempSettings.voiceURI;
+            
+            settingsModal.classList.add('show');
+        }
+
+        function closeSettingsModal() {
+            settingsModal.classList.remove('show');
+        }
+
+        function saveAndCloseSettings() {
+            voiceSettings = {
+                rate: tempSettings.rate,
+                pitch: tempSettings.pitch,
+                volume: tempSettings.volume,
+                voiceURI: tempSettings.voiceURI
+            };
+            
+            aiSettings = {
+                temperature: tempSettings.temperature,
+                maxTokens: tempSettings.maxTokens,
+                editableOutput: tempSettings.editableOutput,
+                thinkingEnabled: tempSettings.thinkingEnabled
+            };
+            
+            saveSettings();
+            renderConversation();
+            closeSettingsModal();
+        }
+
+        function stopGeneration() {
+            if (abortController) {
+                abortController.abort();
+                abortController = null;
+            }
+            isGenerating = false;
+            updateSendButton(false);
+        }
+
+        function handleSendOrStop() {
+            if (isGenerating) {
+                stopGeneration();
+            } else {
+                sendMessage();
+            }
+        }
+
+        function updateSendButton(generating) {
+            const originalText = sendBtn.getAttribute('data-original-text') || '发送';
+            if (generating) {
+                sendBtn.textContent = '⏹️ 中断';
+                sendBtn.classList.add('stop-mode');
+            } else {
+                sendBtn.textContent = originalText;
+                sendBtn.classList.remove('stop-mode');
+            }
+        }
+
+        function loadVoices() {
+            voices = synthesis.getVoices();
+            voiceSelect.innerHTML = '';
+            
+            const zhVoices = voices.filter(voice => voice.lang.includes('zh'));
+            
+            if (zhVoices.length === 0) {
+                voices.forEach((voice) => {
+                    const option = document.createElement('option');
+                    option.value = voice.voiceURI;
+                    option.textContent = `${voice.name} (${voice.lang})`;
+                    voiceSelect.appendChild(option);
+                });
+            } else {
+                zhVoices.forEach((voice) => {
+                    const option = document.createElement('option');
+                    option.value = voice.voiceURI;
+                    option.textContent = `${voice.name} (${voice.lang})`;
+                    voiceSelect.appendChild(option);
+                });
+            }
+            
+            if (voiceSettings.voiceURI) {
+                voiceSelect.value = voiceSettings.voiceURI;
+            }
+        }
+
+        function saveSettings() {
+            localStorage.setItem('voiceSettings', JSON.stringify(voiceSettings));
+            localStorage.setItem('aiSettings', JSON.stringify(aiSettings));
+        }
+
+        function loadSettings() {
+            const savedVoice = localStorage.getItem('voiceSettings');
+            if (savedVoice) {
+                voiceSettings = JSON.parse(savedVoice);
+            }
+            
+            const savedAI = localStorage.getItem('aiSettings');
+            if (savedAI) {
+                aiSettings = JSON.parse(savedAI);
+                if (aiSettings.editableOutput === undefined) {
+                    aiSettings.editableOutput = false;
+                }
+                if (aiSettings.thinkingEnabled === undefined) {
+                    aiSettings.thinkingEnabled = false;
+                }
+            }
+            
+            const savedThinking = localStorage.getItem('thinkingEnabled');
+            if (savedThinking !== null) {
+                aiSettings.thinkingEnabled = JSON.parse(savedThinking);
+                thinkingToggle.checked = aiSettings.thinkingEnabled;
+            }
+        }
+
+        function speakText(text) {
+            synthesis.cancel();
+            
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'zh-CN';
+            utterance.rate = voiceSettings.rate;
+            utterance.pitch = voiceSettings.pitch;
+            utterance.volume = voiceSettings.volume;
+            
+            if (voiceSettings.voiceURI) {
+                const selectedVoice = voices.find(voice => voice.voiceURI === voiceSettings.voiceURI);
+                if (selectedVoice) {
+                    utterance.voice = selectedVoice;
+                }
+            }
+            
+            synthesis.speak(utterance);
+        }
+
+        async function sendMessage() {
+            const message = userInput.value.trim();
+            if (!message) return;
+            
+            if (synthesis) {
+                synthesis.cancel();
+            }
+            
+            const lastNode = getLastNode();
+            createNode('user', message, lastNode.id);
+            
+            userInput.value = '';
+            renderConversation();
+            
+            await performGeneration();
+        }
+
+        async function performGeneration(targetParentId = null) {
+            const thinkingEnabledForThisRequest = aiSettings.thinkingEnabled;
+            const thinkingConfig = {
+                thinking: {
+                    type: thinkingEnabledForThisRequest ? 'enabled' : 'disabled'
+                }
+            };
+            
+            abortController = new AbortController();
+            isGenerating = true;
+            updateSendButton(true);
+            
+            let lastNode;
+            if (targetParentId && nodes[targetParentId]) {
+                lastNode = nodes[targetParentId];
+            } else {
+                lastNode = getLastNode();
+            }
+            
+            const assistantNode = createNode('assistant', '', lastNode.id);
+            renderConversation();
+            
+            const msgDiv = document.getElementById(`dom-${assistantNode.id}`);
+            const contentP = msgDiv ? msgDiv.querySelector('.message-content div') : null;
+            const thinkingDiv = msgDiv ? msgDiv.querySelector('.thinking-box') : null;
+            const thinkingContent = msgDiv ? msgDiv.querySelector('.thinking-content') : null;
+            
+            const history = getMessageHistory();
+            history.pop();
+            
+            const messages = history.map(msg => ({
+                role: msg.role,
+                content: msg.content
+            }));
+            
+            let fullContent = '';
+            
+            try {
+                const response = await fetch(API_BASE_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${API_KEY}`
+                    },
+                    body: JSON.stringify({
+                        model: MODEL_NAME,
+                        messages: messages,
+                        temperature: aiSettings.temperature,
+                        max_tokens: aiSettings.maxTokens,
+                        stream: true,
+                        ...thinkingConfig
+                    }),
+                    signal: abortController.signal
+                });
+                
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({}));
+                    throw new Error(errorData.error?.message || `API 响应错误: ${response.status}`);
+                }
+                
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+                
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+                    
+                    const chunk = decoder.decode(value, { stream: true });
+                    const lines = chunk.split('\n');
+                    
+                    for (const line of lines) {
+                        if (line.startsWith('data: ')) {
+                            const data = line.slice(6);
+                            if (data === '[DONE]') break;
+                            
+                            try {
+                                const json = JSON.parse(data);
+
+                                if (json.choices && json.choices.length > 0) {
+                                    const delta = json.choices[0].delta;
+                                    
+                                    const reasoning = delta.reasoning_content || '';
+                                    if (reasoning && thinkingEnabledForThisRequest) {
+                                        if (!assistantNode.reasoning) assistantNode.reasoning = '';
+                                        assistantNode.reasoning += reasoning;
+                                        
+                                        if (thinkingDiv && thinkingContent) {
+                                            thinkingDiv.style.display = 'block';
+                                            thinkingContent.innerHTML = marked.parse(assistantNode.reasoning);
+                                        }
+                                    }
+
+                                    const content = delta.content || '';
+                                    if (content) {
+                                        fullContent += content;
+                                        assistantNode.content = fullContent;
+                                        if (contentP) contentP.innerHTML = marked.parse(fullContent);
+                                    }
+                                }
+
+                                if (json.usage) {
+                                    assistantNode.usage = json.usage;
+                                }
+                            } catch (e) {
+                                console.error('解析流数据错误:', e);
+                            }
+                        }
+                    }
+                }
+                
+                if (!fullContent && !assistantNode.reasoning) {
+                    assistantNode.content = '抱歉，没有收到有效的响应。';
+                    renderConversation();
+                }
+                
+            } catch (error) {
+                if (error.name === 'AbortError') {
+                    console.log('生成已中断');
+                } else {
+                    console.error('生成错误:', error);
+                    assistantNode.content = `错误: ${error.message}`;
+                    renderConversation();
+                }
+            } finally {
+                isGenerating = false;
+                updateSendButton(false);
+                abortController = null;
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>

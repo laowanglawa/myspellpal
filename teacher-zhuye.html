@@ -13,6 +13,7 @@
     <!-- 统一的 Tailwind 配置 -->
     <script>
         tailwind.config = {
+            darkMode: 'class',
             theme: {
                 extend: {
                     colors: {
@@ -107,17 +108,26 @@
                 text-transform: uppercase;
                 letter-spacing: 0.05em;
             }
+            .dark .table-header {
+                color: #9CA3AF;
+            }
             .table-cell {
                 padding: 1rem 1.5rem;
                 white-space: nowrap;
                 font-size: 0.875rem;
                 color: #111827;
             }
+            .dark .table-cell {
+                color: #E5E7EB;
+            }
             .card {
                 background-color: white;
                 border-radius: 0.5rem;
                 box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
                 padding: 1.5rem;
+            }
+            .dark .card {
+                background-color: #1F2937;
             }
             .badge {
                 padding: 0.25rem 0.5rem;
@@ -129,13 +139,39 @@
                 background-color: #D1FAE5;
                 color: #065F46;
             }
+            .dark .badge-success {
+                background-color: #065F46;
+                color: #D1FAE5;
+            }
             .badge-warning {
                 background-color: #FEF3C7;
                 color: #92400E;
             }
+            .dark .badge-warning {
+                background-color: #92400E;
+                color: #FEF3C7;
+            }
             .badge-danger {
                 background-color: #FEE2E2;
                 color: #991B1B;
+            }
+            .dark .badge-danger {
+                background-color: #991B1B;
+                color: #FEE2E2;
+            }
+            .dark label {
+                color: #9CA3AF !important;
+            }
+            .dark .modal-content {
+                background-color: #1F2937;
+                color: #E5E7EB;
+            }
+            .dark .modal-content input,
+            .dark .modal-content textarea,
+            .dark .modal-content select {
+                background-color: #374151;
+                border-color: #4B5563;
+                color: #E5E7EB;
             }
             .glow-btn {
                 position: relative;
@@ -196,56 +232,50 @@
         }
     </style>
 </head>
-<body class="bg-gray-50 font-sans">
+<body class="bg-gray-50 dark:bg-gray-900 font-sans text-gray-900 dark:text-white transition-colors duration-300">
     <div class="flex h-screen overflow-hidden">
         <!-- 侧边导航栏 -->
-        <div class="w-64 bg-primary text-white shadow-lg hidden md:block">
-            <div class="flex items-center justify-center h-16 border-b border-blue-700">
+        <div class="w-64 bg-primary dark:bg-gray-800 text-white shadow-lg hidden md:block transition-colors duration-300">
+            <div class="flex items-center justify-center h-16 border-b border-blue-700 dark:border-gray-700">
                 <img src="backend/img/myspellpal.png" alt="MySpellPal" class="w-10 h-10 object-contain mr-2">
                 <h1 class="text-xl font-bold">学生管理系统</h1>
             </div>
             <nav class="mt-5">
                 <ul>
                     <li>
-                        <a href="#dashboard" class="flex items-center px-6 py-3 sidebar-active" data-target="dashboard">
+                        <a href="#dashboard" class="flex items-center px-6 py-3 sidebar-active dark:bg-blue-900 dark:text-white" data-target="dashboard">
                             <i class="fa fa-dashboard sidebar-icon"></i>
                             <span>系统概览</span>
                         </a>
                     </li>
                     <li>
-                        <a href="#students" class="flex items-center px-6 py-3 hover:bg-blue-700 transition-all" data-target="students">
+                        <a href="#students" class="flex items-center px-6 py-3 hover:bg-blue-700 dark:hover:bg-gray-700 transition-all" data-target="students">
                             <i class="fa fa-users sidebar-icon"></i>
                             <span>学生信息管理</span>
                         </a>
                     </li>
                     <li>
-                        <a href="#classes" class="flex items-center px-6 py-3 hover:bg-blue-700 transition-all" data-target="classes" onclick="loadClasses()">
+                        <a href="#classes" class="flex items-center px-6 py-3 hover:bg-blue-700 dark:hover:bg-gray-700 transition-all" data-target="classes" onclick="loadClasses()">
                             <i class="fa fa-graduation-cap sidebar-icon"></i>
                             <span>班级管理</span>
                         </a>
                     </li>
                     <li>
-                        <a href="#grades" class="flex items-center px-6 py-3 hover:bg-blue-700 transition-all" data-target="grades">
+                        <a href="#grades" class="flex items-center px-6 py-3 hover:bg-blue-700 dark:hover:bg-gray-700 transition-all" data-target="grades">
                             <i class="fa fa-graduation-cap sidebar-icon"></i>
                             <span>成绩管理</span>
                         </a>
                     </li>
                     <li>
-                        <a href="#attendance" class="flex items-center px-6 py-3 hover:bg-blue-700 transition-all" data-target="attendance">
+                        <a href="#attendance" class="flex items-center px-6 py-3 hover:bg-blue-700 dark:hover:bg-gray-700 transition-all" data-target="attendance">
                             <i class="fa fa-calendar-check-o sidebar-icon"></i>
                             <span>出勤管理</span>
                         </a>
                     </li>
                     <li>
-                        <a href="#statistics" class="flex items-center px-6 py-3 hover:bg-blue-700 transition-all" data-target="statistics">
+                        <a href="#statistics" class="flex items-center px-6 py-3 hover:bg-blue-700 dark:hover:bg-gray-700 transition-all" data-target="statistics">
                             <i class="fa fa-bar-chart sidebar-icon"></i>
                             <span>数据统计</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#settings" class="flex items-center px-6 py-3 hover:bg-blue-700 transition-all" data-target="settings">
-                            <i class="fa fa-cog sidebar-icon"></i>
-                            <span>系统设置</span>
                         </a>
                     </li>
                 </ul>
@@ -309,12 +339,6 @@
                                 <span>数据统计</span>
                             </a>
                         </li>
-                        <li>
-                            <a href="#settings" class="flex items-center px-6 py-3 hover:bg-blue-700 transition-all mobile-nav-item" data-target="settings">
-                                <i class="fa fa-cog sidebar-icon"></i>
-                                <span>系统设置</span>
-                            </a>
-                        </li>
                     </ul>
                 </nav>
             </div>
@@ -323,22 +347,27 @@
         <!-- 主内容区域 -->
         <div class="flex-1 flex flex-col overflow-hidden">
             <!-- 顶部导航栏 -->
-            <header class="bg-white shadow-sm z-10">
+            <header class="bg-white dark:bg-gray-800 shadow-sm z-10 transition-colors duration-300">
                 <div class="flex items-center justify-between h-16 px-6">
                     <div class="flex items-center">
                         <button id="sidebar-toggle" class="text-gray-500 focus:outline-none md:hidden">
                             <i class="fa fa-bars"></i>
                         </button>
-                        <h2 id="page-title" class="ml-4 text-lg font-medium text-gray-900">系统概览</h2>
+                        <h2 id="page-title" class="ml-4 text-lg font-medium text-gray-900 dark:text-white">系统概览</h2>
                     </div>
                     <div class="flex items-center space-x-4">
+                        <button id="themeToggle" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors" title="切换主题" onclick="toggleTheme()">
+                            <i class="fa fa-moon-o text-xl text-gray-600 dark:text-gray-300"></i>
+                        </button>
                         <div class="relative">
-                            <button class="flex items-center text-gray-700 focus:outline-none">
+                            <button id="teacherProfileBtn" class="flex items-center text-gray-700 dark:text-gray-200 focus:outline-none hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full p-1 transition-colors">
                                 <span class="mr-2">管理员</span>
-                                <i class="fa fa-user-circle text-xl"></i>
+                                <div id="teacherAvatar" class="w-10 h-10 rounded-full bg-primary/20 dark:bg-primary/30 flex items-center justify-center text-primary">
+                                    <i class="fa fa-user text-xl"></i>
+                                </div>
                             </button>
                         </div>
-                        <button id="logout-btn" class="flex items-center text-gray-700 focus:outline-none hover:text-red-500 transition-colors">
+                        <button id="logout-btn" class="flex items-center text-gray-700 dark:text-gray-200 focus:outline-none hover:text-red-500 transition-colors">
                             <i class="fa fa-sign-out mr-1"></i>
                             <span>退出登录</span>
                         </button>
@@ -347,18 +376,18 @@
             </header>
 
             <!-- 内容区域 -->
-            <main class="flex-1 overflow-y-auto bg-gray-50 p-6">
+            <main class="flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-900 p-6">
                 <!-- 系统概览 -->
                 <div id="dashboard" class="page-content active">
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-                        <div class="bg-white rounded-lg shadow-md p-6">
+                        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
                             <div class="flex items-center">
-                                <div class="p-3 rounded-full bg-blue-100 text-blue-600">
+                                <div class="p-3 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300">
                                     <i class="fa fa-users fa-2x"></i>
                                 </div>
                                 <div class="ml-4">
-                                    <p class="text-sm font-medium text-gray-500">学生总数</p>
-                                    <p class="text-2xl font-semibold text-gray-900">248</p>
+                                    <p class="text-sm font-medium text-gray-500 dark:text-gray-400">学生总数</p>
+                                    <p class="text-2xl font-semibold text-gray-900 dark:text-white">248</p>
                                 </div>
                             </div>
                             <div class="mt-4">
@@ -366,18 +395,18 @@
                                     <span class="text-green-500 text-sm font-medium">
                                         <i class="fa fa-arrow-up mr-1"></i> 4.65%
                                     </span>
-                                    <span class="text-gray-500 text-sm ml-2">较上月</span>
+                                    <span class="text-gray-500 dark:text-gray-400 text-sm ml-2">较上月</span>
                                 </div>
                             </div>
                         </div>
-                        <div class="bg-white rounded-lg shadow-md p-6">
+                        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
                             <div class="flex items-center">
-                                <div class="p-3 rounded-full bg-green-100 text-green-600">
+                                <div class="p-3 rounded-full bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-300">
                                     <i class="fa fa-graduation-cap fa-2x"></i>
                                 </div>
                                 <div class="ml-4">
-                                    <p class="text-sm font-medium text-gray-500">课程总数</p>
-                                    <p class="text-2xl font-semibold text-gray-900">36</p>
+                                    <p class="text-sm font-medium text-gray-500 dark:text-gray-400">课程总数</p>
+                                    <p class="text-2xl font-semibold text-gray-900 dark:text-white">36</p>
                                 </div>
                             </div>
                             <div class="mt-4">
@@ -385,18 +414,18 @@
                                     <span class="text-green-500 text-sm font-medium">
                                         <i class="fa fa-arrow-up mr-1"></i> 2.8%
                                     </span>
-                                    <span class="text-gray-500 text-sm ml-2">较上学期</span>
+                                    <span class="text-gray-500 dark:text-gray-400 text-sm ml-2">较上学期</span>
                                 </div>
                             </div>
                         </div>
-                        <div class="bg-white rounded-lg shadow-md p-6">
+                        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
                             <div class="flex items-center">
-                                <div class="p-3 rounded-full bg-yellow-100 text-yellow-600">
+                                <div class="p-3 rounded-full bg-yellow-100 dark:bg-yellow-900 text-yellow-600 dark:text-yellow-300">
                                     <i class="fa fa-calendar-check-o fa-2x"></i>
                                 </div>
                                 <div class="ml-4">
-                                    <p class="text-sm font-medium text-gray-500">今日出勤</p>
-                                    <p class="text-2xl font-semibold text-gray-900">96.8%</p>
+                                    <p class="text-sm font-medium text-gray-500 dark:text-gray-400">今日出勤</p>
+                                    <p class="text-2xl font-semibold text-gray-900 dark:text-white">96.8%</p>
                                 </div>
                             </div>
                             <div class="mt-4">
@@ -404,18 +433,18 @@
                                     <span class="text-red-500 text-sm font-medium">
                                         <i class="fa fa-arrow-down mr-1"></i> 1.2%
                                     </span>
-                                    <span class="text-gray-500 text-sm ml-2">较昨日</span>
+                                    <span class="text-gray-500 dark:text-gray-400 text-sm ml-2">较昨日</span>
                                 </div>
                             </div>
                         </div>
-                        <div class="bg-white rounded-lg shadow-md p-6">
+                        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
                             <div class="flex items-center">
-                                <div class="p-3 rounded-full bg-red-100 text-red-600">
+                                <div class="p-3 rounded-full bg-red-100 dark:bg-red-900 text-red-600 dark:text-red-300">
                                     <i class="fa fa-exclamation-triangle fa-2x"></i>
                                 </div>
                                 <div class="ml-4">
-                                    <p class="text-sm font-medium text-gray-500">待处理事项</p>
-                                    <p class="text-2xl font-semibold text-gray-900">12</p>
+                                    <p class="text-sm font-medium text-gray-500 dark:text-gray-400">待处理事项</p>
+                                    <p class="text-2xl font-semibold text-gray-900 dark:text-white">12</p>
                                 </div>
                             </div>
                             <div class="mt-4">
@@ -423,114 +452,114 @@
                                     <span class="text-green-500 text-sm font-medium">
                                         <i class="fa fa-arrow-down mr-1"></i> 8.3%
                                     </span>
-                                    <span class="text-gray-500 text-sm ml-2">较上周</span>
+                                    <span class="text-gray-500 dark:text-gray-400 text-sm ml-2">较上周</span>
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-                        <div class="bg-white rounded-lg shadow-md p-6">
-                            <h3 class="text-lg font-medium text-gray-900 mb-4">学生成绩分布</h3>
+                        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+                            <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">学生成绩分布</h3>
                             <div class="h-64">
                                 <canvas id="gradesChart"></canvas>
                             </div>
                         </div>
-                        <div class="bg-white rounded-lg shadow-md p-6">
-                            <h3 class="text-lg font-medium text-gray-900 mb-4">出勤趋势</h3>
+                        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+                            <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">出勤趋势</h3>
                             <div class="h-64">
                                 <canvas id="attendanceChart"></canvas>
                             </div>
                         </div>
                     </div>
 
-                    <div class="bg-white rounded-lg shadow-md p-6">
+                    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
                         <div class="flex items-center justify-between mb-4">
-                            <h3 class="text-lg font-medium text-gray-900">最近活动</h3>
-                            <button class="text-blue-600 hover:text-blue-800 text-sm font-medium">查看全部</button>
+                            <h3 class="text-lg font-medium text-gray-900 dark:text-white">最近活动</h3>
+                            <button class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 text-sm font-medium">查看全部</button>
                         </div>
                         <div class="overflow-x-auto">
-                            <table class="min-w-full divide-y divide-gray-200">
-                                <thead class="bg-gray-50">
+                            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                                <thead class="bg-gray-50 dark:bg-gray-700">
                                     <tr>
-                                        <th scope="col" class="table-header">活动类型</th>
-                                        <th scope="col" class="table-header">描述</th>
-                                        <th scope="col" class="table-header">操作人</th>
-                                        <th scope="col" class="table-header">时间</th>
-                                        <th scope="col" class="table-header">状态</th>
+                                        <th scope="col" class="table-header dark:text-gray-300">活动类型</th>
+                                        <th scope="col" class="table-header dark:text-gray-300">描述</th>
+                                        <th scope="col" class="table-header dark:text-gray-300">操作人</th>
+                                        <th scope="col" class="table-header dark:text-gray-300">时间</th>
+                                        <th scope="col" class="table-header dark:text-gray-300">状态</th>
                                     </tr>
                                 </thead>
-                                <tbody class="bg-white divide-y divide-gray-200">
+                                <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                                     <tr>
-                                        <td class="table-cell">
+                                        <td class="table-cell dark:text-gray-200">
                                             <div class="flex items-center">
-                                                <div class="flex-shrink-0 h-8 w-8 bg-blue-100 rounded-full flex items-center justify-center">
-                                                    <i class="fa fa-user-plus text-blue-600"></i>
+                                                <div class="flex-shrink-0 h-8 w-8 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
+                                                    <i class="fa fa-user-plus text-blue-600 dark:text-blue-300"></i>
                                                 </div>
                                                 <div class="ml-3">
-                                                    <p class="text-sm font-medium text-gray-900">添加学生</p>
+                                                    <p class="text-sm font-medium text-gray-900 dark:text-white">添加学生</p>
                                                 </div>
                                             </div>
                                         </td>
-                                        <td class="table-cell">添加了新学生 张三</td>
-                                        <td class="table-cell">王老师</td>
-                                        <td class="table-cell">2023-06-15 09:45</td>
+                                        <td class="table-cell dark:text-gray-200">添加了新学生 张三</td>
+                                        <td class="table-cell dark:text-gray-200">王老师</td>
+                                        <td class="table-cell dark:text-gray-200">2023-06-15 09:45</td>
                                         <td class="table-cell">
-                                            <span class="badge badge-success">已完成</span>
+                                            <span class="badge badge-success dark:bg-green-900 dark:text-green-300">已完成</span>
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td class="table-cell">
+                                        <td class="table-cell dark:text-gray-200">
                                             <div class="flex items-center">
-                                                <div class="flex-shrink-0 h-8 w-8 bg-green-100 rounded-full flex items-center justify-center">
-                                                    <i class="fa fa-graduation-cap text-green-600"></i>
+                                                <div class="flex-shrink-0 h-8 w-8 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center">
+                                                    <i class="fa fa-graduation-cap text-green-600 dark:text-green-300"></i>
                                                 </div>
                                                 <div class="ml-3">
-                                                    <p class="text-sm font-medium text-gray-900">成绩录入</p>
+                                                    <p class="text-sm font-medium text-gray-900 dark:text-white">成绩录入</p>
                                                 </div>
                                             </div>
                                         </td>
-                                        <td class="table-cell">录入了高等数学成绩</td>
-                                        <td class="table-cell">李老师</td>
-                                        <td class="table-cell">2023-06-14 14:30</td>
+                                        <td class="table-cell dark:text-gray-200">录入了高等数学成绩</td>
+                                        <td class="table-cell dark:text-gray-200">李老师</td>
+                                        <td class="table-cell dark:text-gray-200">2023-06-14 14:30</td>
                                         <td class="table-cell">
-                                            <span class="badge badge-success">已完成</span>
+                                            <span class="badge badge-success dark:bg-green-900 dark:text-green-300">已完成</span>
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td class="table-cell">
+                                        <td class="table-cell dark:text-gray-200">
                                             <div class="flex items-center">
-                                                <div class="flex-shrink-0 h-8 w-8 bg-yellow-100 rounded-full flex items-center justify-center">
-                                                    <i class="fa fa-calendar-check-o text-yellow-600"></i>
+                                                <div class="flex-shrink-0 h-8 w-8 bg-yellow-100 dark:bg-yellow-900 rounded-full flex items-center justify-center">
+                                                    <i class="fa fa-calendar-check-o text-yellow-600 dark:text-yellow-300"></i>
                                                 </div>
                                                 <div class="ml-3">
-                                                    <p class="text-sm font-medium text-gray-900">出勤记录</p>
+                                                    <p class="text-sm font-medium text-gray-900 dark:text-white">出勤记录</p>
                                                 </div>
                                             </div>
                                         </td>
-                                        <td class="table-cell">记录了2023-06-15的出勤情况</td>
-                                        <td class="table-cell">张老师</td>
-                                        <td class="table-cell">2023-06-15 12:15</td>
+                                        <td class="table-cell dark:text-gray-200">记录了2023-06-15的出勤情况</td>
+                                        <td class="table-cell dark:text-gray-200">张老师</td>
+                                        <td class="table-cell dark:text-gray-200">2023-06-15 12:15</td>
                                         <td class="table-cell">
-                                            <span class="badge badge-warning">处理中</span>
+                                            <span class="badge badge-warning dark:bg-yellow-900 dark:text-yellow-300">处理中</span>
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td class="table-cell">
+                                        <td class="table-cell dark:text-gray-200">
                                             <div class="flex items-center">
-                                                <div class="flex-shrink-0 h-8 w-8 bg-red-100 rounded-full flex items-center justify-center">
-                                                    <i class="fa fa-exclamation-circle text-red-600"></i>
+                                                <div class="flex-shrink-0 h-8 w-8 bg-red-100 dark:bg-red-900 rounded-full flex items-center justify-center">
+                                                    <i class="fa fa-exclamation-circle text-red-600 dark:text-red-300"></i>
                                                 </div>
                                                 <div class="ml-3">
-                                                    <p class="text-sm font-medium text-gray-900">请假申请</p>
+                                                    <p class="text-sm font-medium text-gray-900 dark:text-white">请假申请</p>
                                                 </div>
                                             </div>
                                         </td>
-                                        <td class="table-cell">李四提交了请假申请</td>
-                                        <td class="table-cell">李四</td>
-                                        <td class="table-cell">2023-06-15 10:20</td>
+                                        <td class="table-cell dark:text-gray-200">李四提交了请假申请</td>
+                                        <td class="table-cell dark:text-gray-200">李四</td>
+                                        <td class="table-cell dark:text-gray-200">2023-06-15 10:20</td>
                                         <td class="table-cell">
-                                            <span class="badge badge-danger">待审批</span>
+                                            <span class="badge badge-danger dark:bg-red-900 dark:text-red-300">待审批</span>
                                         </td>
                                     </tr>
                                 </tbody>
@@ -541,14 +570,14 @@
 
                 <!-- 班级管理 -->
                 <div id="classes" class="page-content hidden">
-                    <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+                    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6">
                         <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
-                            <h3 class="text-lg font-medium text-gray-900 mb-4 md:mb-0">班级管理</h3>
+                            <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4 md:mb-0">班级管理</h3>
                             <div class="flex flex-col md:flex-row space-y-3 md:space-y-0 md:space-x-3">
                                 <div class="relative">
-                                    <input type="text" placeholder="搜索班级..." class="input-field pl-10">
+                                    <input type="text" placeholder="搜索班级..." class="input-field dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400 pl-10">
                                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                        <i class="fa fa-search text-gray-400"></i>
+                                        <i class="fa fa-search text-gray-400 dark:text-gray-300"></i>
                                     </div>
                                 </div>
                                 <button id="add-class-btn" class="glow-btn btn-primary flex items-center justify-center">
@@ -557,33 +586,33 @@
                             </div>
                         </div>
                         <div class="overflow-x-auto">
-                            <table class="min-w-full divide-y divide-gray-200">
-                                <thead class="bg-gray-50">
+                            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                                <thead class="bg-gray-50 dark:bg-gray-700">
                                     <tr>
-                                        <th scope="col" class="table-header">班级ID</th>
-                                        <th scope="col" class="table-header">班级名称</th>
-                                        <th scope="col" class="table-header">教师</th>
-                                        <th scope="col" class="table-header">邀请码</th>
-                                        <th scope="col" class="table-header">学生人数</th>
-                                        <th scope="col" class="table-header">创建时间</th>
-                                        <th scope="col" class="table-header">操作</th>
+                                        <th scope="col" class="table-header dark:text-gray-300">班级ID</th>
+                                        <th scope="col" class="table-header dark:text-gray-300">班级名称</th>
+                                        <th scope="col" class="table-header dark:text-gray-300">教师</th>
+                                        <th scope="col" class="table-header dark:text-gray-300">邀请码</th>
+                                        <th scope="col" class="table-header dark:text-gray-300">学生人数</th>
+                                        <th scope="col" class="table-header dark:text-gray-300">创建时间</th>
+                                        <th scope="col" class="table-header dark:text-gray-300">操作</th>
                                     </tr>
                                 </thead>
-                                <tbody class="bg-white divide-y divide-gray-200" id="classes-table-body">
+                                <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700" id="classes-table-body">
                                     <!-- 班级数据将通过JavaScript动态生成 -->
                                 </tbody>
                             </table>
                         </div>
                         <div class="flex items-center justify-between mt-6">
-                            <div class="text-sm text-gray-700">
-                                显示 <span class="font-medium">1</span> 到 <span class="font-medium">10</span> 条，共 <span class="font-medium">0</span> 条
+                            <div class="text-sm text-gray-700 dark:text-gray-300">
+                                显示 <span class="font-medium dark:text-white">1</span> 到 <span class="font-medium dark:text-white">10</span> 条，共 <span class="font-medium dark:text-white">0</span> 条
                             </div>
                             <div class="flex space-x-2">
-                                <button class="px-3 py-1 border border-gray-300 rounded-md text-sm disabled:opacity-50" disabled>上一页</button>
-                                <button class="px-3 py-1 bg-blue-600 text-white border border-blue-600 rounded-md text-sm">1</button>
-                                <button class="px-3 py-1 border border-gray-300 rounded-md text-sm">2</button>
-                                <button class="px-3 py-1 border border-gray-300 rounded-md text-sm">3</button>
-                                <button class="px-3 py-1 border border-gray-300 rounded-md text-sm">下一页</button>
+                                <button class="px-3 py-1 border border-gray-300 dark:border-gray-600 dark:text-gray-300 rounded-md text-sm disabled:opacity-50" disabled>上一页</button>
+                                <button class="px-3 py-1 bg-blue-600 text-white border border-blue-600 dark:bg-blue-500 dark:border-blue-500 rounded-md text-sm">1</button>
+                                <button class="px-3 py-1 border border-gray-300 dark:border-gray-600 dark:text-gray-300 dark:bg-gray-700 rounded-md text-sm">2</button>
+                                <button class="px-3 py-1 border border-gray-300 dark:border-gray-600 dark:text-gray-300 dark:bg-gray-700 rounded-md text-sm">3</button>
+                                <button class="px-3 py-1 border border-gray-300 dark:border-gray-600 dark:text-gray-300 dark:bg-gray-700 rounded-md text-sm">下一页</button>
                             </div>
                         </div>
                     </div>
@@ -591,14 +620,14 @@
 
                 <!-- 学生信息管理 -->
                 <div id="students" class="page-content hidden">
-                    <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+                    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6">
                         <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
-                            <h3 class="text-lg font-medium text-gray-900 mb-4 md:mb-0">学生信息管理</h3>
+                            <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4 md:mb-0">学生信息管理</h3>
                             <div class="flex flex-col md:flex-row space-y-3 md:space-y-0 md:space-x-3">
                                 <div class="relative">
-                                    <input type="text" placeholder="搜索学生..." class="input-field pl-10">
+                                    <input type="text" placeholder="搜索学生..." class="input-field dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400 pl-10">
                                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                        <i class="fa fa-search text-gray-400"></i>
+                                        <i class="fa fa-search text-gray-400 dark:text-gray-300"></i>
                                     </div>
                                 </div>
                                 <button id="add-student-btn" class="glow-btn btn-primary flex items-center justify-center">
@@ -607,38 +636,38 @@
                             </div>
                         </div>
                         <div class="overflow-x-auto">
-                            <table class="min-w-full divide-y divide-gray-200">
-                                <thead class="bg-gray-50">
+                            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                                <thead class="bg-gray-50 dark:bg-gray-700">
                                     <tr>
-                                        <th scope="col" class="table-header">
-                                            <input type="checkbox" class="h-4 w-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500">
+                                        <th scope="col" class="table-header dark:text-gray-300">
+                                            <input type="checkbox" class="h-4 w-4 text-blue-600 rounded border-gray-300 dark:border-gray-600 dark:bg-gray-600 focus:ring-blue-500">
                                         </th>
-                                        <th scope="col" class="table-header">学号</th>
-                                        <th scope="col" class="table-header">姓名</th>
-                                        <th scope="col" class="table-header">性别</th>
-                                        <th scope="col" class="table-header">出生日期</th>
-                                        <th scope="col" class="table-header">班级</th>
+                                        <th scope="col" class="table-header dark:text-gray-300">学号</th>
+                                        <th scope="col" class="table-header dark:text-gray-300">姓名</th>
+                                        <th scope="col" class="table-header dark:text-gray-300">性别</th>
+                                        <th scope="col" class="table-header dark:text-gray-300">出生日期</th>
+                                        <th scope="col" class="table-header dark:text-gray-300">班级</th>
                                         <th scope="col" class="table-header">专业</th>
                                         <th scope="col" class="table-header">操作</th>
                                     </tr>
                                 </thead>
-                                <tbody class="bg-white divide-y divide-gray-200" id="students-table-body">
+                                <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700" id="students-table-body">
                                     <!-- 学生数据将通过JavaScript动态生成 -->
                                 </tbody>
                             </table>
                         </div>
                         <div class="flex items-center justify-between mt-6">
-                            <div class="text-sm text-gray-700">
-                                显示 <span class="font-medium">1</span> 到 <span class="font-medium">10</span> 条，共 <span class="font-medium">248</span> 条
+                            <div class="text-sm text-gray-700 dark:text-gray-300">
+                                显示 <span class="font-medium dark:text-white">1</span> 到 <span class="font-medium dark:text-white">10</span> 条，共 <span class="font-medium dark:text-white">248</span> 条
                             </div>
                             <div class="flex space-x-2">
-                                <button class="px-3 py-1 border border-gray-300 rounded-md text-sm disabled:opacity-50" disabled>上一页</button>
-                                <button class="px-3 py-1 bg-blue-600 text-white border border-blue-600 rounded-md text-sm">1</button>
-                                <button class="px-3 py-1 border border-gray-300 rounded-md text-sm">2</button>
-                                <button class="px-3 py-1 border border-gray-300 rounded-md text-sm">3</button>
-                                <button class="px-3 py-1 border border-gray-300 rounded-md text-sm">...</button>
-                                <button class="px-3 py-1 border border-gray-300 rounded-md text-sm">25</button>
-                                <button class="px-3 py-1 border border-gray-300 rounded-md text-sm">下一页</button>
+                                <button class="px-3 py-1 border border-gray-300 dark:border-gray-600 dark:text-gray-300 dark:bg-gray-700 rounded-md text-sm disabled:opacity-50" disabled>上一页</button>
+                                <button class="px-3 py-1 bg-blue-600 text-white border border-blue-600 dark:bg-blue-500 dark:border-blue-500 rounded-md text-sm">1</button>
+                                <button class="px-3 py-1 border border-gray-300 dark:border-gray-600 dark:text-gray-300 dark:bg-gray-700 rounded-md text-sm">2</button>
+                                <button class="px-3 py-1 border border-gray-300 dark:border-gray-600 dark:text-gray-300 dark:bg-gray-700 rounded-md text-sm">3</button>
+                                <button class="px-3 py-1 border border-gray-300 dark:border-gray-600 dark:text-gray-300 dark:bg-gray-700 rounded-md text-sm">...</button>
+                                <button class="px-3 py-1 border border-gray-300 dark:border-gray-600 dark:text-gray-300 dark:bg-gray-700 rounded-md text-sm">25</button>
+                                <button class="px-3 py-1 border border-gray-300 dark:border-gray-600 dark:text-gray-300 dark:bg-gray-700 rounded-md text-sm">下一页</button>
                             </div>
                         </div>
                     </div>
@@ -646,14 +675,14 @@
 
                 <!-- 成绩管理 -->
                 <div id="grades" class="page-content hidden">
-                    <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+                    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6">
                         <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
-                            <h3 class="text-lg font-medium text-gray-900 mb-4 md:mb-0">成绩管理</h3>
+                            <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4 md:mb-0">成绩管理</h3>
                             <div class="flex flex-col md:flex-row space-y-3 md:space-y-0 md:space-x-3">
                                 <div class="relative">
-                                    <input type="text" placeholder="搜索学生或科目..." class="input-field pl-10">
+                                    <input type="text" placeholder="搜索学生或科目..." class="input-field dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400 pl-10">
                                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                        <i class="fa fa-search text-gray-400"></i>
+                                        <i class="fa fa-search text-gray-400 dark:text-gray-300"></i>
                                     </div>
                                 </div>
                                 <button id="add-grade-btn" class="glow-btn btn-primary flex items-center justify-center">
@@ -662,36 +691,36 @@
                             </div>
                         </div>
                         <div class="overflow-x-auto">
-                            <table class="min-w-full divide-y divide-gray-200">
-                                <thead class="bg-gray-50">
+                            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                                <thead class="bg-gray-50 dark:bg-gray-700">
                                     <tr>
-                                        <th scope="col" class="table-header">学号</th>
-                                        <th scope="col" class="table-header">姓名</th>
-                                        <th scope="col" class="table-header">班级</th>
-                                        <th scope="col" class="table-header">科目</th>
-                                        <th scope="col" class="table-header">成绩</th>
-                                        <th scope="col" class="table-header">学期</th>
-                                        <th scope="col" class="table-header">考试日期</th>
-                                        <th scope="col" class="table-header">操作</th>
+                                        <th scope="col" class="table-header dark:text-gray-300">学号</th>
+                                        <th scope="col" class="table-header dark:text-gray-300">姓名</th>
+                                        <th scope="col" class="table-header dark:text-gray-300">班级</th>
+                                        <th scope="col" class="table-header dark:text-gray-300">科目</th>
+                                        <th scope="col" class="table-header dark:text-gray-300">成绩</th>
+                                        <th scope="col" class="table-header dark:text-gray-300">学期</th>
+                                        <th scope="col" class="table-header dark:text-gray-300">考试日期</th>
+                                        <th scope="col" class="table-header dark:text-gray-300">操作</th>
                                     </tr>
                                 </thead>
-                                <tbody class="bg-white divide-y divide-gray-200" id="grades-table-body">
+                                <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700" id="grades-table-body">
                                     <!-- 成绩数据将通过JavaScript动态生成 -->
                                 </tbody>
                             </table>
                         </div>
                         <div class="flex items-center justify-between mt-6">
-                            <div class="text-sm text-gray-700">
-                                显示 <span class="font-medium">1</span> 到 <span class="font-medium">10</span> 条，共 <span class="font-medium">1240</span> 条
+                            <div class="text-sm text-gray-700 dark:text-gray-300">
+                                显示 <span class="font-medium dark:text-white">1</span> 到 <span class="font-medium dark:text-white">10</span> 条，共 <span class="font-medium dark:text-white">1240</span> 条
                             </div>
                             <div class="flex space-x-2">
-                                <button class="px-3 py-1 border border-gray-300 rounded-md text-sm disabled:opacity-50" disabled>上一页</button>
-                                <button class="px-3 py-1 bg-blue-600 text-white border border-blue-600 rounded-md text-sm">1</button>
-                                <button class="px-3 py-1 border border-gray-300 rounded-md text-sm">2</button>
-                                <button class="px-3 py-1 border border-gray-300 rounded-md text-sm">3</button>
-                                <button class="px-3 py-1 border border-gray-300 rounded-md text-sm">...</button>
-                                <button class="px-3 py-1 border border-gray-300 rounded-md text-sm">124</button>
-                                <button class="px-3 py-1 border border-gray-300 rounded-md text-sm">下一页</button>
+                                <button class="px-3 py-1 border border-gray-300 dark:border-gray-600 dark:text-gray-300 dark:bg-gray-700 rounded-md text-sm disabled:opacity-50" disabled>上一页</button>
+                                <button class="px-3 py-1 bg-blue-600 text-white border border-blue-600 dark:bg-blue-500 dark:border-blue-500 rounded-md text-sm">1</button>
+                                <button class="px-3 py-1 border border-gray-300 dark:border-gray-600 dark:text-gray-300 dark:bg-gray-700 rounded-md text-sm">2</button>
+                                <button class="px-3 py-1 border border-gray-300 dark:border-gray-600 dark:text-gray-300 dark:bg-gray-700 rounded-md text-sm">3</button>
+                                <button class="px-3 py-1 border border-gray-300 dark:border-gray-600 dark:text-gray-300 dark:bg-gray-700 rounded-md text-sm">...</button>
+                                <button class="px-3 py-1 border border-gray-300 dark:border-gray-600 dark:text-gray-300 dark:bg-gray-700 rounded-md text-sm">124</button>
+                                <button class="px-3 py-1 border border-gray-300 dark:border-gray-600 dark:text-gray-300 dark:bg-gray-700 rounded-md text-sm">下一页</button>
                             </div>
                         </div>
                     </div>
@@ -699,18 +728,18 @@
 
                 <!-- 出勤管理 -->
                 <div id="attendance" class="page-content hidden">
-                    <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+                    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6">
                         <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
-                            <h3 class="text-lg font-medium text-gray-900 mb-4 md:mb-0">出勤管理</h3>
+                            <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4 md:mb-0">出勤管理</h3>
                             <div class="flex flex-col md:flex-row space-y-3 md:space-y-0 md:space-x-3">
                                 <div class="relative">
-                                    <input type="text" placeholder="搜索学生..." class="input-field pl-10">
+                                    <input type="text" placeholder="搜索学生..." class="input-field dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400 pl-10">
                                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                        <i class="fa fa-search text-gray-400"></i>
+                                        <i class="fa fa-search text-gray-400 dark:text-gray-300"></i>
                                     </div>
                                 </div>
                                 <div>
-                                    <input type="date" class="input-field">
+                                    <input type="date" class="input-field dark:bg-gray-700 dark:border-gray-600 dark:text-white">
                                 </div>
                                 <button id="record-attendance-btn" class="glow-btn btn-primary flex items-center justify-center">
                                     <i class="fa fa-plus mr-2"></i> 记录出勤
@@ -718,35 +747,35 @@
                             </div>
                         </div>
                         <div class="overflow-x-auto">
-                            <table class="min-w-full divide-y divide-gray-200">
-                                <thead class="bg-gray-50">
+                            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                                <thead class="bg-gray-50 dark:bg-gray-700">
                                     <tr>
-                                        <th scope="col" class="table-header">学号</th>
-                                        <th scope="col" class="table-header">姓名</th>
-                                        <th scope="col" class="table-header">班级</th>
-                                        <th scope="col" class="table-header">日期</th>
-                                        <th scope="col" class="table-header">状态</th>
-                                        <th scope="col" class="table-header">原因</th>
-                                        <th scope="col" class="table-header">操作</th>
+                                        <th scope="col" class="table-header dark:text-gray-300">学号</th>
+                                        <th scope="col" class="table-header dark:text-gray-300">姓名</th>
+                                        <th scope="col" class="table-header dark:text-gray-300">班级</th>
+                                        <th scope="col" class="table-header dark:text-gray-300">日期</th>
+                                        <th scope="col" class="table-header dark:text-gray-300">状态</th>
+                                        <th scope="col" class="table-header dark:text-gray-300">原因</th>
+                                        <th scope="col" class="table-header dark:text-gray-300">操作</th>
                                     </tr>
                                 </thead>
-                                <tbody class="bg-white divide-y divide-gray-200" id="attendance-table-body">
+                                <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700" id="attendance-table-body">
                                     <!-- 出勤数据将通过JavaScript动态生成 -->
                                 </tbody>
                             </table>
                         </div>
                         <div class="flex items-center justify-between mt-6">
-                            <div class="text-sm text-gray-700">
-                                显示 <span class="font-medium">1</span> 到 <span class="font-medium">10</span> 条，共 <span class="font-medium">744</span> 条
+                            <div class="text-sm text-gray-700 dark:text-gray-300">
+                                显示 <span class="font-medium dark:text-white">1</span> 到 <span class="font-medium dark:text-white">10</span> 条，共 <span class="font-medium dark:text-white">744</span> 条
                             </div>
                             <div class="flex space-x-2">
-                                <button class="px-3 py-1 border border-gray-300 rounded-md text-sm disabled:opacity-50" disabled>上一页</button>
-                                <button class="px-3 py-1 bg-blue-600 text-white border border-blue-600 rounded-md text-sm">1</button>
-                                <button class="px-3 py-1 border border-gray-300 rounded-md text-sm">2</button>
-                                <button class="px-3 py-1 border border-gray-300 rounded-md text-sm">3</button>
-                                <button class="px-3 py-1 border border-gray-300 rounded-md text-sm">...</button>
-                                <button class="px-3 py-1 border border-gray-300 rounded-md text-sm">75</button>
-                                <button class="px-3 py-1 border border-gray-300 rounded-md text-sm">下一页</button>
+                                <button class="px-3 py-1 border border-gray-300 dark:border-gray-600 dark:text-gray-300 dark:bg-gray-700 rounded-md text-sm disabled:opacity-50" disabled>上一页</button>
+                                <button class="px-3 py-1 bg-blue-600 text-white border border-blue-600 dark:bg-blue-500 dark:border-blue-500 rounded-md text-sm">1</button>
+                                <button class="px-3 py-1 border border-gray-300 dark:border-gray-600 dark:text-gray-300 dark:bg-gray-700 rounded-md text-sm">2</button>
+                                <button class="px-3 py-1 border border-gray-300 dark:border-gray-600 dark:text-gray-300 dark:bg-gray-700 rounded-md text-sm">3</button>
+                                <button class="px-3 py-1 border border-gray-300 dark:border-gray-600 dark:text-gray-300 dark:bg-gray-700 rounded-md text-sm">...</button>
+                                <button class="px-3 py-1 border border-gray-300 dark:border-gray-600 dark:text-gray-300 dark:bg-gray-700 rounded-md text-sm">75</button>
+                                <button class="px-3 py-1 border border-gray-300 dark:border-gray-600 dark:text-gray-300 dark:bg-gray-700 rounded-md text-sm">下一页</button>
                             </div>
                         </div>
                     </div>
@@ -755,93 +784,93 @@
                 <!-- 数据统计 -->
                 <div id="statistics" class="page-content hidden">
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-                        <div class="bg-white rounded-lg shadow-md p-6">
-                            <h3 class="text-lg font-medium text-gray-900 mb-4">学生成绩分布</h3>
+                        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+                            <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">学生成绩分布</h3>
                             <div class="h-64">
                                 <canvas id="gradeDistributionChart"></canvas>
                             </div>
                         </div>
-                        <div class="bg-white rounded-lg shadow-md p-6">
-                            <h3 class="text-lg font-medium text-gray-900 mb-4">各班级成绩对比</h3>
+                        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+                            <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">各班级成绩对比</h3>
                             <div class="h-64">
                                 <canvas id="classComparisonChart"></canvas>
                             </div>
                         </div>
                     </div>
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-                        <div class="bg-white rounded-lg shadow-md p-6">
-                            <h3 class="text-lg font-medium text-gray-900 mb-4">出勤情况趋势</h3>
+                        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+                            <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">出勤情况趋势</h3>
                             <div class="h-64">
                                 <canvas id="attendanceTrendChart"></canvas>
                             </div>
                         </div>
-                        <div class="bg-white rounded-lg shadow-md p-6">
-                            <h3 class="text-lg font-medium text-gray-900 mb-4">学生综合表现</h3>
+                        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+                            <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">学生综合表现</h3>
                             <div class="h-64">
                                 <canvas id="studentPerformanceChart"></canvas>
                             </div>
                         </div>
                     </div>
-                    <div class="bg-white rounded-lg shadow-md p-6">
-                        <h3 class="text-lg font-medium text-gray-900 mb-4">成绩详情统计</h3>
+                    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+                        <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">成绩详情统计</h3>
                         <div class="overflow-x-auto">
-                            <table class="min-w-full divide-y divide-gray-200">
-                                <thead class="bg-gray-50">
+                            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                                <thead class="bg-gray-50 dark:bg-gray-700">
                                     <tr>
-                                        <th scope="col" class="table-header">科目</th>
-                                        <th scope="col" class="table-header">参考人数</th>
-                                        <th scope="col" class="table-header">平均分</th>
-                                        <th scope="col" class="table-header">最高分</th>
-                                        <th scope="col" class="table-header">最低分</th>
-                                        <th scope="col" class="table-header">及格率</th>
-                                        <th scope="col" class="table-header">优秀率</th>
+                                        <th scope="col" class="table-header dark:text-gray-300">科目</th>
+                                        <th scope="col" class="table-header dark:text-gray-300">参考人数</th>
+                                        <th scope="col" class="table-header dark:text-gray-300">平均分</th>
+                                        <th scope="col" class="table-header dark:text-gray-300">最高分</th>
+                                        <th scope="col" class="table-header dark:text-gray-300">最低分</th>
+                                        <th scope="col" class="table-header dark:text-gray-300">及格率</th>
+                                        <th scope="col" class="table-header dark:text-gray-300">优秀率</th>
                                     </tr>
                                 </thead>
-                                <tbody class="bg-white divide-y divide-gray-200">
+                                <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                                     <tr>
-                                        <td class="table-cell">高等数学</td>
-                                        <td class="table-cell">248</td>
-                                        <td class="table-cell">78.5</td>
-                                        <td class="table-cell">98</td>
-                                        <td class="table-cell">52</td>
-                                        <td class="table-cell">86.3%</td>
-                                        <td class="table-cell">24.6%</td>
+                                        <td class="table-cell dark:text-gray-200">高等数学</td>
+                                        <td class="table-cell dark:text-gray-200">248</td>
+                                        <td class="table-cell dark:text-gray-200">78.5</td>
+                                        <td class="table-cell dark:text-gray-200">98</td>
+                                        <td class="table-cell dark:text-gray-200">52</td>
+                                        <td class="table-cell dark:text-gray-200">86.3%</td>
+                                        <td class="table-cell dark:text-gray-200">24.6%</td>
                                     </tr>
                                     <tr>
-                                        <td class="table-cell">大学物理</td>
-                                        <td class="table-cell">248</td>
-                                        <td class="table-cell">75.2</td>
-                                        <td class="table-cell">96</td>
-                                        <td class="table-cell">48</td>
-                                        <td class="table-cell">82.7%</td>
-                                        <td class="table-cell">19.8%</td>
+                                        <td class="table-cell dark:text-gray-200">大学物理</td>
+                                        <td class="table-cell dark:text-gray-200">248</td>
+                                        <td class="table-cell dark:text-gray-200">75.2</td>
+                                        <td class="table-cell dark:text-gray-200">96</td>
+                                        <td class="table-cell dark:text-gray-200">48</td>
+                                        <td class="table-cell dark:text-gray-200">82.7%</td>
+                                        <td class="table-cell dark:text-gray-200">19.8%</td>
                                     </tr>
                                     <tr>
-                                        <td class="table-cell">计算机基础</td>
-                                        <td class="table-cell">248</td>
-                                        <td class="table-cell">82.4</td>
-                                        <td class="table-cell">100</td>
-                                        <td class="table-cell">62</td>
-                                        <td class="table-cell">94.3%</td>
-                                        <td class="table-cell">38.7%</td>
+                                        <td class="table-cell dark:text-gray-200">计算机基础</td>
+                                        <td class="table-cell dark:text-gray-200">248</td>
+                                        <td class="table-cell dark:text-gray-200">82.4</td>
+                                        <td class="table-cell dark:text-gray-200">100</td>
+                                        <td class="table-cell dark:text-gray-200">62</td>
+                                        <td class="table-cell dark:text-gray-200">94.3%</td>
+                                        <td class="table-cell dark:text-gray-200">38.7%</td>
                                     </tr>
                                     <tr>
-                                        <td class="table-cell">英语</td>
-                                        <td class="table-cell">248</td>
-                                        <td class="table-cell">76.8</td>
-                                        <td class="table-cell">95</td>
-                                        <td class="table-cell">55</td>
-                                        <td class="table-cell">88.3%</td>
-                                        <td class="table-cell">22.2%</td>
+                                        <td class="table-cell dark:text-gray-200">英语</td>
+                                        <td class="table-cell dark:text-gray-200">248</td>
+                                        <td class="table-cell dark:text-gray-200">76.8</td>
+                                        <td class="table-cell dark:text-gray-200">95</td>
+                                        <td class="table-cell dark:text-gray-200">55</td>
+                                        <td class="table-cell dark:text-gray-200">88.3%</td>
+                                        <td class="table-cell dark:text-gray-200">22.2%</td>
                                     </tr>
                                     <tr>
-                                        <td class="table-cell">思想政治</td>
-                                        <td class="table-cell">248</td>
-                                        <td class="table-cell">80.1</td>
-                                        <td class="table-cell">97</td>
-                                        <td class="table-cell">60</td>
-                                        <td class="table-cell">92.8%</td>
-                                        <td class="table-cell">31.5%</td>
+                                        <td class="table-cell dark:text-gray-200">思想政治</td>
+                                        <td class="table-cell dark:text-gray-200">248</td>
+                                        <td class="table-cell dark:text-gray-200">80.1</td>
+                                        <td class="table-cell dark:text-gray-200">97</td>
+                                        <td class="table-cell dark:text-gray-200">60</td>
+                                        <td class="table-cell dark:text-gray-200">92.8%</td>
+                                        <td class="table-cell dark:text-gray-200">31.5%</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -849,81 +878,101 @@
                     </div>
                 </div>
 
-                <!-- 系统设置 -->
-                <div id="settings" class="page-content hidden">
-                    <div class="bg-white rounded-lg shadow-md p-6">
-                        <h3 class="text-lg font-medium text-gray-900 mb-6">系统设置</h3>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <h4 class="text-md font-medium text-gray-700 mb-4">基本设置</h4>
-                                <div class="space-y-4">
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-1">系统名称</label>
-                                        <input type="text" value="学生管理系统" class="input-field">
-                                    </div>
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-1">学校名称</label>
-                                        <input type="text" value="示例大学" class="input-field">
-                                    </div>
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-1">联系邮箱</label>
-                                        <input type="email" value="admin@example.edu" class="input-field">
-                                    </div>
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-1">联系电话</label>
-                                        <input type="tel" value="010-12345678" class="input-field">
-                                    </div>
-                                </div>
-                            </div>
-                            <div>
-                                <h4 class="text-md font-medium text-gray-700 mb-4">高级设置</h4>
-                                <div class="space-y-4">
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-1">数据备份频率</label>
-                                        <select class="input-field">
-                                            <option>每天</option>
-                                            <option selected>每周</option>
-                                            <option>每月</option>
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-1">系统语言</label>
-                                        <select class="input-field">
-                                            <option selected>简体中文</option>
-                                            <option>English</option>
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-1">时区设置</label>
-                                        <select class="input-field">
-                                            <option selected>(GMT+8:00) 北京时间</option>
-                                            <option>(GMT+0:00) 格林威治标准时间</option>
-                                            <option>(GMT-5:00) 东部标准时间</option>
-                                        </select>
-                                    </div>
-                                    <div class="flex items-center">
-                                        <input type="checkbox" id="enable-notifications" class="h-4 w-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500" checked>
-                                        <label for="enable-notifications" class="ml-2 block text-sm text-gray-700">启用系统通知</label>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="mt-8 flex justify-end">
-                            <button class="glow-border btn-secondary mr-3 relative z-10">取消</button>
-                            <button class="glow-btn btn-primary">保存设置</button>
-                        </div>
-                    </div>
-                </div>
             </main>
+        </div>
+    </div>
+
+    <!-- 教师账户详情模态框 -->
+    <div id="teacherAccountModal" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center hidden">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl w-full max-w-md p-6 transform transition-all scale-95 opacity-0">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-bold text-gray-900 dark:text-white">我的账户</h3>
+                <button id="closeTeacherAccountModalBtn" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+                    <i class="fa fa-times text-xl"></i>
+                </button>
+            </div>
+            <!-- 用户信息卡片 -->
+            <div class="flex flex-col items-center mb-8">
+                <div id="teacherAccountAvatar" class="w-24 h-24 rounded-full bg-primary/20 dark:bg-primary/30 flex items-center justify-center text-primary mb-4">
+                    <i class="fa fa-user text-4xl"></i>
+                </div>
+                <h4 id="teacherAccountUsername" class="text-xl font-bold text-gray-900 dark:text-white mb-1">管理员</h4>
+                <p id="teacherAccountJoinDate" class="text-gray-500 dark:text-gray-400 text-sm">注册时间: 2023-01-01</p>
+            </div>
+
+            <!-- 账户功能选项 -->
+            <div class="space-y-4 mb-8">
+                <button id="teacherAccountSettingsBtn" class="w-full flex items-center justify-between p-4 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                    <div class="flex items-center">
+                        <div class="w-10 h-10 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center mr-3">
+                            <i class="fa fa-cog text-blue-600 dark:text-blue-300"></i>
+                        </div>
+                        <span class="font-medium text-gray-900 dark:text-white">账户设置</span>
+                    </div>
+                    <i class="fa fa-chevron-right text-gray-400"></i>
+                </button>
+            </div>
+            <!-- 退出登录按钮 -->
+            <button id="teacherLogoutBtn" class="w-full py-3 bg-red-500 hover:bg-red-600 text-white font-medium rounded-lg transition-colors">
+                <i class="fa fa-sign-out mr-2"></i>退出登录
+            </button>
+        </div>
+    </div>
+
+    <!-- 教师账户设置模态框 -->
+    <div id="teacherAccountSettingsModal" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center hidden">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl w-full max-w-md p-6 transform transition-all scale-95 opacity-0">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-bold text-gray-900 dark:text-white">账户设置</h3>
+                <button id="closeTeacherAccountSettingsModalBtn" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+                    <i class="fa fa-times text-xl"></i>
+                </button>
+            </div>
+
+            <div class="space-y-6">
+                <!-- 用户头像设置 -->
+                <div class="flex flex-col items-center mb-6">
+                    <div class="relative mb-2">
+                        <div id="teacherSettingsAvatar" class="w-24 h-24 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center overflow-hidden border-4 border-white dark:border-gray-800 shadow-md">
+                            <i class="fa fa-user text-4xl text-gray-400 dark:text-gray-500"></i>
+                        </div>
+                        <label for="teacherAvatarUpload" class="absolute bottom-0 right-0 bg-blue-500 text-white rounded-full p-2 cursor-pointer hover:bg-blue-600 transition-colors">
+                            <i class="fa fa-camera"></i>
+                        </label>
+                        <input type="file" id="teacherAvatarUpload" accept="image/*" class="hidden">
+                    </div>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-2">点击相机图标更换头像</p>
+                    <button id="teacherResetAvatarBtn" class="text-sm text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300 transition-colors">
+                        <i class="fa fa-trash-o mr-1"></i>删除头像
+                    </button>
+                </div>
+
+                <!-- 用户名设置 -->
+                <div>
+                    <label for="teacherUsernameInput" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">用户名</label>
+                    <input type="text" id="teacherUsernameInput" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="请输入用户名">
+                </div>
+
+                <!-- 密码设置 -->
+                <div>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">密码</p>
+                    <button id="teacherChangePasswordBtn" class="text-blue-600 dark:text-blue-400 hover:underline">修改密码</button>
+                </div>
+
+                <!-- 保存按钮 -->
+                <button id="teacherSaveAccountSettingsBtn" class="glow-btn w-full bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-lg transition-colors">
+                    保存设置
+                </button>
+            </div>
         </div>
     </div>
 
     <!-- 创建班级模态框 -->
     <div id="add-class-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50 hidden">
-        <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
-            <div class="flex items-center justify-between p-6 border-b border-gray-200">
-                <h3 class="text-lg font-medium text-gray-900">创建班级</h3>
-                <button id="close-class-modal" class="text-gray-400 hover:text-gray-500">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full mx-4">
+            <div class="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+                <h3 class="text-lg font-medium text-gray-900 dark:text-white">创建班级</h3>
+                <button id="close-class-modal" class="text-gray-400 hover:text-gray-500 dark:text-gray-400 dark:hover:text-gray-300">
                     <i class="fa fa-times"></i>
                 </button>
             </div>
@@ -931,30 +980,30 @@
                 <form id="add-class-form">
                     <div class="grid grid-cols-1 gap-4">
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">班级名称</label>
-                            <input type="text" id="class-name" class="input-field" placeholder="例如：计算机科学2023级1班" required>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">班级名称</label>
+                            <input type="text" id="class-name" class="input-field dark:bg-gray-700 dark:border-gray-600 dark:text-white" placeholder="例如：计算机科学2023级1班" required>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">班级描述</label>
-                            <textarea id="class-description" class="input-field" rows="3" placeholder="请输入班级描述信息"></textarea>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">班级描述</label>
+                            <textarea id="class-description" class="input-field dark:bg-gray-700 dark:border-gray-600 dark:text-white" rows="3" placeholder="请输入班级描述信息"></textarea>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">教师姓名</label>
-                            <input type="text" id="class-teacher" class="input-field" placeholder="请输入教师姓名" required>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">教师姓名</label>
+                            <input type="text" id="class-teacher" class="input-field dark:bg-gray-700 dark:border-gray-600 dark:text-white" placeholder="请输入教师姓名" required>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">邀请码</label>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">邀请码</label>
                             <div class="flex">
-                                <input type="text" id="class-invite-code" class="input-field rounded-r-none" placeholder="自动生成或手动输入" required>
-                                <button type="button" id="generate-code-btn" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-r-md border border-l-0 border-gray-300">
+                                <input type="text" id="class-invite-code" class="input-field rounded-r-none dark:bg-gray-700 dark:border-gray-600 dark:text-white" placeholder="自动生成或手动输入" required>
+                                <button type="button" id="generate-code-btn" class="bg-gray-200 hover:bg-gray-300 text-gray-800 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600 px-4 py-2 rounded-r-md border border-l-0 border-gray-300 dark:border-gray-600">
                                     生成
                                 </button>
                             </div>
-                            <p class="text-xs text-gray-500 mt-1">邀请码用于学生加入班级，请分享给学生</p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">邀请码用于学生加入班级，请分享给学生</p>
                         </div>
                     </div>
                     <div class="mt-6 flex justify-end">
-                        <button type="button" id="cancel-add-class" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-4 rounded mr-3">
+                        <button type="button" id="cancel-add-class" class="bg-gray-200 hover:bg-gray-300 text-gray-800 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600 font-medium py-2 px-4 rounded mr-3">
                             取消
                         </button>
                         <button type="submit" class="glow-btn btn-primary">
@@ -968,10 +1017,10 @@
 
     <!-- 添加学生模态框 -->
     <div id="add-student-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50 hidden">
-        <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
-            <div class="flex items-center justify-between p-6 border-b border-gray-200">
-                <h3 class="text-lg font-medium text-gray-900">添加学生</h3>
-                <button id="close-student-modal" class="text-gray-400 hover:text-gray-500">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full mx-4">
+            <div class="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+                <h3 class="text-lg font-medium text-gray-900 dark:text-white">添加学生</h3>
+                <button id="close-student-modal" class="text-gray-400 hover:text-gray-500 dark:text-gray-400 dark:hover:text-gray-300">
                     <i class="fa fa-times"></i>
                 </button>
             </div>
@@ -979,40 +1028,40 @@
                 <form id="add-student-form">
                     <div class="grid grid-cols-1 gap-4">
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">学号</label>
-                            <input type="text" id="student-id" class="input-field" required>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">学号</label>
+                            <input type="text" id="student-id" class="input-field dark:bg-gray-700 dark:border-gray-600 dark:text-white" required>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">姓名</label>
-                            <input type="text" id="student-name" class="input-field" required>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">姓名</label>
+                            <input type="text" id="student-name" class="input-field dark:bg-gray-700 dark:border-gray-600 dark:text-white" required>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">性别</label>
-                            <select id="student-gender" class="input-field" required>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">性别</label>
+                            <select id="student-gender" class="input-field dark:bg-gray-700 dark:border-gray-600 dark:text-white" required>
                                 <option value="">请选择</option>
                                 <option value="男">男</option>
                                 <option value="女">女</option>
                             </select>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">出生日期</label>
-                            <input type="date" id="student-birthdate" class="input-field" required>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">出生日期</label>
+                            <input type="date" id="student-birthdate" class="input-field dark:bg-gray-700 dark:border-gray-600 dark:text-white" required>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">班级</label>
-                            <input type="text" id="student-class" class="input-field" required>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">班级</label>
+                            <input type="text" id="student-class" class="input-field dark:bg-gray-700 dark:border-gray-600 dark:text-white" required>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">专业</label>
-                            <input type="text" id="student-major" class="input-field" required>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">专业</label>
+                            <input type="text" id="student-major" class="input-field dark:bg-gray-700 dark:border-gray-600 dark:text-white" required>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">联系方式</label>
-                            <input type="tel" id="student-contact" class="input-field" required>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">联系方式</label>
+                            <input type="tel" id="student-contact" class="input-field dark:bg-gray-700 dark:border-gray-600 dark:text-white" required>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">地址</label>
-                            <textarea id="student-address" class="input-field" rows="3" required></textarea>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">地址</label>
+                            <textarea id="student-address" class="input-field dark:bg-gray-700 dark:border-gray-600 dark:text-white" rows="3" required></textarea>
                         </div>
                     </div>
                     <div class="mt-6 flex justify-end">
@@ -1214,6 +1263,40 @@
     </div>
 
     <script>
+        // 日夜切换功能
+        function initTheme() {
+            const savedTheme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+                document.documentElement.classList.add('dark');
+                updateThemeIcon(true);
+            } else {
+                document.documentElement.classList.remove('dark');
+                updateThemeIcon(false);
+            }
+        }
+
+        function updateThemeIcon(isDark) {
+            const icon = document.querySelector('#themeToggle i');
+            if (icon) {
+                if (isDark) {
+                    icon.classList.remove('fa-moon-o');
+                    icon.classList.add('fa-sun-o');
+                } else {
+                    icon.classList.remove('fa-sun-o');
+                    icon.classList.add('fa-moon-o');
+                }
+            }
+        }
+
+        function toggleTheme() {
+            const isDark = document.documentElement.classList.toggle('dark');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            updateThemeIcon(isDark);
+        }
+
+        document.addEventListener('DOMContentLoaded', initTheme);
+
         // 模拟数据
         const students = [
             { id: '2023001', name: '张三', gender: '男', birthdate: '2005-01-15', class: '计算机2301', major: '计算机科学与技术', contact: '13800138001', address: '北京市海淀区' },
@@ -1702,6 +1785,9 @@
                 window.location.href = 'index.html';
             });
 
+            // 教师账户相关事件监听器
+            initTeacherAccount();
+
             // 作业相关事件监听器
             // 布置作业按钮点击事件（动态生成的按钮需要在生成后绑定）
             
@@ -1925,7 +2011,7 @@
                 if (classes.length === 0) {
                     tableBody.innerHTML = `
                         <tr>
-                            <td colspan="7" class="px-6 py-4 text-center text-gray-500">
+                            <td colspan="7" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
                                 暂无班级数据，请点击"创建班级"按钮添加
                             </td>
                         </tr>
@@ -1941,15 +2027,15 @@
                     
                     const row = document.createElement('tr');
                     row.innerHTML = `
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${classItem.id}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${classItem.name}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${classItem.teacher}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${classItem.inviteCode}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${classItem.studentCount}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${new Date(classItem.createTime).toLocaleDateString()}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">${classItem.id}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">${classItem.name}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">${classItem.teacher}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">${classItem.inviteCode}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">${classItem.studentCount}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">${new Date(classItem.createTime).toLocaleDateString()}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                            <button class="text-blue-600 hover:text-blue-900 mr-3 view-class-btn" data-id="${classItem.id}">查看</button>
-                            <button class="text-red-600 hover:text-red-900 delete-class-btn" data-id="${classItem.id}">删除</button>
+                            <button class="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 mr-3 view-class-btn" data-id="${classItem.id}">查看</button>
+                            <button class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 delete-class-btn" data-id="${classItem.id}">删除</button>
                         </td>
                     `;
                     tableBody.appendChild(row);
@@ -1969,6 +2055,294 @@
                         deleteClass(classId);
                     });
                 });
+            }
+
+            // 教师账户功能
+            function initTeacherAccount() {
+                // 初始化头像显示
+                loadTeacherAvatar();
+                loadTeacherUsername();
+
+                // 教师账户按钮点击事件
+                const teacherProfileBtn = document.getElementById('teacherProfileBtn');
+                if (teacherProfileBtn) {
+                    teacherProfileBtn.addEventListener('click', openTeacherAccountModal);
+                }
+
+                // 关闭账户模态框按钮
+                const closeTeacherAccountModalBtn = document.getElementById('closeTeacherAccountModalBtn');
+                if (closeTeacherAccountModalBtn) {
+                    closeTeacherAccountModalBtn.addEventListener('click', closeTeacherAccountModal);
+                }
+
+                // 账户模态框背景点击关闭
+                const teacherAccountModal = document.getElementById('teacherAccountModal');
+                if (teacherAccountModal) {
+                    teacherAccountModal.addEventListener('click', function(e) {
+                        if (e.target === teacherAccountModal) {
+                            closeTeacherAccountModal();
+                        }
+                    });
+                }
+
+                // 账户设置按钮
+                const teacherAccountSettingsBtn = document.getElementById('teacherAccountSettingsBtn');
+                if (teacherAccountSettingsBtn) {
+                    teacherAccountSettingsBtn.addEventListener('click', openTeacherAccountSettingsModal);
+                }
+
+                // 关闭账户设置模态框按钮
+                const closeTeacherAccountSettingsModalBtn = document.getElementById('closeTeacherAccountSettingsModalBtn');
+                if (closeTeacherAccountSettingsModalBtn) {
+                    closeTeacherAccountSettingsModalBtn.addEventListener('click', closeTeacherAccountSettingsModal);
+                }
+
+                // 账户设置模态框背景点击关闭
+                const teacherAccountSettingsModal = document.getElementById('teacherAccountSettingsModal');
+                if (teacherAccountSettingsModal) {
+                    teacherAccountSettingsModal.addEventListener('click', function(e) {
+                        if (e.target === teacherAccountSettingsModal) {
+                            closeTeacherAccountSettingsModal();
+                        }
+                    });
+                }
+
+                // 头像上传事件
+                const teacherAvatarUpload = document.getElementById('teacherAvatarUpload');
+                if (teacherAvatarUpload) {
+                    teacherAvatarUpload.addEventListener('change', handleTeacherAvatarUpload);
+                }
+
+                // 重置头像按钮
+                const teacherResetAvatarBtn = document.getElementById('teacherResetAvatarBtn');
+                if (teacherResetAvatarBtn) {
+                    teacherResetAvatarBtn.addEventListener('click', resetTeacherAvatar);
+                }
+
+                // 保存账户设置按钮
+                const teacherSaveAccountSettingsBtn = document.getElementById('teacherSaveAccountSettingsBtn');
+                if (teacherSaveAccountSettingsBtn) {
+                    teacherSaveAccountSettingsBtn.addEventListener('click', saveTeacherAccountSettings);
+                }
+
+                // 账户模态框中的退出登录按钮
+                const teacherLogoutBtn = document.getElementById('teacherLogoutBtn');
+                if (teacherLogoutBtn) {
+                    teacherLogoutBtn.addEventListener('click', function() {
+                        localStorage.removeItem('currentUser');
+                        localStorage.removeItem('currentUserRole');
+                        window.location.href = 'index.html';
+                    });
+                }
+            }
+
+            // 加载教师头像
+            function loadTeacherAvatar() {
+                const savedAvatar = localStorage.getItem('teacherAvatar');
+                const teacherAvatar = document.getElementById('teacherAvatar');
+                const teacherAccountAvatar = document.getElementById('teacherAccountAvatar');
+                const teacherSettingsAvatar = document.getElementById('teacherSettingsAvatar');
+
+                if (savedAvatar) {
+                    if (teacherAvatar) {
+                        teacherAvatar.innerHTML = `<img src="${savedAvatar}" alt="教师头像" class="w-full h-full rounded-full object-cover">`;
+                    }
+                    if (teacherAccountAvatar) {
+                        teacherAccountAvatar.innerHTML = `<img src="${savedAvatar}" alt="教师头像" class="w-full h-full rounded-full object-cover">`;
+                    }
+                    if (teacherSettingsAvatar) {
+                        teacherSettingsAvatar.innerHTML = `<img src="${savedAvatar}" alt="教师头像" class="w-full h-full rounded-full object-cover">`;
+                    }
+                }
+            }
+
+            // 加载教师用户名
+            function loadTeacherUsername() {
+                const savedUsername = localStorage.getItem('teacherUsername') || '管理员';
+                const teacherProfileBtn = document.getElementById('teacherProfileBtn');
+                const teacherAccountUsername = document.getElementById('teacherAccountUsername');
+                const teacherUsernameInput = document.getElementById('teacherUsernameInput');
+
+                if (teacherProfileBtn) {
+                    const usernameSpan = teacherProfileBtn.querySelector('span');
+                    if (usernameSpan) {
+                        usernameSpan.textContent = savedUsername;
+                    }
+                }
+                if (teacherAccountUsername) {
+                    teacherAccountUsername.textContent = savedUsername;
+                }
+                if (teacherUsernameInput) {
+                    teacherUsernameInput.value = savedUsername;
+                }
+            }
+
+            // 打开教师账户模态框
+            function openTeacherAccountModal() {
+                const modal = document.getElementById('teacherAccountModal');
+                if (!modal) return;
+
+                modal.classList.remove('hidden');
+                const modalContent = modal.querySelector('div');
+                if (modalContent) {
+                    setTimeout(() => {
+                        modalContent.classList.remove('scale-95', 'opacity-0');
+                        modalContent.classList.add('scale-100', 'opacity-100');
+                    }, 10);
+                }
+            }
+
+            // 关闭教师账户模态框
+            function closeTeacherAccountModal() {
+                const modal = document.getElementById('teacherAccountModal');
+                if (!modal) return;
+
+                const modalContent = modal.querySelector('div');
+                if (modalContent) {
+                    modalContent.classList.remove('scale-100', 'opacity-100');
+                    modalContent.classList.add('scale-95', 'opacity-0');
+
+                    setTimeout(() => {
+                        modal.classList.add('hidden');
+                    }, 300);
+                }
+            }
+
+            // 打开教师账户设置模态框
+            function openTeacherAccountSettingsModal() {
+                closeTeacherAccountModal();
+                const modal = document.getElementById('teacherAccountSettingsModal');
+                if (!modal) return;
+
+                modal.classList.remove('hidden');
+                const modalContent = modal.querySelector('div');
+                if (modalContent) {
+                    setTimeout(() => {
+                        modalContent.classList.remove('scale-95', 'opacity-0');
+                        modalContent.classList.add('scale-100', 'opacity-100');
+                    }, 10);
+                }
+            }
+
+            // 关闭教师账户设置模态框
+            function closeTeacherAccountSettingsModal() {
+                const modal = document.getElementById('teacherAccountSettingsModal');
+                if (!modal) return;
+
+                const modalContent = modal.querySelector('div');
+                if (modalContent) {
+                    modalContent.classList.remove('scale-100', 'opacity-100');
+                    modalContent.classList.add('scale-95', 'opacity-0');
+
+                    setTimeout(() => {
+                        modal.classList.add('hidden');
+                    }, 300);
+                }
+            }
+
+            // 处理教师头像上传
+            function handleTeacherAvatarUpload(event) {
+                const file = event.target.files[0];
+                if (!file) return;
+
+                // 检查文件类型
+                if (!file.type.startsWith('image/')) {
+                    showNotification('请选择有效的图片文件', 'error');
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    // 更新所有头像显示
+                    updateAllTeacherAvatars(e.target.result);
+
+                    // 保存头像到本地存储
+                    localStorage.setItem('teacherAvatar', e.target.result);
+
+                    showNotification('头像上传成功', 'success');
+                };
+                reader.readAsDataURL(file);
+            }
+
+            // 更新所有教师头像显示
+            function updateAllTeacherAvatars(avatarSrc) {
+                // 更新导航栏中的头像
+                const teacherAvatar = document.getElementById('teacherAvatar');
+                if (teacherAvatar) {
+                    teacherAvatar.innerHTML = `<img src="${avatarSrc}" alt="教师头像" class="w-full h-full rounded-full object-cover">`;
+                }
+
+                // 更新账户模态框中的头像
+                const teacherAccountAvatar = document.getElementById('teacherAccountAvatar');
+                if (teacherAccountAvatar) {
+                    teacherAccountAvatar.innerHTML = `<img src="${avatarSrc}" alt="教师头像" class="w-full h-full rounded-full object-cover">`;
+                }
+
+                // 更新账户设置模态框中的头像
+                const teacherSettingsAvatar = document.getElementById('teacherSettingsAvatar');
+                if (teacherSettingsAvatar) {
+                    teacherSettingsAvatar.innerHTML = `<img src="${avatarSrc}" alt="教师头像" class="w-full h-full rounded-full object-cover">`;
+                }
+            }
+
+            // 重置教师头像
+            function resetTeacherAvatar() {
+                // 清除本地存储中的头像
+                localStorage.removeItem('teacherAvatar');
+
+                // 重置所有头像显示为默认
+                const defaultAvatar = '<i class="fa fa-user text-xl"></i>';
+                const bigDefaultAvatar = '<i class="fa fa-user text-4xl text-gray-400 dark:text-gray-500"></i>';
+
+                const teacherAvatar = document.getElementById('teacherAvatar');
+                if (teacherAvatar) {
+                    teacherAvatar.innerHTML = defaultAvatar;
+                }
+
+                const teacherAccountAvatar = document.getElementById('teacherAccountAvatar');
+                if (teacherAccountAvatar) {
+                    teacherAccountAvatar.innerHTML = '<i class="fa fa-user text-4xl"></i>';
+                }
+
+                const teacherSettingsAvatar = document.getElementById('teacherSettingsAvatar');
+                if (teacherSettingsAvatar) {
+                    teacherSettingsAvatar.innerHTML = bigDefaultAvatar;
+                }
+
+                showNotification('头像已重置', 'success');
+            }
+
+            // 保存教师账户设置
+            function saveTeacherAccountSettings() {
+                const usernameInput = document.getElementById('teacherUsernameInput');
+                const newUsername = usernameInput.value.trim();
+
+                if (!newUsername) {
+                    showNotification('请输入用户名', 'error');
+                    return;
+                }
+
+                // 保存用户名到本地存储
+                localStorage.setItem('teacherUsername', newUsername);
+
+                // 更新页面上的用户名显示
+                const teacherProfileBtn = document.getElementById('teacherProfileBtn');
+                if (teacherProfileBtn) {
+                    const usernameSpan = teacherProfileBtn.querySelector('span');
+                    if (usernameSpan) {
+                        usernameSpan.textContent = newUsername;
+                    }
+                }
+
+                const teacherAccountUsername = document.getElementById('teacherAccountUsername');
+                if (teacherAccountUsername) {
+                    teacherAccountUsername.textContent = newUsername;
+                }
+
+                // 关闭模态框
+                closeTeacherAccountSettingsModal();
+
+                showNotification('设置保存成功', 'success');
             }
 
             // 查看班级详情
@@ -2626,12 +3000,14 @@
                     
                     // 重新加载出勤表格
                     loadAttendance();
-                    
+
                     // 显示成功提示
                     alert('出勤记录删除成功！');
                 }
             }
-        }}
+        }
+
+        }
     </script>
 </body>
 </html>

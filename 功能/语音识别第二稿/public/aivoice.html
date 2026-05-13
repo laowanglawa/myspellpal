@@ -1,0 +1,1419 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>英语口语练习</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --primary: #3B82F6;
+            --primary-light: rgba(59, 130, 246, 0.15);
+            --primary-dark: rgba(59, 130, 246, 0.3);
+            --secondary: #10B981;
+            --danger: #EF4444;
+            --warning: #F59E0B;
+            --bg-light: #ffffff;
+            --bg-dark: #1f2937;
+            --card-light: #ffffff;
+            --card-dark: #374151;
+            --text-light: #1f2937;
+            --text-dark: #f3f4f6;
+            --text-muted-light: #6b7280;
+            --text-muted-dark: #9ca3af;
+            --border-light: #e5e7eb;
+            --border-dark: #4b5563;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg-light);
+            min-height: 100vh;
+            color: var(--text-light);
+            transition: background 0.3s, color 0.3s;
+        }
+
+        body.dark {
+            background: var(--bg-dark);
+            color: var(--text-dark);
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        header p {
+            color: var(--text-muted-light);
+            font-size: 1.1em;
+        }
+
+        body.dark header p {
+            color: var(--text-muted-dark);
+        }
+
+        .card {
+            background: var(--card-light);
+            border: 1px solid var(--border-light);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            transition: background 0.3s, border-color 0.3s;
+        }
+
+        body.dark .card {
+            background: var(--card-dark);
+            border-color: var(--border-dark);
+        }
+
+        .card h2 {
+            font-size: 1.4em;
+            margin-bottom: 20px;
+            color: var(--primary);
+        }
+
+        .topic-selector {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .topic-btn {
+            padding: 8px 18px;
+            border: 1px solid var(--primary);
+            background: transparent;
+            color: var(--primary);
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.95em;
+            transition: all 0.3s;
+        }
+
+        .topic-btn:hover, .topic-btn.active {
+            background: var(--primary-light);
+        }
+
+        .prompt-area {
+            background: #f9fafb;
+            border-radius: 12px;
+            padding: 24px;
+            min-height: 80px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        body.dark .prompt-area {
+            background: #1f2937;
+        }
+
+        .prompt-area .en-text {
+            font-size: 1.3em;
+            line-height: 1.6;
+            color: var(--text-light);
+            margin-bottom: 8px;
+        }
+
+        body.dark .prompt-area .en-text {
+            color: var(--text-dark);
+        }
+
+        .prompt-area .zh-text {
+            font-size: 0.95em;
+            color: var(--text-muted-light);
+        }
+
+        body.dark .prompt-area .zh-text {
+            color: var(--text-muted-dark);
+        }
+
+        .refresh-btn {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: none;
+            border: none;
+            color: var(--primary);
+            cursor: pointer;
+            font-size: 1.2em;
+            opacity: 0.7;
+            transition: opacity 0.3s;
+        }
+
+        .refresh-btn:hover { opacity: 1; }
+
+        .speak-controls {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-left: 12px;
+            vertical-align: middle;
+        }
+
+        .voice-select {
+            border: 1px solid var(--border-light);
+            border-radius: 16px;
+            padding: 6px 10px;
+            font-size: 0.85em;
+            background: var(--card-light);
+            color: var(--text-light);
+            cursor: pointer;
+            max-width: 180px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        body.dark .voice-select {
+            background: var(--card-dark);
+            color: var(--text-dark);
+            border-color: var(--border-dark);
+        }
+
+        .voice-select:focus {
+            border-color: var(--primary);
+        }
+
+        .speak-btn {
+            background: var(--primary-light);
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            padding: 6px 14px;
+            border-radius: 16px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.3s;
+        }
+
+        .speak-btn:hover {
+            background: var(--primary-dark);
+        }
+
+        .speak-btn.speaking {
+            animation: speaking-pulse 1s infinite;
+        }
+
+        @keyframes speaking-pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .playback-section {
+            margin-top: 16px;
+            padding: 16px;
+            background: #f3f4f6;
+            border-radius: 10px;
+        }
+
+        body.dark .playback-section {
+            background: #1f2937;
+        }
+
+        .playback-btn {
+            background: var(--primary-light);
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .playback-btn:hover {
+            background: var(--primary-dark);
+        }
+
+        .playback-btn.playing {
+            background: var(--primary-dark);
+        }
+
+        .playback-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .record-section {
+            text-align: center;
+        }
+
+        .record-btn {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: 3px solid var(--danger);
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+            font-size: 2.5em;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .record-btn:hover {
+            background: rgba(239, 68, 68, 0.2);
+            transform: scale(1.05);
+        }
+
+        .record-btn.recording {
+            background: rgba(239, 68, 68, 0.3);
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+            50% { box-shadow: 0 0 0 20px rgba(239, 68, 68, 0); }
+        }
+
+        .record-status {
+            margin-top: 12px;
+            color: var(--text-muted-light);
+            font-size: 0.95em;
+        }
+
+        body.dark .record-status {
+            color: var(--text-muted-dark);
+        }
+
+        .timer {
+            font-size: 1.2em;
+            color: var(--danger);
+            margin-top: 8px;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .result-area {
+            margin-top: 24px;
+        }
+
+        .result-box {
+            background: #f9fafb;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+        }
+
+        body.dark .result-box {
+            background: #1f2937;
+        }
+
+        .result-box .label {
+            font-size: 0.85em;
+            color: var(--text-muted-light);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        body.dark .result-box .label {
+            color: var(--text-muted-dark);
+        }
+
+        .result-box .text {
+            font-size: 1.2em;
+            line-height: 1.5;
+        }
+
+        .recognized-text { color: var(--warning); }
+        .target-text { color: var(--secondary); }
+
+        .score-section {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-top: 16px;
+        }
+
+        .score-circle {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8em;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .score-excellent { background: rgba(16, 185, 129, 0.2); color: var(--secondary); border: 2px solid var(--secondary); }
+        .score-good { background: var(--primary-light); color: var(--primary); border: 2px solid var(--primary); }
+        .score-fair { background: rgba(245, 158, 11, 0.2); color: var(--warning); border: 2px solid var(--warning); }
+        .score-poor { background: rgba(239, 68, 68, 0.2); color: var(--danger); border: 2px solid var(--danger); }
+
+        .score-detail { flex: 1; }
+        .score-detail p { color: var(--text-muted-light); font-size: 0.95em; line-height: 1.6; }
+        body.dark .score-detail p { color: var(--text-muted-dark); }
+
+        .diff-words {
+            margin-top: 12px;
+        }
+
+        .diff-words .word {
+            display: inline-block;
+            padding: 2px 8px;
+            margin: 3px;
+            border-radius: 4px;
+            font-size: 0.95em;
+        }
+
+        .word-correct { background: rgba(16, 185, 129, 0.15); color: var(--secondary); }
+        .word-wrong { background: rgba(239, 68, 68, 0.15); color: var(--danger); }
+        .word-missing { background: rgba(245, 158, 11, 0.15); color: var(--warning); }
+
+        .history-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .history-item {
+            background: #f9fafb;
+            border-radius: 10px;
+            padding: 16px;
+            margin-bottom: 12px;
+            border-left: 3px solid var(--primary);
+        }
+
+        body.dark .history-item {
+            background: #1f2937;
+        }
+
+        .history-item .time {
+            font-size: 0.8em;
+            color: var(--text-muted-light);
+        }
+
+        body.dark .history-item .time {
+            color: var(--text-muted-dark);
+        }
+
+        .history-item .prompt {
+            color: var(--secondary);
+            font-size: 0.95em;
+            margin: 6px 0;
+        }
+
+        .history-item .spoken {
+            color: var(--warning);
+            font-size: 0.95em;
+        }
+
+        .history-item .hist-score {
+            float: right;
+            font-weight: bold;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(59, 130, 246, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 0.8s ease-in-out infinite;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .hidden { display: none; }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 3px; }
+
+        .header-actions {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
+
+        .ai-summary-btn {
+            background: var(--primary);
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.95em;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .ai-summary-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(59, 130, 246, 0.4);
+        }
+
+        .ai-summary-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .ai-generate-btn {
+            background: var(--primary);
+            border: none;
+            color: white;
+            padding: 6px 14px;
+            border-radius: 16px;
+            cursor: pointer;
+            font-size: 0.85em;
+            margin-left: 8px;
+            transition: all 0.3s;
+            vertical-align: middle;
+        }
+
+        .ai-generate-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .ai-generate-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .ai-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .ai-modal.show {
+            display: flex;
+        }
+
+        .ai-modal-content {
+            background: var(--card-light);
+            border: 1px solid var(--border-light);
+            border-radius: 16px;
+            padding: 30px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        body.dark .ai-modal-content {
+            background: var(--card-dark);
+            border-color: var(--border-dark);
+        }
+
+        .ai-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        body.dark .ai-modal-header {
+            border-color: var(--border-dark);
+        }
+
+        .ai-modal-header h3 {
+            color: var(--primary);
+            font-size: 1.3em;
+        }
+
+        .ai-modal-close {
+            background: none;
+            border: none;
+            color: var(--text-muted-light);
+            font-size: 1.5em;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        body.dark .ai-modal-close {
+            color: var(--text-muted-dark);
+        }
+
+        .ai-modal-close:hover {
+            color: var(--danger);
+        }
+
+        .ai-modal-body {
+            color: var(--text-light);
+            line-height: 1.8;
+        }
+
+        body.dark .ai-modal-body {
+            color: var(--text-dark);
+        }
+
+        .ai-loading {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .ai-loading .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(59, 130, 246, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        .ai-result {
+            white-space: pre-wrap;
+        }
+
+        .ai-result h4 {
+            color: var(--primary);
+            margin: 15px 0 10px;
+        }
+
+        .ai-result ul {
+            margin-left: 20px;
+            margin-bottom: 10px;
+        }
+
+        .ai-result li {
+            margin: 5px 0;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-actions">
+                <button class="ai-summary-btn" id="aiSummaryBtn" onclick="showAISummary()" title="AI总结练习情况">
+                    🤖 AI总结
+                </button>
+            </div>
+            <h1>English Speaking Practice</h1>
+            <p>练习英语口语，AI 实时识别你的发音</p>
+        </header>
+
+        <div class="card">
+            <h2>📝 选择练习主题</h2>
+            <div class="topic-selector" id="topicSelector"></div>
+            <div class="prompt-area">
+                <button class="refresh-btn" onclick="refreshPrompt()" title="换一题">🔄</button>
+                <div class="en-text" id="promptEn">点击上方主题开始练习</div>
+                <div class="zh-text" id="promptZh"></div>
+                <div class="speak-controls">
+                    <select id="voiceSelect" class="voice-select">
+                        <option value="">加载中...</option>
+                    </select>
+                    <button class="speak-btn" id="speakBtn" onclick="speakPrompt()" title="朗读例句">🔊 朗读例句</button>
+                </div>
+                <button class="ai-generate-btn" id="aiGenerateBtn" onclick="generateAIPrompt()" title="AI生成例句">✨ AI生成例句</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>🎙️ 录音练习</h2>
+            <div class="record-section">
+                <button class="record-btn" id="recordBtn" onclick="toggleRecording()">
+                    🎤
+                </button>
+                <div class="record-status" id="recordStatus">点击按钮开始录音</div>
+                <div class="timer hidden" id="timer">00:00</div>
+            </div>
+
+            <div class="result-area hidden" id="resultArea">
+                <div class="playback-section" id="playbackSection">
+                    <button class="playback-btn" id="playbackBtn" onclick="playRecording()" disabled>
+                        <span id="playbackIcon">▶️</span>
+                        <span id="playbackText">播放录音</span>
+                    </button>
+                    <span id="playbackStatus" style="margin-left: 12px; color: #8892b0; font-size: 0.9em;"></span>
+                </div>
+                <div class="result-box">
+                    <div class="label">你说的话</div>
+                    <div class="text recognized-text" id="recognizedText"></div>
+                </div>
+                <div class="result-box">
+                    <div class="label">参考文本</div>
+                    <div class="text target-text" id="targetText"></div>
+                </div>
+                <div class="score-section" id="scoreSection">
+                    <div class="score-circle" id="scoreCircle">--</div>
+                    <div class="score-detail">
+                        <p id="scoreComment">识别中...</p>
+                        <div class="diff-words" id="diffWords"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>📊 练习记录</h2>
+            <div class="history-list" id="historyList">
+                <p style="color: #5a6384; text-align: center; padding: 20px;">暂无练习记录，开始录音吧！</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="ai-modal" id="aiModal">
+        <div class="ai-modal-content">
+            <div class="ai-modal-header">
+                <h3 id="aiModalTitle">🤖 AI 分析</h3>
+                <button class="ai-modal-close" onclick="closeAIModal()">✕</button>
+            </div>
+            <div class="ai-modal-body" id="aiModalBody">
+                <div class="ai-loading">
+                    <div class="spinner"></div>
+                    <p>AI 正在分析中...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const topics = {
+            '日常问候': [
+                { en: 'Hello, how are you doing today?', zh: '你好，你今天怎么样？' },
+                { en: 'Good morning! It is a beautiful day.', zh: '早上好！今天天气真好。' },
+                { en: 'Nice to meet you. My name is John.', zh: '很高兴认识你。我叫约翰。' },
+                { en: 'How have you been? Long time no see.', zh: '你最近怎么样？好久不见。' },
+                { en: 'What is up? Anything new?', zh: '怎么了？有什么新鲜事吗？' },
+                { en: 'Good evening! Did you have a good day?', zh: '晚上好！你今天过得怎么样？' },
+                { en: 'It is so nice to see you again!', zh: '真高兴再次见到你！' },
+                { en: 'How is everything going with you?', zh: '你一切都好吗？' },
+                { en: 'I hope you are having a wonderful day.', zh: '希望你今天过得愉快。' },
+                { en: 'Take care and see you soon!', zh: '保重，很快再见！' },
+            ],
+            '自我介绍': [
+                { en: 'I am a software engineer from China.', zh: '我是一名来自中国的软件工程师。' },
+                { en: 'I enjoy reading books and playing basketball.', zh: '我喜欢读书和打篮球。' },
+                { en: 'I have been studying English for three years.', zh: '我学英语已经三年了。' },
+                { en: 'My favorite hobby is traveling around the world.', zh: '我最大的爱好是环游世界。' },
+                { en: 'I work at a technology company in Beijing.', zh: '我在北京的一家科技公司工作。' },
+                { en: 'I graduated from Peking University last year.', zh: '我去年从北京大学毕业。' },
+                { en: 'I have two sisters and one brother.', zh: '我有两个姐姐和一个哥哥。' },
+                { en: 'My dream is to become a professional photographer.', zh: '我的梦想是成为一名专业摄影师。' },
+                { en: 'I am currently learning how to play the guitar.', zh: '我正在学习弹吉他。' },
+                { en: 'I have been living in Shanghai for five years.', zh: '我在上海住了五年了。' },
+            ],
+            '旅行出行': [
+                { en: 'Could you please tell me how to get to the train station?', zh: '请问去火车站怎么走？' },
+                { en: 'I would like to book a round trip ticket to London.', zh: '我想订一张去伦敦的往返票。' },
+                { en: 'Where is the nearest restaurant around here?', zh: '这附近最近的餐厅在哪里？' },
+                { en: 'How much does it cost to take a taxi to the airport?', zh: '打车去机场要多少钱？' },
+                { en: 'Can you recommend a good hotel in this area?', zh: '你能推荐这个区域的好酒店吗？' },
+                { en: 'Excuse me, is this the right way to the museum?', zh: '请问这是去博物馆的路吗？' },
+                { en: 'I need to check in for my flight to New York.', zh: '我需要办理去纽约的航班登机手续。' },
+                { en: 'What time does the last bus leave?', zh: '最后一班公交车几点出发？' },
+                { en: 'Is there a subway station nearby?', zh: '这附近有地铁站吗？' },
+                { en: 'I would like to rent a car for three days.', zh: '我想租一辆车三天。' },
+            ],
+            '餐厅点餐': [
+                { en: 'I would like a cup of coffee and a sandwich please.', zh: '请给我一杯咖啡和一个三明治。' },
+                { en: 'Could I see the menu, please?', zh: '请给我看一下菜单好吗？' },
+                { en: 'The food here is absolutely delicious.', zh: '这里的食物真的太好吃了。' },
+                { en: 'I am allergic to seafood. Do you have other options?', zh: '我对海鲜过敏。你们有其他选择吗？' },
+                { en: 'Can we have the bill, please?', zh: '请买单。' },
+                { en: 'I would like to make a reservation for two people.', zh: '我想预订两个人的位置。' },
+                { en: 'What is the special today?', zh: '今天的特色菜是什么？' },
+                { en: 'Could I have some water, please?', zh: '请给我一些水好吗？' },
+                { en: 'This steak is cooked perfectly.', zh: '这块牛排做得太完美了。' },
+                { en: 'Do you have any vegetarian dishes?', zh: '你们有素食菜品吗？' },
+            ],
+            '工作面试': [
+                { en: 'I believe my experience makes me a strong candidate for this position.', zh: '我相信我的经验使我是这个职位的有力候选人。' },
+                { en: 'My greatest strength is my ability to solve problems creatively.', zh: '我最大的优势是创造性地解决问题的能力。' },
+                { en: 'I am a team player and I enjoy working with others.', zh: '我很有团队精神，喜欢与他人合作。' },
+                { en: 'I am always eager to learn new skills and take on challenges.', zh: '我总是渴望学习新技能并接受挑战。' },
+                { en: 'In my previous role, I successfully led a project team of ten people.', zh: '在之前的工作中，我成功领导了一个十人的项目团队。' },
+                { en: 'I have excellent communication skills in both English and Chinese.', zh: '我有出色的中英文沟通能力。' },
+                { en: 'I am comfortable working under pressure and meeting tight deadlines.', zh: '我能在压力下工作并按时完成任务。' },
+                { en: 'My career goal is to become a senior manager within five years.', zh: '我的职业目标是在五年内成为高级经理。' },
+                { en: 'I have experience working with international clients.', zh: '我有与国际客户合作的经验。' },
+                { en: 'I am proficient in Python, Java, and JavaScript.', zh: '我精通Python、Java和JavaScript。' },
+            ],
+            '购物消费': [
+                { en: 'How much is this shirt? Can I try it on?', zh: '这件衬衫多少钱？我可以试穿吗？' },
+                { en: 'Do you have this in a larger size?', zh: '这个有大一号的吗？' },
+                { en: 'Is there any discount on this item?', zh: '这件商品有折扣吗？' },
+                { en: 'I am just browsing, thank you.', zh: '我只是随便看看，谢谢。' },
+                { en: 'I will take it. Can I pay by credit card?', zh: '我要了。可以刷卡吗？' },
+                { en: 'Could you wrap this as a gift, please?', zh: '请帮我把这个包装成礼物好吗？' },
+                { en: 'Do you have this in different colors?', zh: '这个有其他颜色吗？' },
+                { en: 'I would like to return this item.', zh: '我想退掉这个商品。' },
+                { en: 'Is this on sale?', zh: '这个在打折吗？' },
+                { en: 'Can I get a receipt, please?', zh: '请给我一张收据好吗？' },
+            ],
+            '医疗健康': [
+                { en: 'I have a headache and feel a bit dizzy.', zh: '我头痛，感觉有点头晕。' },
+                { en: 'I need to make an appointment with a doctor.', zh: '我需要预约看医生。' },
+                { en: 'How often should I take this medicine?', zh: '这种药我应该多久吃一次？' },
+                { en: 'I have been feeling tired for the past week.', zh: '过去一周我一直感觉很累。' },
+                { en: 'Do I need to have any tests done?', zh: '我需要做什么检查吗？' },
+                { en: 'I think I have caught a cold.', zh: '我想我感冒了。' },
+                { en: 'Where is the nearest pharmacy?', zh: '最近的药店在哪里？' },
+                { en: 'I need to refill my prescription.', zh: '我需要续开处方药。' },
+                { en: 'Are there any side effects of this medication?', zh: '这种药有副作用吗？' },
+                { en: 'I have an allergy to penicillin.', zh: '我对青霉素过敏。' },
+            ],
+            '校园生活': [
+                { en: 'What time does the library close today?', zh: '图书馆今天几点关门？' },
+                { en: 'I need to submit my assignment by Friday.', zh: '我需要在周五之前提交作业。' },
+                { en: 'Could you help me with this math problem?', zh: '你能帮我解决这道数学题吗？' },
+                { en: 'I have a class at two oclock this afternoon.', zh: '我今天下午两点有课。' },
+                { en: 'Where is the cafeteria located?', zh: '食堂在哪里？' },
+                { en: 'I am planning to study abroad next semester.', zh: '我计划下学期出国留学。' },
+                { en: 'The professor gave an interesting lecture today.', zh: '教授今天的讲座很有趣。' },
+                { en: 'I need to borrow some books from the library.', zh: '我需要从图书馆借一些书。' },
+                { en: 'When is the final exam scheduled?', zh: '期末考试安排在什么时候？' },
+                { en: 'I am looking for a study partner.', zh: '我在找一个学习伙伴。' },
+            ],
+        };
+
+        let currentTopic = null;
+        let currentPrompt = null;
+        let isRecording = false;
+        let mediaRecorder = null;
+        let audioChunks = [];
+        let timerInterval = null;
+        let seconds = 0;
+        let history = [];
+        let lastRecordingBlob = null;
+        let audioPlayer = null;
+        let isSpeaking = false;
+        const synth = window.speechSynthesis;
+
+        function loadVoices() {
+            const voices = synth.getVoices();
+            const voiceSelect = document.getElementById('voiceSelect');
+            if (!voiceSelect) return;
+            voiceSelect.innerHTML = '';
+            voices.forEach(voice => {
+                const option = document.createElement('option');
+                option.value = voice.name;
+                option.textContent = voice.name + ' (' + voice.lang + ')';
+                voiceSelect.appendChild(option);
+            });
+        }
+
+        synth.onvoiceschanged = loadVoices;
+
+        function syncTheme() {
+            try {
+                const parentTheme = window.parent.localStorage.getItem('theme');
+                if (parentTheme === 'dark') {
+                    document.body.classList.add('dark');
+                } else {
+                    document.body.classList.remove('dark');
+                }
+            } catch (e) {
+                const localTheme = localStorage.getItem('theme');
+                if (localTheme === 'dark') {
+                    document.body.classList.add('dark');
+                }
+            }
+        }
+
+        function init() {
+            syncTheme();
+            
+            setInterval(syncTheme, 500);
+            
+            const selector = document.getElementById('topicSelector');
+            const topicKeys = Object.keys(topics);
+            topicKeys.forEach((topic, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'topic-btn';
+                btn.textContent = topic;
+                btn.onclick = () => selectTopic(topic, btn);
+                selector.appendChild(btn);
+                if (index === 0) {
+                    btn.classList.add('active');
+                    currentTopic = topic;
+                    refreshPrompt();
+                }
+            });
+        }
+
+        function speakPrompt() {
+            if (!currentPrompt) return;
+            
+            synth.cancel();
+            
+            const utterance = new SpeechSynthesisUtterance(currentPrompt.en);
+            
+            const selectedVoice = synth.getVoices().find(v => v.name === voiceSelect.value);
+            if (selectedVoice) utterance.voice = selectedVoice;
+            utterance.lang = 'en-US';
+            utterance.rate = 0.9;
+            utterance.pitch = 1;
+            utterance.volume = 1;
+            
+            const speakBtn = document.getElementById('speakBtn');
+            
+            utterance.onstart = () => {
+                isSpeaking = true;
+                speakBtn.classList.add('speaking');
+                speakBtn.textContent = '🔊 正在朗读...';
+            };
+            
+            utterance.onend = () => {
+                isSpeaking = false;
+                speakBtn.classList.remove('speaking');
+                speakBtn.textContent = '🔊 朗读例句';
+            };
+            
+            utterance.onerror = () => {
+                isSpeaking = false;
+                speakBtn.classList.remove('speaking');
+                speakBtn.textContent = '🔊 朗读例句';
+            };
+            
+            synth.speak(utterance);
+        }
+
+        function playRecording() {
+            if (!lastRecordingBlob) return;
+            
+            const playbackBtn = document.getElementById('playbackBtn');
+            const playbackIcon = document.getElementById('playbackIcon');
+            const playbackText = document.getElementById('playbackText');
+            const playbackStatus = document.getElementById('playbackStatus');
+            
+            if (audioPlayer && !audioPlayer.paused) {
+                audioPlayer.pause();
+                audioPlayer.currentTime = 0;
+                playbackIcon.textContent = '▶️';
+                playbackText.textContent = '播放录音';
+                playbackBtn.classList.remove('playing');
+                playbackStatus.textContent = '';
+                return;
+            }
+            
+            audioPlayer = new Audio(URL.createObjectURL(lastRecordingBlob));
+            
+            audioPlayer.onplay = () => {
+                playbackIcon.textContent = '⏸️';
+                playbackText.textContent = '停止播放';
+                playbackBtn.classList.add('playing');
+            };
+            
+            audioPlayer.onended = () => {
+                playbackIcon.textContent = '▶️';
+                playbackText.textContent = '播放录音';
+                playbackBtn.classList.remove('playing');
+                playbackStatus.textContent = '播放完毕';
+            };
+            
+            audioPlayer.onpause = () => {
+                playbackIcon.textContent = '▶️';
+                playbackText.textContent = '播放录音';
+                playbackBtn.classList.remove('playing');
+            };
+            
+            audioPlayer.ontimeupdate = () => {
+                const duration = audioPlayer.duration;
+                const currentTime = audioPlayer.currentTime;
+                if (duration && currentTime) {
+                    const remaining = duration - currentTime;
+                    playbackStatus.textContent = `剩余 ${remaining.toFixed(1)} 秒`;
+                }
+            };
+            
+            audioPlayer.play();
+        }
+
+        function selectTopic(topic, btn) {
+            document.querySelectorAll('.topic-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentTopic = topic;
+            refreshPrompt();
+        }
+
+        function refreshPrompt() {
+            if (!currentTopic) return;
+            const items = topics[currentTopic];
+            currentPrompt = items[Math.floor(Math.random() * items.length)];
+            document.getElementById('promptEn').textContent = currentPrompt.en;
+            document.getElementById('promptZh').textContent = currentPrompt.zh;
+            document.getElementById('resultArea').classList.add('hidden');
+        }
+
+        async function toggleRecording() {
+            if (isRecording) {
+                stopRecording();
+            } else {
+                await startRecording();
+            }
+        }
+
+        async function startRecording() {
+            try {
+                if (audioPlayer) {
+                    audioPlayer.pause();
+                    audioPlayer = null;
+                }
+                
+                const playbackBtn = document.getElementById('playbackBtn');
+                playbackBtn.disabled = true;
+                document.getElementById('playbackStatus').textContent = '';
+                
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    audio: {
+                        channelCount: 1,
+                        sampleRate: 16000,
+                        echoCancellation: true,
+                        noiseSuppression: true
+                    }
+                });
+
+                mediaRecorder = new MediaRecorder(stream, { mimeType: getSupportedMimeType() });
+                audioChunks = [];
+
+                mediaRecorder.ondataavailable = (e) => {
+                    if (e.data.size > 0) audioChunks.push(e.data);
+                };
+
+                mediaRecorder.onstop = async () => {
+                    stream.getTracks().forEach(t => t.stop());
+                    await sendAudio();
+                };
+
+                mediaRecorder.start();
+                isRecording = true;
+                seconds = 0;
+
+                const btn = document.getElementById('recordBtn');
+                btn.classList.add('recording');
+                btn.textContent = '⏹';
+                document.getElementById('recordStatus').textContent = '正在录音...点击停止';
+                document.getElementById('timer').classList.remove('hidden');
+                document.getElementById('resultArea').classList.add('hidden');
+
+                timerInterval = setInterval(() => {
+                    seconds++;
+                    const m = String(Math.floor(seconds / 60)).padStart(2, '0');
+                    const s = String(seconds % 60).padStart(2, '0');
+                    document.getElementById('timer').textContent = `${m}:${s}`;
+                }, 1000);
+
+            } catch (err) {
+                alert('无法访问麦克风，请检查权限设置');
+                console.error(err);
+            }
+        }
+
+        function stopRecording() {
+            if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+                mediaRecorder.stop();
+            }
+            isRecording = false;
+            clearInterval(timerInterval);
+
+            const btn = document.getElementById('recordBtn');
+            btn.classList.remove('recording');
+            btn.textContent = '🎤';
+            document.getElementById('recordStatus').innerHTML = '<span class="loading"></span>识别中...';
+            document.getElementById('timer').classList.add('hidden');
+        }
+
+        function getSupportedMimeType() {
+            const types = ['audio/webm;codecs=opus', 'audio/webm', 'audio/ogg;codecs=opus', 'audio/mp4'];
+            for (const type of types) {
+                if (MediaRecorder.isTypeSupported(type)) return type;
+            }
+            return '';
+        }
+
+        async function sendAudio() {
+            try {
+                const mimeType = getSupportedMimeType() || 'audio/webm';
+                const audioBlob = new Blob(audioChunks, { type: mimeType });
+                
+                lastRecordingBlob = audioBlob;
+
+                const wavBlob = await convertToWav(audioBlob);
+
+                const formData = new FormData();
+                formData.append('audio', wavBlob, 'recording.wav');
+
+                const res = await fetch('/api/recognize', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await res.json();
+
+                if (data.err_no === 0 && data.result && data.result.length > 0) {
+                    showResult(data.result[0]);
+                } else if (data.err_no === 3301) {
+                    showResult('', '音频质量过差，请靠近麦克风重新尝试');
+                } else if (data.err_no === 3307) {
+                    showResult('', '语音太短，请说更长时间');
+                } else {
+                    showResult('', `识别失败: ${data.err_msg || '未知错误'}`);
+                }
+            } catch (err) {
+                showResult('', '网络错误，请检查服务器连接');
+                console.error(err);
+            }
+        }
+
+        async function convertToWav(blob) {
+            const arrayBuffer = await blob.arrayBuffer();
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 16000 });
+            const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+
+            const numChannels = 1;
+            const sampleRate = 16000;
+            const format = 1;
+            const bitsPerSample = 16;
+
+            const length = audioBuffer.length;
+            const channelData = audioBuffer.getChannelData(0);
+
+            const dataLength = length * numChannels * (bitsPerSample / 8);
+            const buffer = new ArrayBuffer(44 + dataLength);
+            const view = new DataView(buffer);
+
+            writeString(view, 0, 'RIFF');
+            view.setUint32(4, 36 + dataLength, true);
+            writeString(view, 8, 'WAVE');
+            writeString(view, 12, 'fmt ');
+            view.setUint32(16, 16, true);
+            view.setUint16(20, format, true);
+            view.setUint16(22, numChannels, true);
+            view.setUint32(24, sampleRate, true);
+            view.setUint32(28, sampleRate * numChannels * (bitsPerSample / 8), true);
+            view.setUint16(32, numChannels * (bitsPerSample / 8), true);
+            view.setUint16(34, bitsPerSample, true);
+            writeString(view, 36, 'data');
+            view.setUint32(40, dataLength, true);
+
+            let offset = 44;
+            for (let i = 0; i < length; i++) {
+                const sample = Math.max(-1, Math.min(1, channelData[i]));
+                view.setInt16(offset, sample < 0 ? sample * 0x8000 : sample * 0x7FFF, true);
+                offset += 2;
+            }
+
+            audioContext.close();
+            return new Blob([buffer], { type: 'audio/wav' });
+        }
+
+        function writeString(view, offset, string) {
+            for (let i = 0; i < string.length; i++) {
+                view.setUint8(offset + i, string.charCodeAt(i));
+            }
+        }
+
+        function showResult(recognized, errorMsg) {
+            const resultArea = document.getElementById('resultArea');
+            resultArea.classList.remove('hidden');
+
+            const playbackBtn = document.getElementById('playbackBtn');
+            if (lastRecordingBlob) {
+                playbackBtn.disabled = false;
+            }
+
+            if (errorMsg) {
+                document.getElementById('recognizedText').textContent = errorMsg;
+                document.getElementById('targetText').textContent = currentPrompt ? currentPrompt.en : '';
+                document.getElementById('scoreSection').classList.add('hidden');
+                document.getElementById('recordStatus').textContent = '识别失败，请重试';
+                return;
+            }
+
+            document.getElementById('recognizedText').textContent = recognized;
+            document.getElementById('targetText').textContent = currentPrompt ? currentPrompt.en : '';
+            document.getElementById('scoreSection').classList.remove('hidden');
+
+            const score = calculateScore(recognized, currentPrompt ? currentPrompt.en : '');
+            displayScore(score, recognized);
+            addHistory(recognized, score);
+            document.getElementById('recordStatus').textContent = '点击按钮开始录音';
+        }
+
+        function calculateScore(recognized, target) {
+            if (!target) return 0;
+            const recWords = recognized.toLowerCase().replace(/[^a-z0-9\s]/g, '').split(/\s+/).filter(w => w);
+            const tarWords = target.toLowerCase().replace(/[^a-z0-9\s]/g, '').split(/\s+/).filter(w => w);
+
+            if (recWords.length === 0) return 0;
+
+            let correct = 0;
+            const tarCopy = [...tarWords];
+            const diffResult = [];
+
+            for (const word of recWords) {
+                const idx = tarCopy.indexOf(word);
+                if (idx !== -1) {
+                    correct++;
+                    tarCopy.splice(idx, 1);
+                    diffResult.push({ word, type: 'correct' });
+                } else {
+                    diffResult.push({ word, type: 'wrong' });
+                }
+            }
+
+            for (const word of tarCopy) {
+                diffResult.push({ word, type: 'missing' });
+            }
+
+            const precision = recWords.length > 0 ? correct / recWords.length : 0;
+            const recall = tarWords.length > 0 ? correct / tarWords.length : 0;
+            const f1 = precision + recall > 0 ? 2 * precision * recall / (precision + recall) : 0;
+
+            return {
+                score: Math.round(f1 * 100),
+                diff: diffResult,
+                correct,
+                total: tarWords.length
+            };
+        }
+
+        function displayScore(scoreData, recognized) {
+            const score = scoreData.score;
+            const circle = document.getElementById('scoreCircle');
+            circle.textContent = score;
+
+            circle.className = 'score-circle';
+            if (score >= 80) circle.classList.add('score-excellent');
+            else if (score >= 60) circle.classList.add('score-good');
+            else if (score >= 40) circle.classList.add('score-fair');
+            else circle.classList.add('score-poor');
+
+            let comment = '';
+            if (score >= 90) comment = '太棒了！发音非常准确！🎉';
+            else if (score >= 80) comment = '很好！大部分单词都说对了！';
+            else if (score >= 60) comment = '不错，继续加油，注意标红的单词！';
+            else if (score >= 40) comment = '还需要多练习，仔细听参考文本的发音。';
+            else comment = '再试一次吧，慢慢说，注意每个单词的发音。';
+
+            document.getElementById('scoreComment').textContent = comment;
+
+            const diffContainer = document.getElementById('diffWords');
+            diffContainer.innerHTML = '';
+            scoreData.diff.forEach(item => {
+                const span = document.createElement('span');
+                span.className = `word word-${item.type}`;
+                span.textContent = item.word;
+                diffContainer.appendChild(span);
+            });
+        }
+
+        function addHistory(recognized, scoreData) {
+            const now = new Date();
+            const timeStr = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}`;
+
+            history.unshift({
+                time: timeStr,
+                prompt: currentPrompt ? currentPrompt.en : '',
+                spoken: recognized,
+                score: scoreData.score
+            });
+
+            if (history.length > 20) history.pop();
+            renderHistory();
+        }
+
+        function renderHistory() {
+            const list = document.getElementById('historyList');
+            if (history.length === 0) {
+                list.innerHTML = '<p style="color: #5a6384; text-align: center; padding: 20px;">暂无练习记录</p>';
+                return;
+            }
+
+            list.innerHTML = history.map(item => {
+                let scoreClass = 'score-poor';
+                if (item.score >= 80) scoreClass = 'score-excellent';
+                else if (item.score >= 60) scoreClass = 'score-good';
+                else if (item.score >= 40) scoreClass = 'score-fair';
+
+                return `
+                    <div class="history-item">
+                        <span class="hist-score ${scoreClass}" style="color: inherit">${item.score}分</span>
+                        <div class="time">${item.time}</div>
+                        <div class="prompt">📖 ${item.prompt}</div>
+                        <div class="spoken">🗣️ ${item.spoken}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        const AI_API_URL = 'https://open.bigmodel.cn/api/paas/v4/chat/completions';
+        const AI_MODEL = 'glm-4.5-flash';
+        const AI_API_KEY = 'aaf20d23b2f842ebb9a75252d0a1dbda.N4ten0XTQKkNQ0K4';
+
+        async function callAI(prompt, onStream) {
+            const response = await fetch(AI_API_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${AI_API_KEY}`
+                },
+                body: JSON.stringify({
+                    model: AI_MODEL,
+                    messages: [{ role: 'user', content: prompt }],
+                    temperature: 0.7,
+                    max_tokens: 2000,
+                    stream: true
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error('AI API 请求失败');
+            }
+
+            const reader = response.body.getReader();
+            const decoder = new TextDecoder();
+            let fullContent = '';
+
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+
+                const chunk = decoder.decode(value, { stream: true });
+                const lines = chunk.split('\n');
+
+                for (const line of lines) {
+                    if (line.startsWith('data: ')) {
+                        const data = line.slice(6);
+                        if (data === '[DONE]') break;
+
+                        try {
+                            const json = JSON.parse(data);
+                            if (json.choices && json.choices.length > 0) {
+                                const content = json.choices[0].delta?.content || '';
+                                if (content) {
+                                    fullContent += content;
+                                    if (onStream) onStream(fullContent);
+                                }
+                            }
+                        } catch (e) {}
+                    }
+                }
+            }
+
+            return fullContent;
+        }
+
+        function showAIModal(title) {
+            document.getElementById('aiModalTitle').textContent = title;
+            document.getElementById('aiModalBody').innerHTML = `
+                <div class="ai-loading">
+                    <div class="spinner"></div>
+                    <p>AI 正在分析中...</p>
+                </div>
+            `;
+            document.getElementById('aiModal').classList.add('show');
+        }
+
+        function closeAIModal() {
+            document.getElementById('aiModal').classList.remove('show');
+        }
+
+        async function showAISummary() {
+            if (history.length === 0) {
+                alert('暂无练习记录，请先进行口语练习！');
+                return;
+            }
+
+            showAIModal('🤖 AI 学习总结');
+
+            const summaryData = history.map(h => 
+                `参考句子: "${h.prompt}"\n你说的话: "${h.spoken}"\n得分: ${h.score}分`
+            ).join('\n\n');
+
+            const prompt = `你是一位专业的英语口语教练。请根据以下学生的练习记录，分析他们的发音问题和薄弱环节，并给出具体的改进建议。
+
+练习记录：
+${summaryData}
+
+请用中文回答，包含以下内容：
+1. 整体表现总结
+2. 常见错误分析（具体指出哪些单词发音有问题）
+3. 改进建议（给出具体的练习方法）
+4. 推荐重点练习的单词或句型`;
+
+            try {
+                await callAI(prompt, (content) => {
+                    document.getElementById('aiModalBody').innerHTML = `<div class="ai-result">${marked.parse(content)}</div>`;
+                });
+            } catch (err) {
+                document.getElementById('aiModalBody').innerHTML = `<p style="color: #ff6b6b;">AI 分析失败: ${err.message}</p>`;
+            }
+        }
+
+        async function generateAIPrompt() {
+            if (!currentTopic) {
+                alert('请先选择一个练习主题！');
+                return;
+            }
+
+            const btn = document.getElementById('aiGenerateBtn');
+            btn.disabled = true;
+            btn.textContent = '⏳ 生成中...';
+
+            const prompt = `请为"${currentTopic}"主题生成一个适合英语口语练习的句子。
+要求：
+1. 句子长度适中（10-20个单词）
+2. 使用常用词汇
+3. 语法正确
+4. 实用性强
+
+请直接返回JSON格式：{"en": "英文句子", "zh": "中文翻译"}`;
+
+            try {
+                const result = await callAI(prompt);
+                
+                const jsonMatch = result.match(/\{[\s\S]*\}/);
+                if (jsonMatch) {
+                    const data = JSON.parse(jsonMatch[0]);
+                    currentPrompt = data;
+                    document.getElementById('promptEn').textContent = data.en;
+                    document.getElementById('promptZh').textContent = data.zh;
+                    document.getElementById('resultArea').classList.add('hidden');
+                } else {
+                    alert('AI 返回格式错误，请重试');
+                }
+            } catch (err) {
+                alert('AI 生成失败: ' + err.message);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '✨ AI生成例句';
+            }
+        }
+
+        init();
+    </script>
+</body>
+</html>
